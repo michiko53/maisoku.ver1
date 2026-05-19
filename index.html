@@ -95,7 +95,7 @@
             </div>
             <div>
                 <span class="font-bold text-lg tracking-wider">マイソク作成ツール <span class="text-indigo-400">Pro</span></span>
-                <span class="text-xs text-slate-400 ml-2">試作中です！！</span>
+                <span class="text-xs text-slate-400 ml-2">プロ仕様・会社情報維持＆リセット版</span>
             </div>
         </div>
         
@@ -631,7 +631,7 @@
                                 <span id="txt-company" class="text-base font-black tracking-wider text-slate-900">株式会社 テクノホーム</span>
                                 <span id="txt-license" class="text-[8px] font-bold text-slate-500">東京都知事 (3) 第99999号</span>
                             </div>
-                            <div id="txt-company-address" class="text-[9px] text-slate-600 mt-1">東京都江戸川区東葛西6-4-17ELLEPLAN1F</div>
+                            <div id="txt-company-address" class="text-[9px] text-slate-600 mt-1">東京都江戸川区中葛西1-2-3 テクノビル1F</div>
                         </div>
 
                         <!-- 電話・FAX（巨大で見やすい表記） -->
@@ -1136,17 +1136,29 @@
            【新規追加機能】新規作成（クリア） ＆ 保存（エクスポート） ＆ 読込（インポート）
            ========================================================================== */
 
-        // 1. 新規作成（すべてのフォームデータを初期化）
+        // 1. 新規作成（すべてのフォームデータを初期化、ただし会社情報などは維持）
         function createNewMaisoku() {
-            if (!confirm("現在の編集内容が消去されます。新しく物件情報を作成してもよろしいですか？")) {
+            if (!confirm("現在の編集内容（物件情報）が消去されます。新しく物件情報を作成してもよろしいですか？\n※会社情報や取引条件はそのまま維持されます。")) {
                 return;
             }
 
-            // 主要なテキスト項目を真っ白に、またはデフォルト値に変更
-            const emptyData = {
-                'top-ribbon': "【アピールタイトルをここに入力】",
+            // 現在入力されている「保持したい会社帯情報＆仲介条件」の値を退避
+            const savedCompanyData = {
+                'deal': document.getElementById('input-deal').value,
+                'commission': document.getElementById('input-commission').value,
+                'ad': document.getElementById('input-ad').value,
+                'company': document.getElementById('input-company').value,
+                'license': document.getElementById('input-license').value,
+                'company-address': document.getElementById('input-company-address').value,
+                'tel': document.getElementById('input-tel').value,
+                'fax': document.getElementById('input-fax').value,
+            };
+
+            // 物件情報リセットデータ
+            const emptyPropertyData = {
+                'top-ribbon': "【物件のアピールタイトルをここに入力】",
                 'building-name': "【物件名】",
-                'sub-catch': "【アピールポイントや特記事項を入力】",
+                'sub-catch': "【アピールサブキャッチコピー、特記事項を入力】",
                 'rent': "0",
                 'service': "0",
                 'shikikin': "なし",
@@ -1156,27 +1168,40 @@
                 'layout': "1R",
                 'area': "20.00",
                 'balcony': "0.00㎡",
-                'address': "東京都江戸川区",
+                'address': "東京都",
                 'structure': "RC造",
                 'built': "2026年築",
                 'entry': "相談",
                 'contract': "普通借家 2年",
                 'status': "空室",
-                'route': "最寄りの路線名",
-                'station': "葛西",
+                'route': "路線名",
+                'station': "〇〇",
                 'walk': "5",
                 'room': "101号室"
             };
 
-            applyInputSet(emptyData);
+            // 物件情報のみリセット
+            applyInputSet(emptyPropertyData);
 
-            // アピール設備をクリア
+            // おすすめ設備・アピール条件をクリア
             selectedFeatures = [];
             updateFeaturesUI();
 
-            // 間取り図、写真をリセット（選択中のノーマル等に初期化）
+            // 退避していた会社情報＆仲介条件を再セット
+            for (const [key, value] of Object.entries(savedCompanyData)) {
+                const input = document.getElementById(`input-${key}`);
+                if (input) {
+                    input.value = value;
+                }
+                updateValue(key, value);
+            }
+
+            // 写真と間取りを現在のテーマ（スタイル）の初期状態にリセット
             hasCustomFloorplan = false;
-            applyStylePreset('normal'); // デフォルトは標準テーマにする
+            setPresetPhotos(currentTheme);
+            setPresetFloorplan(currentTheme);
+
+            // レイアウトは標準の「写真メイン」にする
             applyLayoutPreset('photo');
         }
 
