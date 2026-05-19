@@ -73,12 +73,6 @@
             border-radius: 4px;
         }
 
-        /* 縦書きテキスト */
-        .writing-mode-vertical {
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-        }
-
         /* テーマ別のスタイルクラス切り替え用 */
         .theme-highgrade {
             font-family: 'Shippori Mincho', 'Noto Sans JP', serif;
@@ -100,17 +94,38 @@
                 <i class="fa-solid fa-file-invoice text-lg"></i>
             </div>
             <div>
-                <span class="font-bold text-lg tracking-wider">マイソクメーカー <span class="text-indigo-400">Pro</span></span>
-                <span class="text-xs text-slate-400 ml-2">プロ仕様・複数写真＆間取り連動版</span>
+                <span class="font-bold text-lg tracking-wider">マイソク作成ツール <span class="text-indigo-400">Pro</span></span>
+                <span class="text-xs text-slate-400 ml-2">試作中です！！</span>
             </div>
         </div>
-        <div class="flex items-center space-x-4">
-            <span class="text-xs bg-slate-800 text-slate-300 px-3 py-1.5 rounded border border-slate-700">
-                <i class="fa-solid fa-circle-info text-indigo-400 mr-1"></i> どのような画像サイズでもレイアウトが絶対に崩れません
-            </span>
-            <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition px-5 py-2 rounded font-bold text-sm flex items-center space-x-2 shadow-lg">
+        
+        <!-- ヘッダーアクション群 -->
+        <div class="flex items-center space-x-3">
+            <!-- 新規作成（リセット） -->
+            <button onclick="createNewMaisoku()" class="bg-slate-800 hover:bg-slate-700 active:scale-95 transition text-slate-200 border border-slate-700 px-3.5 py-2 rounded font-bold text-xs flex items-center space-x-1.5 shadow">
+                <i class="fa-solid fa-file-circle-plus text-sky-400"></i>
+                <span>新規作成</span>
+            </button>
+
+            <!-- データ読込（JSONインポート） -->
+            <button onclick="triggerImport()" class="bg-slate-800 hover:bg-slate-700 active:scale-95 transition text-slate-200 border border-slate-700 px-3.5 py-2 rounded font-bold text-xs flex items-center space-x-1.5 shadow">
+                <i class="fa-solid fa-upload text-amber-400"></i>
+                <span>データ読込</span>
+            </button>
+            <input type="file" id="input-import-json" accept=".json" onchange="importMaisokuData(event)" class="hidden">
+
+            <!-- データ保存（JSONエクスポート） -->
+            <button onclick="exportMaisokuData()" class="bg-indigo-900 hover:bg-indigo-800 active:scale-95 transition text-indigo-100 border border-indigo-700 px-3.5 py-2 rounded font-bold text-xs flex items-center space-x-1.5 shadow">
+                <i class="fa-solid fa-download text-indigo-300"></i>
+                <span>データ保存</span>
+            </button>
+
+            <span class="h-6 w-px bg-slate-800"></span>
+
+            <!-- PDF/印刷 -->
+            <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition px-4 py-2 rounded font-bold text-xs flex items-center space-x-2 shadow-lg">
                 <i class="fa-solid fa-print"></i>
-                <span>PDF保存・印刷する (A4横)</span>
+                <span>PDF保存・印刷する</span>
             </button>
         </div>
     </header>
@@ -138,7 +153,7 @@
                             <i class="fa-solid fa-image text-amber-600 text-base mb-1"></i>
                             <span class="text-[11px] font-bold">写真メイン</span>
                         </button>
-                        <button onclick="applyLayoutPreset('floorplan')" id="btn-layout-floorplan" class="layout-btn bg-white border-2 border-amber-500 text-amber-950 rounded-lg p-2 text-center hover:bg-slate-50 active:scale-95 transition flex flex-col items-center">
+                        <button onclick="applyLayoutPreset('floorplan')" id="btn-layout-floorplan" class="layout-btn bg-white border border-slate-200 text-slate-700 rounded-lg p-2 text-center hover:bg-slate-50 active:scale-95 transition flex flex-col items-center">
                             <i class="fa-solid fa-drafting-compass text-amber-600 text-base mb-1"></i>
                             <span class="text-[11px] font-bold">間取り図メイン</span>
                         </button>
@@ -153,7 +168,7 @@
                 <div class="bg-indigo-50 p-3.5 rounded-xl border border-indigo-100 space-y-2.5">
                     <span class="text-xs font-black text-indigo-950 block"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> 建物デザイン・タイプ選択（写真/間取り連動）</span>
                     <div class="grid grid-cols-3 gap-2">
-                        <button onclick="applyStylePreset('highgrade')" id="btn-preset-highgrade" class="preset-btn bg-white border-2 border-indigo-600 text-indigo-950 rounded-lg p-2 text-center hover:bg-slate-50 active:scale-95 transition flex flex-col items-center">
+                        <button onclick="applyStylePreset('highgrade')" id="btn-preset-highgrade" class="preset-btn bg-white border border-slate-200 text-slate-700 rounded-lg p-2 text-center hover:bg-slate-50 active:scale-95 transition flex flex-col items-center">
                             <i class="fa-solid fa-crown text-amber-500 text-base mb-1"></i>
                             <span class="text-xs font-bold">ハイグレード</span>
                             <span class="text-[9px] text-slate-400">(2SLDK)</span>
@@ -176,10 +191,10 @@
                     <h3 class="font-bold text-xs text-slate-900 border-l-4 border-indigo-600 pl-2 uppercase tracking-wider">1. キャッチコピー・建物名</h3>
                     <div>
                         <label class="block text-[11px] font-bold text-slate-500 mb-1">最上部アピール帯</label>
-                        <input type="text" id="input-top-ribbon" oninput="updateValue('top-ribbon', this.value)" value="90㎡超・ペット可・床暖房付きRCハイグレードデザイナーズ" class="w-full border border-slate-300 rounded px-2.5 py-1.5 text-xs focus:outline-indigo-500 font-medium font-bold">
+                        <input type="text" id="input-top-ribbon" oninput="updateValue('top-ribbon', this.value)" value="90㎡超・ペット可・床暖房付きRCハイグレードデザイナーズ" class="w-full border border-slate-300 rounded px-2.5 py-1.5 text-xs focus:outline-indigo-500 font-bold">
                     </div>
                     <div>
-                        <label class="block text-[11px] font-bold text-slate-500 mb-1">建物名（マイソクの中心となる名前）</label>
+                        <label class="block text-[11px] font-bold text-slate-500 mb-1">建物名</label>
                         <input type="text" id="input-building-name" oninput="updateValue('building-name', this.value)" value="フレスタンテ中葛西" class="w-full border border-slate-300 rounded px-2.5 py-1.5 text-xs font-bold focus:outline-indigo-500">
                     </div>
                     <div>
@@ -280,6 +295,82 @@
                     </div>
                 </div>
 
+                <!-- 4.5 おすすめ設備・アピール条件 -->
+                <div class="space-y-4 bg-indigo-50/50 p-3 rounded-xl border border-indigo-100">
+                    <div class="flex items-center justify-between border-b border-indigo-100 pb-1.5">
+                        <h3 class="font-bold text-xs text-indigo-950 border-l-4 border-indigo-600 pl-2 uppercase tracking-wider">4.5 アピール・設備条件</h3>
+                        <span id="features-counter" class="text-[10px] bg-indigo-100 text-indigo-800 font-bold px-2 py-0.5 rounded-full">0/7 件</span>
+                    </div>
+
+                    <!-- 選択中のアピール項目一覧 -->
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold text-slate-600">選択・入力中の項目 (直接編集＆削除可能)</label>
+                        <div id="selected-features-list" class="space-y-1.5">
+                            <!-- JSで直接テキストを編集できる個別input要素群が動的生成されます -->
+                        </div>
+                        
+                        <!-- 自由追加フォーム -->
+                        <div class="flex gap-1.5 pt-1">
+                            <input type="text" id="input-new-feature" placeholder="自由なアピールを新しく追加" class="flex-1 border border-slate-300 rounded px-2.5 py-1 text-xs focus:outline-indigo-500">
+                            <button onclick="addNewFeature()" class="bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white font-bold px-3 py-1 rounded text-xs transition shrink-0">
+                                追加
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- ワンタップで追加できるプリセット設備リスト -->
+                    <div class="space-y-2.5 pt-2 border-t border-indigo-100">
+                        <span class="block text-[11px] font-bold text-slate-600"><i class="fa-solid fa-wand-magic-sparkles text-indigo-500 mr-1"></i> ワンタップ追加・削除プリセット</span>
+                        
+                        <div class="space-y-2 text-[10px]">
+                            <!-- セキュリティ -->
+                            <div>
+                                <span class="text-[9px] font-bold text-slate-400 block mb-1">【防犯・共用】</span>
+                                <div class="flex flex-wrap gap-1" id="preset-group-security">
+                                    <!-- ボタン群 -->
+                                </div>
+                            </div>
+                            <!-- 水回り -->
+                            <div>
+                                <span class="text-[9px] font-bold text-slate-400 block mb-1">【水回り・台所】</span>
+                                <div class="flex flex-wrap gap-1" id="preset-group-water">
+                                    <!-- ボタン群 -->
+                                </div>
+                            </div>
+                            <!-- 部屋・その他 -->
+                            <div>
+                                <span class="text-[9px] font-bold text-slate-400 block mb-1">【快適・その他】</span>
+                                <div class="flex flex-wrap gap-1" id="preset-group-comfort">
+                                    <!-- ボタン群 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. 物件概要（テーブル連動） -->
+                <div class="space-y-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <h3 class="font-bold text-xs text-slate-900 border-l-4 border-indigo-600 pl-2 uppercase tracking-wider">5. 物件概要詳細</h3>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">築年月</label>
+                            <input type="text" id="input-built" oninput="updateValue('built', this.value)" value="2020年3月" class="w-full border border-slate-300 rounded px-2 py-1 text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">入居日</label>
+                            <input type="text" id="input-entry" oninput="updateValue('entry', this.value)" value="即時可能" class="w-full border border-slate-300 rounded px-2 py-1 text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">契約期間</label>
+                            <input type="text" id="input-contract" oninput="updateValue('contract', this.value)" value="普通借家 2年" class="w-full border border-slate-300 rounded px-2 py-1 text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">現況</label>
+                            <input type="text" id="input-status" oninput="updateValue('status', this.value)" value="空室" class="w-full border border-slate-300 rounded px-2 py-1 text-xs">
+                        </div>
+                    </div>
+                </div>
+
                 <!-- 6. 写真・図面アップロード (複数写真用) -->
                 <div class="space-y-4 bg-slate-50 p-3 rounded-lg border border-slate-200">
                     <h3 class="font-bold text-xs text-slate-900 border-l-4 border-indigo-600 pl-2 uppercase tracking-wider">6. 写真（最大3枚）＆図面の挿入</h3>
@@ -298,27 +389,60 @@
                             <input type="file" accept="image/*" onchange="previewMultipleImages(event, 3)" class="block w-full text-[10px] text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
                         </div>
                         <div class="pt-1 border-t border-slate-200">
-                            <label class="block font-bold text-slate-700 mb-1">④ 間取り図面（手動上書き）</label>
-                            <input type="file" accept="image/*" onchange="previewImage(event, 'uploaded-floorplan')" class="block w-full text-[10px] text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+                            <label class="block font-bold text-slate-700 mb-1">④ 間取り図面（手動アップロード）</label>
+                            <input type="file" accept="image/*" onchange="previewImage(event)" class="block w-full text-[10px] text-slate-500 file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
                         </div>
                     </div>
 
                     <div class="flex flex-col gap-1.5 pt-1.5 border-t border-slate-200">
-                        <button onclick="resetPhotos()" class="text-[10px] bg-red-50 text-red-600 border border-red-200 px-2 py-1 rounded font-bold hover:bg-red-100 active:scale-95 transition text-center">
-                            <i class="fa-solid fa-image mr-1"></i> 全ての物件写真をデフォルトに戻す
+                        <button onclick="resetPhotos()" class="text-[10px] bg-red-50 text-red-600 border border-red-200 px-2 py-1.5 rounded font-bold hover:bg-red-100 active:scale-95 transition text-center">
+                            <i class="fa-solid fa-image mr-1"></i> 全ての物件写真をデフォルト（AI描画）に戻す
                         </button>
-                        <button onclick="resetFloorplan()" class="text-[10px] bg-red-50 text-red-600 border border-red-200 px-2 py-1 rounded font-bold hover:bg-red-100 active:scale-95 transition text-center">
-                            <i class="fa-solid fa-rotate-left mr-1"></i> 間取り図を自動生成プランに戻す
+                        <button onclick="resetFloorplan()" class="text-[10px] bg-red-50 text-red-600 border border-red-200 px-2 py-1.5 rounded font-bold hover:bg-red-100 active:scale-95 transition text-center">
+                            <i class="fa-solid fa-rotate-left mr-1"></i> 間取り図を自動生成（テーマ連動）に戻す
                         </button>
                     </div>
                 </div>
 
-                <!-- 8. 元付・帯情報 -->
+                <!-- 7. 帯情報（元付・客付・AD） -->
+                <div class="space-y-3 bg-amber-50/50 p-3 rounded-xl border border-amber-100">
+                    <h3 class="font-bold text-xs text-amber-950 border-l-4 border-amber-600 pl-2 uppercase tracking-wider">7. 仲介条件表記設定</h3>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">取引態様</label>
+                            <select id="input-deal" onchange="updateValue('deal', this.value)" class="w-full border border-slate-300 rounded px-1.5 py-1 text-xs">
+                                <option value="専任媒介" selected>専任媒介</option>
+                                <option value="専属専任">専属専任</option>
+                                <option value="一般媒介">一般媒介</option>
+                                <option value="貸主">貸主</option>
+                                <option value="代理">代理</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">手数料率</label>
+                            <input type="text" id="input-commission" oninput="updateValue('commission', this.value)" value="分かれ" class="w-full border border-slate-300 rounded px-1.5 py-1 text-xs">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 mb-1">広告報酬(AD)</label>
+                            <input type="text" id="input-ad" oninput="updateValue('ad', this.value)" value="AD 100%" class="w-full border border-slate-300 rounded px-1.5 py-1 text-xs font-bold text-emerald-700">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 8. 元付・会社情報 -->
                 <div class="space-y-3">
-                    <h3 class="font-bold text-xs text-slate-900 border-l-4 border-indigo-600 pl-2 uppercase tracking-wider">8. 帯（会社情報）と仲介条件</h3>
+                    <h3 class="font-bold text-xs text-slate-900 border-l-4 border-indigo-600 pl-2 uppercase tracking-wider">8. 帯（会社情報）</h3>
                     <div>
                         <label class="block text-[11px] font-bold text-slate-500 mb-1">会社名</label>
                         <input type="text" id="input-company" oninput="updateValue('company', this.value)" value="株式会社 テクノホーム" class="w-full border border-slate-300 rounded px-2.5 py-1.5 text-xs font-bold focus:outline-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 mb-1">免許番号</label>
+                        <input type="text" id="input-license" oninput="updateValue('license', this.value)" value="東京都知事 (3) 第99999号" class="w-full border border-slate-300 rounded px-2.5 py-1.5 text-xs focus:outline-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-500 mb-1">住所</label>
+                        <input type="text" id="input-company-address" oninput="updateValue('company-address', this.value)" value="東京都江戸川区中葛西1-2-3 テクノビル1F" class="w-full border border-slate-300 rounded px-2.5 py-1.5 text-xs focus:outline-indigo-500">
                     </div>
                     <div class="grid grid-cols-2 gap-2">
                         <div>
@@ -341,8 +465,8 @@
             <div id="zoom-container" class="origin-center transition-transform duration-200">
                 <div id="maisoku-canvas" class="maisoku-paper print-container flex flex-col p-4 justify-between theme-highgrade">
                     
-                    <!-- 1. 最上部アピールリボン（デザインイメージ・カラーが適応） -->
-                    <div id="badge-top-ribbon" class="bg-amber-950 text-white py-2.5 px-4 rounded flex justify-between items-center transition-all duration-300">
+                    <!-- 1. 最上部アピールリボン -->
+                    <div id="badge-top-ribbon" class="bg-amber-950 text-white py-2.5 px-4 rounded flex justify-between items-center transition-all duration-300 shrink-0">
                         <span id="txt-top-ribbon" class="text-base font-bold tracking-widest leading-none">90㎡超・ペット可・床暖房付きRCハイグレードデザイナーズ</span>
                         <div class="flex items-center space-x-2">
                             <span id="txt-direction-badge" class="bg-white/15 text-white font-bold px-2 py-0.5 rounded text-[10px]">南向き</span>
@@ -351,7 +475,7 @@
                     </div>
 
                     <!-- 2. ヘッドラインセクション（最寄駅・物件名・家賃） -->
-                    <div class="grid grid-cols-12 gap-3 mt-2.5 items-stretch">
+                    <div class="grid grid-cols-12 gap-3 mt-2.5 items-stretch shrink-0">
                         
                         <!-- 最寄駅（左側） -->
                         <div class="col-span-3 border border-slate-300 bg-slate-50/80 rounded p-2 flex flex-col justify-center items-center text-center">
@@ -385,34 +509,33 @@
                         </div>
                     </div>
 
-                    <!-- 3. ビジュアルブロック (複数写真グリッド対応・絶対領域サイズ保証) -->
-                    <div id="dynamic-grid" class="grid grid-cols-12 gap-3 mt-2.5 flex-1 overflow-hidden" style="max-height: 385px; min-height: 385px;">
+                    <!-- 3. ビジュアルブロック (複数写真グリッド対応) -->
+                    <div id="dynamic-grid" class="grid grid-cols-12 gap-3 mt-2.5 overflow-hidden" style="height: 330px; min-height: 330px; max-height: 330px;">
                         
-                        <!-- A. 外観・お部屋マルチ写真ブロック (絶対幅・高さ崩壊ガード付) -->
+                        <!-- A. 外観・お部屋マルチ写真ブロック -->
                         <div id="cell-exterior" class="col-span-4 flex flex-col justify-between h-full transition-all duration-300 overflow-hidden">
-                            <!-- 写真コンテナ（高さが画像をアップロードしても絶対に広がらないよう h-0 と relative を使用） -->
                             <div class="w-full flex-1 flex flex-col space-y-1.5 min-h-0 h-0">
                                 <!-- ① メイン・外観写真 (上部) -->
-                                <div class="flex-[10] relative bg-slate-100 border border-slate-300 rounded overflow-hidden">
-                                    <img id="preview-photo-1" src="" alt="メイン物件写真" class="absolute inset-0 w-full h-full object-cover">
+                                <div class="flex-[10] relative bg-slate-100 border border-slate-300 rounded overflow-hidden shadow-sm">
+                                    <div id="preview-photo-1" class="absolute inset-0 w-full h-full bg-cover bg-center transition-all duration-300"></div>
                                     <div class="absolute bottom-1 left-1 bg-slate-900/85 text-white text-[8px] px-1.5 py-0.5 rounded font-medium select-none">① メイン / 外観</div>
                                 </div>
                                 <!-- ②③ サブ写真2枚横並び (下部) -->
                                 <div class="flex-[7] grid grid-cols-2 gap-1.5 min-h-0 h-0">
                                     <!-- ②内装・リビング -->
-                                    <div class="relative bg-slate-100 border border-slate-300 rounded overflow-hidden">
-                                        <img id="preview-photo-2" src="" alt="内装写真" class="absolute inset-0 w-full h-full object-cover">
-                                        <div class="absolute bottom-1 left-1 bg-slate-900/85 text-white text-[8px] px-1 py-0.5 rounded font-medium select-none">② 内装・室内</div>
+                                    <div class="relative bg-slate-100 border border-slate-300 rounded overflow-hidden shadow-sm">
+                                        <div id="preview-photo-2" class="absolute inset-0 w-full h-full bg-cover bg-center transition-all duration-300"></div>
+                                        <div class="absolute bottom-1 left-1 bg-slate-900/85 text-white text-[8px] px-1 py-0.5 rounded font-medium select-none">② 内装・リビング</div>
                                     </div>
                                     <!-- ③水回り・共用部等 -->
-                                    <div class="relative bg-slate-100 border border-slate-300 rounded overflow-hidden">
-                                        <img id="preview-photo-3" src="" alt="その他設備写真" class="absolute inset-0 w-full h-full object-cover">
-                                        <div class="absolute bottom-1 left-1 bg-slate-900/85 text-white text-[8px] px-1 py-0.5 rounded font-medium select-none">③ 水回り・その他</div>
+                                    <div class="relative bg-slate-100 border border-slate-300 rounded overflow-hidden shadow-sm">
+                                        <div id="preview-photo-3" class="absolute inset-0 w-full h-full bg-cover bg-center transition-all duration-300"></div>
+                                        <div class="absolute bottom-1 left-1 bg-slate-900/85 text-white text-[8px] px-1 py-0.5 rounded font-medium select-none">③ 水回り・設備</div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <!-- 下部簡易お部屋情報 (高さを固定し写真エリアを侵害しない) -->
+                            <!-- 下部簡易お部屋情報 -->
                             <div class="grid grid-cols-3 gap-1 mt-1.5 bg-slate-50 p-1 border border-slate-300 rounded text-center shrink-0">
                                 <div>
                                     <div class="text-[7px] text-slate-400 font-bold leading-none">間取り</div>
@@ -429,15 +552,14 @@
                             </div>
                         </div>
 
-                        <!-- B. 間取り図ブロック (アスペクト比維持しつつ最大幅フィット) -->
+                        <!-- B. 間取り図ブロック -->
                         <div id="cell-floorplan" class="col-span-5 flex flex-col h-full transition-all duration-300 overflow-hidden">
                             <div class="w-full h-full bg-white border border-slate-300 rounded overflow-hidden relative p-2" id="floorplan-container">
-                                <!-- wrapperをabsolute化して親のレイアウトサイズ崩しを完全防止 -->
                                 <div id="preview-floorplan-wrapper" class="absolute inset-2 flex items-center justify-center">
-                                    <!-- JSでSVGが動的に入る、またはimgタグが描画されます -->
+                                    <!-- JSでSVGが動的に入ります -->
                                 </div>
-                                <div class="absolute bottom-1.5 left-1.5 bg-indigo-900/90 text-white text-[8px] px-1.5 py-0.5 rounded font-medium select-none">
-                                    <i class="fa-solid fa-house-chimney mr-1"></i>間取り図プラン
+                                <div class="absolute bottom-1.5 left-1.5 bg-slate-950/85 text-white text-[8px] px-1.5 py-0.5 rounded font-medium select-none shadow">
+                                    <i class="fa-solid fa-house-chimney mr-1 text-yellow-400"></i>間取り
                                 </div>
                             </div>
                         </div>
@@ -446,623 +568,740 @@
                         <div id="cell-features" class="col-span-3 flex flex-col h-full transition-all duration-300 overflow-hidden">
                             <div class="border border-slate-300 rounded bg-white p-2.5 h-full flex flex-col overflow-hidden">
                                 <div id="badge-features-header" class="text-[10px] font-bold text-white bg-amber-950 py-1 rounded text-center tracking-wider mb-2 shrink-0 select-none">
-                                    おすすめ設備・条件
+                                    おすすめ設備・アピール条件
                                 </div>
                                 
-                                <!-- 通常リスト（高さを溢れさせないよう max-h-full & overflow-hidden を設定） -->
-                                <ul id="features-list" class="space-y-1.5 text-[9px] text-slate-700 overflow-hidden flex-1 min-h-0">
-                                    <li id="feat-pet" class="flex items-center space-x-1.5 border-b border-dashed border-slate-200 pb-1 font-bold">
-                                        <i class="fa-solid fa-square-check text-amber-600 text-[10px]"></i>
-                                        <span class="truncate">ペット飼育相談（猫・小型犬）</span>
-                                    </li>
-                                    <li id="feat-floor-heating" class="flex items-center space-x-1.5 border-b border-dashed border-slate-200 pb-1 font-bold">
-                                        <i class="fa-solid fa-square-check text-amber-600 text-[10px]"></i>
-                                        <span class="truncate">ガス温水床暖房完備</span>
-                                    </li>
-                                    <li id="feat-autolock" class="flex items-center space-x-1.5 border-b border-dashed border-slate-200 pb-1 font-bold">
-                                        <i class="fa-solid fa-square-check text-amber-600 text-[10px]"></i>
-                                        <span class="truncate">カラーモニター付オートロック</span>
-                                    </li>
-                                    <li id="feat-delivery" class="flex items-center space-x-1.5 border-b border-dashed border-slate-200 pb-1 font-bold">
-                                        <i class="fa-solid fa-square-check text-amber-600 text-[10px]"></i>
-                                        <span class="truncate">24時間対応宅配ボックス</span>
-                                    </li>
-                                    <li id="feat-system-kitchen" class="flex items-center space-x-1.5 border-b border-dashed border-slate-200 pb-1 font-bold">
-                                        <i class="fa-solid fa-square-check text-amber-600 text-[10px]"></i>
-                                        <span class="truncate">3口IHシステムキッチン（食洗機付）</span>
-                                    </li>
-                                    <li id="feat-dryer" class="flex items-center space-x-1.5 border-b border-dashed border-slate-200 pb-1 font-bold">
-                                        <i class="fa-solid fa-square-check text-amber-600 text-[10px]"></i>
-                                        <span class="truncate">浴室暖房乾燥機・追焚機能</span>
-                                    </li>
-                                    <li id="feat-elevator" class="flex items-center space-x-1.5 border-b border-dashed border-slate-200 pb-1 font-bold">
-                                        <i class="fa-solid fa-square-check text-amber-600 text-[10px]"></i>
-                                        <span class="truncate">乗用エレベーター搭載</span>
-                                    </li>
-                                    <li id="feat-washlet" class="flex items-center space-x-1.5 border-b border-dashed border-slate-200 pb-1 font-bold">
-                                        <i class="fa-solid fa-square-check text-amber-600 text-[10px]"></i>
-                                        <span class="truncate">温水洗浄暖房便座（独立トイレ）</span>
-                                    </li>
-                                    <li id="feat-counter" class="flex items-center space-x-1.5 border-b border-dashed border-slate-200 pb-1 font-bold">
-                                        <i class="fa-solid fa-square-check text-amber-600 text-[10px]"></i>
-                                        <span class="truncate">対面式ペニンシュラキッチン</span>
-                                    </li>
-                                    <li id="feat-net" class="flex items-center space-x-1.5 border-b border-dashed border-slate-200 pb-1 font-bold">
-                                        <i class="fa-solid fa-square-check text-amber-600 text-[10px]"></i>
-                                        <span class="truncate">光ファイバーインターネット無料</span>
-                                    </li>
+                                <ul id="features-list" class="space-y-1.5 text-[9.5px] text-slate-700 overflow-hidden flex-1 min-h-0">
+                                    <!-- JSにより自動的に項目が追加されます -->
                                 </ul>
-
-                                <!-- 追加：情報メイン時に出現する「詳細備考/アピールポイント枠」 -->
-                                <div id="info-points-box" class="hidden flex-1 flex-col justify-between mt-1 text-[9px] text-slate-600 leading-normal border-t border-slate-100 pt-2 shrink-0">
-                                    <div class="bg-slate-50 p-2 rounded border border-slate-100">
-                                        <span class="font-bold text-slate-800 text-[10px] block mb-1">■ ライフインフォメーション</span>
-                                        <ul class="space-y-1">
-                                            <li>・ファミリーマート 中葛西店 … 徒歩3分</li>
-                                            <li>・ワイズマート 葛西店 ……… 徒歩7分</li>
-                                            <li>・区立新田小学校 …………… 徒歩5分</li>
-                                        </ul>
-                                    </div>
-                                    <div class="bg-amber-50/50 p-2 rounded border border-amber-100 mt-1">
-                                        <span class="font-bold text-amber-900 text-[10px] block mb-1">■ 特記事項・ペット条件</span>
-                                        <p>小型犬・猫合計2匹飼育の場合、敷金＋2ヶ月追加（退去時償却）。1年未満の早期解約時は違約金が発生いたします。</p>
-                                    </div>
-                                </div>
-
                             </div>
                         </div>
                     </div>
 
-                    <!-- 4. 物件概要（高さが膨らまないよう固定サイズの10px文字で構成） -->
-                    <div class="grid grid-cols-12 gap-2 mt-2.5 border border-slate-300 rounded overflow-hidden bg-white text-[10px] shrink-0">
-                        <!-- 左側：縦帯見出し（テーマ対応） -->
-                        <div id="badge-outline-header" class="col-span-1 bg-amber-950 text-white font-bold flex items-center justify-center p-1 text-center writing-mode-vertical tracking-widest text-xs select-none">
-                            物件概要
-                        </div>
-                        
-                        <!-- 右側：網羅データグリッド -->
-                        <div class="col-span-11 grid grid-cols-4 p-2 gap-x-3 gap-y-1 bg-white leading-tight">
-                            <!-- 行1 -->
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-0.5">
-                                <span class="text-slate-400 font-bold">所在地</span>
-                                <span id="txt-address" class="text-slate-800 font-bold truncate max-w-[150px]">東京都江戸川区中葛西2-26-16</span>
-                            </div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-0.5">
-                                <span class="text-slate-400 font-bold">構造・規模</span>
-                                <span id="txt-structure" class="text-slate-800 font-bold">RC造 5階建</span>
-                            </div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-0.5">
-                                <span class="text-slate-400 font-bold">完成築年月</span>
-                                <span id="txt-built" class="text-slate-800 font-bold">2018年4月</span>
-                            </div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-0.5">
-                                <span class="text-slate-400 font-bold">バルコニー</span>
-                                <span id="txt-balcony" class="text-slate-800 font-bold">36.70㎡</span>
-                            </div>
-
-                            <!-- 行2 -->
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-0.5">
-                                <span class="text-slate-400 font-bold">敷金 / 礼金</span>
-                                <span class="text-slate-800 font-bold"><span id="txt-shikikin">1ヶ月</span> / <span id="txt-reikin">1ヶ月</span></span>
-                            </div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-0.5">
-                                <span class="text-slate-400 font-bold">保証金 / 償却</span>
-                                <span id="txt-deposit" class="text-slate-800 font-bold">なし / なし</span>
-                            </div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-0.5">
-                                <span class="text-slate-400 font-bold">契約期間</span>
-                                <span id="txt-contract-type" class="text-slate-800 font-bold">普通借家契約 2年</span>
-                            </div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-0.5">
-                                <span class="text-slate-400 font-bold">更新料</span>
-                                <span id="txt-renewal" class="text-slate-800 font-bold">新賃料の1ヶ月分</span>
-                            </div>
-
-                            <!-- 行3 -->
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-0.5">
-                                <span class="text-slate-400 font-bold">鍵交換費用</span>
-                                <span id="txt-key-fee" class="text-slate-800 font-bold">22,000円</span>
-                            </div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-0.5">
-                                <span class="text-slate-400 font-bold">火災保険料</span>
-                                <span id="txt-insurance" class="text-slate-800 font-bold">16,000円〜 / 2年</span>
-                            </div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-0.5">
-                                <span class="text-slate-400 font-bold">保証会社</span>
-                                <span id="txt-guarantor" class="text-slate-800 font-bold truncate max-w-[120px]">Casa / 初回50%</span>
-                            </div>
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-0.5">
-                                <span class="text-slate-400 font-bold">総戸数 / 向き</span>
-                                <span class="text-slate-800 font-bold"><span id="txt-total-units">24戸</span> / <span id="txt-direction">南向き</span></span>
-                            </div>
-
-                            <!-- 行4 -->
-                            <div class="flex items-center justify-between">
-                                <span class="text-slate-400 font-bold">現況</span>
-                                <span id="txt-status" class="text-slate-800 font-bold">6/8空き予定</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-slate-400 font-bold">入居時期</span>
-                                <span id="txt-availability" class="text-slate-800 font-bold">6月下旬以降</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-slate-400 font-bold">駐車場等</span>
-                                <span id="txt-parking" class="text-slate-800 font-bold truncate max-w-[120px]">22,000円（屋根付）</span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-slate-400 font-bold">駐輪場等</span>
-                                <span id="txt-bicycle" class="text-slate-800 font-bold">あり（無料）</span>
-                            </div>
-                        </div>
+                    <!-- 4. 物件概要（テーブル） -->
+                    <div class="mt-2.5 border border-slate-300 rounded overflow-hidden bg-white shrink-0">
+                        <table class="w-full text-left border-collapse table-fixed">
+                            <tbody>
+                                <tr class="border-b border-slate-200 text-[9px]">
+                                    <td class="bg-slate-100 p-1.5 font-bold text-slate-600 text-center w-[10%] border-r border-slate-200">所在地</td>
+                                    <td class="p-1.5 text-slate-800 w-[40%] border-r border-slate-200 truncate" id="txt-address">東京都江戸川区中葛西2-26-16</td>
+                                    <td class="bg-slate-100 p-1.5 font-bold text-slate-600 text-center w-[10%] border-r border-slate-200">構造規模</td>
+                                    <td class="p-1.5 text-slate-800 w-[15%] border-r border-slate-200" id="txt-structure">RC造 5階建</td>
+                                    <td class="bg-slate-100 p-1.5 font-bold text-slate-600 text-center w-[10%] border-r border-slate-200">築年月</td>
+                                    <td class="p-1.5 text-slate-800 w-[15%]" id="txt-built">2020年3月</td>
+                                </tr>
+                                <tr class="text-[9px]">
+                                    <td class="bg-slate-100 p-1.5 font-bold text-slate-600 text-center border-r border-slate-200">敷金/礼金</td>
+                                    <td class="p-1.5 text-slate-800 border-r border-slate-200">
+                                        敷金:<span id="txt-shikikin" class="font-bold">1ヶ月</span> / 礼金:<span id="txt-reikin" class="font-bold">1ヶ月</span>
+                                    </td>
+                                    <td class="bg-slate-100 p-1.5 font-bold text-slate-600 text-center border-r border-slate-200">保証金</td>
+                                    <td class="p-1.5 text-slate-800 border-r border-slate-200" id="txt-deposit">なし / なし</td>
+                                    <td class="bg-slate-100 p-1.5 font-bold text-slate-600 text-center border-r border-slate-200">入居日</td>
+                                    <td class="p-1.5 text-slate-800" id="txt-entry">即時可能</td>
+                                </tr>
+                                <tr class="border-t border-slate-200 text-[9px]">
+                                    <td class="bg-slate-100 p-1.5 font-bold text-slate-600 text-center border-r border-slate-200">契約区分</td>
+                                    <td class="p-1.5 text-slate-800 border-r border-slate-200" id="txt-contract">普通借家 2年</td>
+                                    <td class="bg-slate-100 p-1.5 font-bold text-slate-600 text-center border-r border-slate-200">現況</td>
+                                    <td class="p-1.5 text-slate-800 border-r border-slate-200" id="txt-status">空室</td>
+                                    <td class="bg-slate-100 p-1.5 font-bold text-slate-600 text-center border-r border-slate-200">バルコニー</td>
+                                    <td class="p-1.5 text-slate-800" id="txt-balcony">36.70㎡</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
-                    <!-- 5. 帯（会社情報等、広告のボトムエリア） -->
-                    <div id="badge-obi-border" class="grid grid-cols-12 gap-2 border-t-2 border-amber-950 pt-2.5 mt-2.5 items-stretch h-16 shrink-0">
-                        <!-- 取引情報 -->
-                        <div class="col-span-3 border-r border-slate-200 flex flex-col justify-between text-[9px] pr-2 leading-none">
-                            <div class="flex justify-between border-b border-slate-100 pb-0.5">
-                                <span class="text-slate-400 font-bold">取引態様</span>
-                                <span id="txt-transaction" class="font-black text-slate-800">媒介</span>
-                            </div>
-                            <div class="flex justify-between border-b border-slate-100 pb-0.5">
-                                <span class="text-slate-400 font-bold">手数料割合</span>
-                                <span id="txt-commission" class="font-black text-slate-800">借主：100% / 客付：100%</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-slate-400 font-bold">広告有効期限</span>
-                                <span id="txt-expire" class="font-bold text-slate-500">2026/08/31</span>
+                    <!-- 5. 元付帯（不動産会社情報 - 帯） -->
+                    <div id="badge-footer-obi" class="mt-2.5 border-t-4 border-amber-950 pt-2 flex items-stretch justify-between text-slate-900 shrink-0">
+                        <!-- 取引条件・手数料 -->
+                        <div class="w-[18%] border border-slate-300 rounded p-1.5 flex flex-col justify-between text-center bg-slate-50">
+                            <div class="text-[8px] font-bold text-slate-400 leading-none">取引態様</div>
+                            <div id="txt-deal" class="text-xs font-black text-slate-800 mt-1">専任媒介</div>
+                            <div class="border-t border-slate-200 my-1"></div>
+                            <div class="flex justify-between text-[8px] font-bold px-1">
+                                <span>手数料: <span id="txt-commission">分かれ</span></span>
+                                <span id="txt-ad" class="text-emerald-700">AD 100%</span>
                             </div>
                         </div>
 
-                        <!-- 会社名・免許情報 -->
-                        <div class="col-span-5 px-2 flex flex-col justify-center leading-none">
-                            <span id="txt-license" class="text-[8px] text-slate-400 font-bold uppercase">国土交通大臣(3) 第8627号</span>
-                            <div id="txt-company" class="text-base font-black text-slate-900 tracking-wide mt-1">株式会社 テクノホーム</div>
-                            <span class="text-[8px] text-slate-400 font-semibold mt-1">東京都江戸川区中葛西エリア / リアルタイムWeb申込対応物件</span>
+                        <!-- 自社会社情報 -->
+                        <div class="w-[50%] px-4 flex flex-col justify-center">
+                            <div class="flex items-baseline space-x-2">
+                                <span id="txt-company" class="text-base font-black tracking-wider text-slate-900">株式会社 テクノホーム</span>
+                                <span id="txt-license" class="text-[8px] font-bold text-slate-500">東京都知事 (3) 第99999号</span>
+                            </div>
+                            <div id="txt-company-address" class="text-[9px] text-slate-600 mt-1">東京都江戸川区東葛西6-4-17ELLEPLAN1F</div>
                         </div>
 
-                        <!-- 問い合わせ窓口 -->
-                        <div class="col-span-4 bg-slate-50 border border-slate-200 rounded px-2.5 flex flex-col justify-center text-right leading-none">
-                            <span class="text-[8px] text-slate-400 font-bold uppercase tracking-wider">物件確認・内見予約・申込受付</span>
-                            <div class="flex items-baseline justify-end space-x-1.5 mt-1">
-                                <span class="text-[9px] font-bold text-slate-500">TEL</span>
-                                <span id="txt-tel" class="text-sm font-black text-slate-950">03-6808-3031</span>
+                        <!-- 電話・FAX（巨大で見やすい表記） -->
+                        <div class="w-[30%] border border-slate-300 rounded p-2 flex flex-col justify-center bg-slate-50">
+                            <div class="flex items-center justify-between text-slate-800">
+                                <span class="text-[8px] font-bold bg-slate-700 text-white px-1 rounded leading-none py-0.5">TEL</span>
+                                <span id="txt-tel" class="text-base font-black tracking-tight font-sans text-indigo-950">03-6808-3031</span>
                             </div>
-                            <div class="flex items-baseline justify-end space-x-1.5 mt-0.5">
-                                <span class="text-[9px] font-bold text-slate-400">FAX</span>
-                                <span id="txt-fax" class="text-[11px] font-bold text-slate-600">03-6808-2360</span>
+                            <div class="flex items-center justify-between text-slate-800 mt-1.5">
+                                <span class="text-[8px] font-bold bg-slate-400 text-white px-1 rounded leading-none py-0.5">FAX</span>
+                                <span id="txt-fax" class="text-sm font-bold tracking-tight font-sans">03-6808-2360</span>
                             </div>
                         </div>
                     </div>
 
                 </div>
             </div>
-        </main>
 
+        </main>
     </div>
 
-    <!-- Script Area for Themes, Layout Presets, Auto-Generated SVGs and Zoom -->
+    <!-- JavaScript For Interactivity -->
     <script>
-        // 各部屋プランに100%連動した高品質な動的SVG間取り図データ
-        const mockFloorplans = {
-            // ハイグレード：2SLDKプラン（フレスタンテ中葛西調）
+        // グローバルステート
+        let currentTheme = 'highgrade';
+        let currentLayout = 'photo';
+        let hasCustomFloorplan = false;
+
+        // 現在選択されているアピール・設備配列 (最大7件)
+        let selectedFeatures = [];
+
+        // ワンクリックプリセット一覧データ
+        const featurePresets = {
+            security: [
+                "オートロック", "防犯カメラ", "TVモニター付インターホン", "24hセキュリティ", "ディンプルキー", "管理人常駐"
+            ],
+            water: [
+                "バス・トイレ別", "独立洗面台", "温水洗浄便座", "追い焚き機能付", "浴室乾燥機", "システムキッチン", "3口ガスコンロ", "IHクッキングヒーター"
+            ],
+            comfort: [
+                "インターネット無料", "ペット相談可能", "温水式床暖房", "宅配ボックス", "敷地内ゴミ置場", "エアコン完備", "広々クローゼット", "エレベーター", "デザイナーズ"
+            ]
+        };
+
+        // デフォルトのモック写真
+        const defaultPhotos = {
+            highgrade: {
+                photo1: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80', // 高級マンション外観
+                photo2: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=600&q=80', // 高級内装
+                photo3: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=600&q=80'  // 高級バスルーム
+            },
+            normal: {
+                photo1: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=600&q=80', // 標準外観
+                photo2: 'https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=600&q=80', // 標準キッチン
+                photo3: 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=600&q=80'  // 標準洗面所
+            },
+            casual: {
+                photo1: 'https://images.unsplash.com/photo-1513584684374-8bab748fbf90?auto=format&fit=crop&w=600&q=80', // カジュアル戸建て風
+                photo2: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80', // 明るいお部屋
+                photo3: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=600&q=80'  // 子供部屋・洋室
+            }
+        };
+
+        // 各テーマごとの初期おすすめ設備配列
+        const defaultFeaturesList = {
+            highgrade: [
+                "ペット２匹相談可能（犬・猫）",
+                "温水式床暖房（リビング）",
+                "3口ガスシステムキッチン",
+                "浴室乾燥機・追焚機能付きバス",
+                "高精度オートロック＆防犯カメラ",
+                "光ファイバーインターネット無料",
+                "宅配ボックス / 敷地内ゴミ置場"
+            ],
+            normal: [
+                "インターネット即日接続無料",
+                "人気のバストイレ別リノベプラン",
+                "たっぷり使える二口ガスコンロ",
+                "使い勝手の良い温水洗浄便座",
+                "広々使える室内洗濯機置場",
+                "大容量シューズクローゼット",
+                "防犯ディンプルキー＆TVドアホン"
+            ],
+            casual: [
+                "のびのび遊べるウッドデッキ専用庭",
+                "天井高ロフト収納スペース完備",
+                "カースペースゆったり２台駐車可",
+                "追い焚き＆自動給湯エコジョーズ",
+                "システムIHクッキングヒーター",
+                "省エネ高効率エアコン全室完備",
+                "24時間オンラインセキュリティ対応"
+            ]
+        };
+
+        // 間取り図の動的SVG定義
+        const floorplanSVGs = {
             highgrade: `
-                <svg viewBox="0 0 500 380" class="w-full h-full text-slate-700 bg-slate-50" style="font-family: sans-serif;">
-                    <defs>
-                        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e2e8f0" stroke-width="0.5"/>
-                        </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#grid)"/>
-                    <rect x="20" y="300" width="460" height="50" fill="#f8fafc" stroke="#64748b" stroke-width="2" stroke-dasharray="4,4"/>
-                    <text x="250" y="330" fill="#475569" font-size="12" font-weight="bold" text-anchor="middle">大型バルコニー (Balcony 36.70㎡)</text>
-                    <rect x="40" y="30" width="420" height="270" fill="none" stroke="#1e293b" stroke-width="4"/>
-                    <line x1="230" y1="30" x2="230" y2="300" stroke="#1e293b" stroke-width="3"/>
-                    <line x1="40" y1="160" x2="230" y2="160" stroke="#1e293b" stroke-width="3"/>
-                    <line x1="140" y1="160" x2="140" y2="300" stroke="#1e293b" stroke-width="3"/>
-                    <rect x="330" y="30" width="130" height="110" fill="#f0f9ff" stroke="#1e293b" stroke-width="3"/>
-                    <line x1="330" y1="90" x2="460" y2="90" stroke="#1e293b" stroke-width="2"/>
-                    <rect x="390" y="40" width="55" height="40" rx="5" fill="none" stroke="#0284c7" stroke-width="2"/>
-                    <circle cx="418" cy="60" r="4" fill="none" stroke="#0284c7" stroke-width="1"/>
-                    <rect x="240" y="40" width="80" height="30" fill="#f1f5f9" stroke="#475569" stroke-width="2"/>
-                    <circle cx="260" cy="55" r="7" fill="none" stroke="#475569" stroke-width="1.5"/>
-                    <rect x="290" y="46" width="18" height="18" fill="none" stroke="#475569" stroke-width="1.5"/>
-                    <path d="M 230 130 A 30 30 0 0 1 200 160 L 230 160 Z" fill="none" stroke="#64748b" stroke-width="1.5"/>
-                    <line x1="300" y1="300" x2="380" y2="300" stroke="#ffffff" stroke-width="5"/>
-                    <line x1="300" y1="300" x2="340" y2="300" stroke="#0f172a" stroke-width="2"/>
-                    <line x1="340" y1="297" x2="380" y2="297" stroke="#0f172a" stroke-width="2"/>
-                    <text x="135" y="100" fill="#1e293b" font-size="14" font-weight="900" text-anchor="middle">洋室 (1)<br><tspan font-size="11" font-weight="bold">8.3帖</tspan></text>
-                    <text x="90" y="235" fill="#1e293b" font-size="13" font-weight="900" text-anchor="middle">洋室 (2)<br><tspan font-size="10" font-weight="bold">7.1帖</tspan></text>
-                    <text x="185" y="235" fill="#1e293b" font-size="13" font-weight="900" text-anchor="middle">サービスルーム<br><tspan font-size="10" font-weight="bold">7.1帖</tspan></text>
-                    <text x="310" y="210" fill="#1e293b" font-size="18" font-weight="900" text-anchor="middle">LDK<br><tspan font-size="13" font-weight="bold">22.7帖 (床暖房)</tspan></text>
-                    <text x="380" y="115" fill="#0369a1" font-size="10" font-weight="bold" text-anchor="middle">パウダールーム</text>
-                    <text x="355" y="65" fill="#0369a1" font-size="10" font-weight="bold" text-anchor="middle">浴室</text>
-                    <text x="440" y="125" fill="#1e293b" font-size="10" font-weight="bold" text-anchor="middle">トイレ</text>
-                    <rect x="40" y="30" width="40" height="30" fill="#fef08a" stroke="#1e293b" stroke-width="1.5"/>
-                    <text x="60" y="48" fill="#854d0e" font-size="9" font-weight="bold" text-anchor="middle">WIC</text>
-                    <rect x="40" y="130" width="40" height="30" fill="#fef08a" stroke="#1e293b" stroke-width="1.5"/>
-                    <text x="60" y="148" fill="#854d0e" font-size="9" font-weight="bold" text-anchor="middle">物入</text>
-                    <text x="110" y="295" fill="#dc2626" font-size="10" font-weight="bold" text-anchor="middle">▲ 玄関</text>
+                <svg viewBox="0 0 100 100" class="w-full h-full text-amber-950 font-sans" stroke="currentColor" fill="none" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- 外壁 -->
+                    <rect x="10" y="10" width="80" height="80" stroke-width="2" />
+                    <!-- バルコニー -->
+                    <rect x="10" y="5" width="80" height="5" stroke-dasharray="2,2" />
+                    <!-- 部屋の仕切り -->
+                    <line x1="10" y1="50" x2="90" y2="50" />
+                    <line x1="50" y1="10" x2="50" y2="50" />
+                    <line x1="65" y1="50" x2="65" y2="90" />
+                    <!-- ドア -->
+                    <path d="M 50,25 A 15,15 0 0,1 65,10" stroke-dasharray="1.5,1.5" />
+                    <line x1="50" y1="25" x2="65" y2="25" />
+                    <!-- テキスト -->
+                    <text x="30" y="30" font-size="6" font-weight="bold" fill="currentColor" text-anchor="middle" stroke="none">LDK 18帖</text>
+                    <text x="70" y="30" font-size="6" font-weight="bold" fill="currentColor" text-anchor="middle" stroke="none">洋室 6帖</text>
+                    <text x="35" y="70" font-size="6" font-weight="bold" fill="currentColor" text-anchor="middle" stroke="none">洋室 7.5帖</text>
+                    <text x="77" y="70" font-size="5" font-weight="bold" fill="currentColor" text-anchor="middle" stroke="none">サービスルーム<br>(納戸)</text>
+                    <text x="50" y="87" font-size="5" fill="gray" text-anchor="middle" stroke="none">玄関</text>
+                    <text x="50" y="3" font-size="4" fill="gray" text-anchor="middle" stroke="none">バルコニー (南向き)</text>
                 </svg>
             `,
-            // ノーマル：1LDKプラン（コンフォリア・リヴ西葛西調）
             normal: `
-                <svg viewBox="0 0 500 380" class="w-full h-full text-slate-700 bg-slate-50" style="font-family: sans-serif;">
-                    <defs>
-                        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e2e8f0" stroke-width="0.5"/>
-                        </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#grid)"/>
-                    <rect x="30" y="310" width="130" height="40" fill="#f8fafc" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,4"/>
-                    <text x="95" y="335" fill="#475569" font-size="10" font-weight="bold" text-anchor="middle">バルコニー</text>
-                    <rect x="30" y="40" width="440" height="270" fill="none" stroke="#0f172a" stroke-width="4"/>
-                    <line x1="180" y1="40" x2="180" y2="310" stroke="#0f172a" stroke-width="3"/>
-                    <line x1="30" y1="160" x2="180" y2="160" stroke="#0f172a" stroke-width="3"/>
-                    <rect x="180" y="40" width="150" height="130" fill="#f0f9ff" stroke="#0f172a" stroke-width="3"/>
-                    <line x1="330" y1="40" x2="330" y2="310" stroke="#0f172a" stroke-width="3"/>
-                    <line x1="180" y1="110" x2="330" y2="110" stroke="#0f172a" stroke-width="2"/>
-                    <rect x="195" y="50" width="50" height="45" rx="4" fill="none" stroke="#0284c7" stroke-width="2"/>
-                    <rect x="350" y="180" width="30" height="40" rx="10" fill="none" stroke="#475569" stroke-width="2"/>
-                    <rect x="110" y="40" width="70" height="40" fill="#fef08a" stroke="#0f172a" stroke-width="1.5"/>
-                    <text x="145" y="65" fill="#854d0e" font-size="10" font-weight="bold" text-anchor="middle">WIC</text>
-                    <rect x="330" y="40" width="110" height="30" fill="#f1f5f9" stroke="#475569" stroke-width="2"/>
-                    <circle cx="355" cy="55" r="6" fill="none" stroke="#475569" stroke-width="1.5"/>
-                    <rect x="400" y="46" width="18" height="18" fill="none" stroke="#475569" stroke-width="1.5"/>
-                    <text x="105" y="115" fill="#0f172a" font-size="13" font-weight="900" text-anchor="middle">洋室<br><tspan font-size="11" font-weight="bold">2.0帖</tspan></text>
-                    <text x="105" y="235" fill="#0f172a" font-size="15" font-weight="900" text-anchor="middle">LDK<br><tspan font-size="11" font-weight="bold">8.0帖</tspan></text>
-                    <text x="245" y="145" fill="#0369a1" font-size="10" font-weight="bold" text-anchor="middle">洗面室</text>
-                    <text x="295" y="75" fill="#0369a1" font-size="10" font-weight="bold" text-anchor="middle">浴室</text>
-                    <text x="395" y="145" fill="#0f172a" font-size="11" font-weight="bold" text-anchor="middle">玄関</text>
-                    <text x="445" y="145" fill="#dc2626" font-size="11" font-weight="bold" text-anchor="middle">▲</text>
+                <svg viewBox="0 0 100 100" class="w-full h-full text-blue-900 font-sans" stroke="currentColor" fill="none" stroke-width="1.2">
+                    <!-- 外壁 -->
+                    <rect x="15" y="10" width="70" height="80" stroke-width="2" />
+                    <!-- 部屋仕切り -->
+                    <line x1="15" y1="60" x2="85" y2="60" />
+                    <line x1="50" y1="10" x2="50" y2="60" />
+                    <!-- キッチン/浴室 -->
+                    <rect x="15" y="60" width="20" height="15" />
+                    <rect x="35" y="60" width="15" height="15" />
+                    <!-- テキスト -->
+                    <text x="32" y="35" font-size="6" font-weight="bold" fill="currentColor" text-anchor="middle" stroke="none">LDK 12帖</text>
+                    <text x="68" y="35" font-size="6" font-weight="bold" fill="currentColor" text-anchor="middle" stroke="none">洋室 6帖</text>
+                    <text x="25" y="68" font-size="4" fill="currentColor" text-anchor="middle" stroke="none">K</text>
+                    <text x="42" y="68" font-size="4" fill="currentColor" text-anchor="middle" stroke="none">浴室</text>
+                    <text x="50" y="85" font-size="5" fill="gray" text-anchor="middle" stroke="none">玄関</text>
                 </svg>
             `,
-            // カジュアル：2LDKプラン（リヴェール調）
             casual: `
-                <svg viewBox="0 0 500 380" class="w-full h-full text-slate-700 bg-slate-50" style="font-family: sans-serif;">
-                    <defs>
-                        <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
-                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e2e8f0" stroke-width="0.5"/>
-                        </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#grid)"/>
-                    <rect x="250" y="310" width="200" height="40" fill="#f8fafc" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,4"/>
-                    <text x="350" y="335" fill="#475569" font-size="10" font-weight="bold" text-anchor="middle">南向きバルコニー</text>
-                    <rect x="40" y="40" width="420" height="270" fill="none" stroke="#166534" stroke-width="4"/>
-                    <line x1="240" y1="40" x2="240" y2="310" stroke="#166534" stroke-width="3"/>
-                    <line x1="40" y1="180" x2="240" y2="180" stroke="#166534" stroke-width="3"/>
-                    <line x1="240" y1="180" x2="460" y2="180" stroke="#166534" stroke-width="2"/>
-                    <rect x="40" y="40" width="100" height="80" fill="#f0f9ff" stroke="#166534" stroke-width="3"/>
-                    <rect x="50" y="50" width="40" height="40" rx="3" fill="none" stroke="#0284c7" stroke-width="1.5"/>
-                    <text x="90" y="105" fill="#0369a1" font-size="9" font-weight="bold" text-anchor="middle">浴室</text>
-                    <rect x="250" y="190" width="70" height="30" fill="#f1f5f9" stroke="#475569" stroke-width="1.5"/>
-                    <circle cx="265" cy="205" r="5" fill="none" stroke="#475569" stroke-width="1.2"/>
-                    <rect x="295" y="196" width="14" height="14" fill="none" stroke="#475569" stroke-width="1.2"/>
-                    <rect x="190" y="180" width="50" height="30" fill="#fef08a" stroke="#166534" stroke-width="1.5"/>
-                    <text x="215" y="198" fill="#854d0e" font-size="9" font-weight="bold" text-anchor="middle">CL</text>
-                    <text x="140" y="245" fill="#14532d" font-size="14" font-weight="900" text-anchor="middle">洋室 (1)<br><tspan font-size="11" font-weight="bold">6.5帖</tspan></text>
-                    <text x="140" y="150" fill="#14532d" font-size="12" font-weight="900" text-anchor="middle">洋室 (2) 3.0帖</text>
-                    <text x="350" y="255" fill="#14532d" font-size="16" font-weight="900" text-anchor="middle">LDK<br><tspan font-size="12" font-weight="bold">10.5帖</tspan></text>
-                    <text x="350" y="110" fill="#14532d" font-size="13" font-weight="900" text-anchor="middle">洋室 (3) 6.0帖</text>
-                    <text x="190" y="90" fill="#14532d" font-size="10" font-weight="bold" text-anchor="middle">玄関 ▲</text>
+                <svg viewBox="0 0 100 100" class="w-full h-full text-emerald-950 font-sans" stroke="currentColor" fill="none" stroke-width="1.2">
+                    <!-- 外壁 -->
+                    <rect x="10" y="15" width="80" height="70" stroke-width="2" />
+                    <!-- 仕切り -->
+                    <line x1="45" y1="15" x2="45" y2="85" />
+                    <line x1="45" y1="50" x2="90" y2="50" />
+                    <!-- テキスト -->
+                    <text x="27" y="50" font-size="7" font-weight="bold" fill="currentColor" text-anchor="middle" stroke="none">LDK 14帖</text>
+                    <text x="67" y="35" font-size="6" font-weight="bold" fill="currentColor" text-anchor="middle" stroke="none">洋室 5.5帖</text>
+                    <text x="67" y="70" font-size="6" font-weight="bold" fill="currentColor" text-anchor="middle" stroke="none">洋室 6帖</text>
+                    <text x="15" y="23" font-size="4" fill="gray" text-anchor="middle" stroke="none">バルコニー</text>
                 </svg>
             `
         };
 
-        const presets = {
-            highgrade: {
-                themeClass: 'theme-highgrade',
-                primaryBg: 'bg-amber-950',
-                borderCol: 'border-amber-950',
-                textCol: 'text-amber-950',
-                iconClass: 'fa-solid fa-hotel text-amber-600',
-                featuresHeaderBg: 'bg-amber-950',
-                outlineHeaderBg: 'bg-amber-950',
-                topRibbonVal: '★プレステージ物件★ ハイグレード仕様レジデンス',
-                subCatchVal: '☆都心アクセス良好・築浅デザイナーズ☆ 床暖房・オートロック完備',
-                layoutVal: '2SLDK',
-                areaVal: '96.49㎡',
-                balconyVal: '36.70㎡',
-                rentVal: '280,000',
-                serviceVal: '5,000',
-                structureVal: 'RC造 5階建',
-                builtVal: '2018年4月',
-                totalUnitsVal: '24戸',
-                photo1: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80',
-                photo2: 'https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=400&q=80',
-                photo3: 'https://images.unsplash.com/photo-1556912173-3bb406ef7e77?auto=format&fit=crop&w=400&q=80'
-            },
-            normal: {
-                themeClass: 'theme-normal',
-                primaryBg: 'bg-slate-900',
-                borderCol: 'border-slate-900',
-                textCol: 'text-indigo-900',
-                iconClass: 'fa-solid fa-train text-indigo-600',
-                featuresHeaderBg: 'bg-indigo-950',
-                outlineHeaderBg: 'bg-slate-900',
-                topRibbonVal: '【RC造・駅近】安心安全のハイクオリティマンション',
-                subCatchVal: '☆充実 of フル設備仕様☆ ダブルロック・24h常時ゴミ出しOK！',
-                layoutVal: '1LDK',
-                areaVal: '27.68㎡',
-                balconyVal: '6.50㎡',
-                rentVal: '130,000',
-                serviceVal: '10,000',
-                structureVal: 'RC造 9階建',
-                builtVal: '2024年4月',
-                totalUnitsVal: '45戸',
-                photo1: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=600&q=80',
-                photo2: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=400&q=80',
-                photo3: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=400&q=80'
-            },
-            casual: {
-                themeClass: 'theme-casual',
-                primaryBg: 'bg-emerald-800',
-                borderCol: 'border-emerald-800',
-                textCol: 'text-emerald-800',
-                iconClass: 'fa-solid fa-house-user text-emerald-600',
-                featuresHeaderBg: 'bg-emerald-800',
-                outlineHeaderBg: 'bg-emerald-800',
-                topRibbonVal: '🎵ペット合計2匹までOK！楽しく暮らせるデザイナーズ賃貸🎵',
-                subCatchVal: '⭐インターネット光無料＆宅配BOX付き⭐ 明るく開放的な室内',
-                layoutVal: '2LDK',
-                areaVal: '54.88㎡',
-                balconyVal: '12.40㎡',
-                rentVal: '165,000',
-                serviceVal: '6,000',
-                structureVal: '鉄骨造 2階建',
-                builtVal: '2011年9月',
-                totalUnitsVal: '8戸',
-                photo1: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=600&q=80',
-                photo2: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=400&q=80',
-                photo3: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=400&q=80'
+        // UIパーツ連動の同期
+        function updateValue(id, value) {
+            const previewEl = document.getElementById(`txt-${id}`);
+            if (previewEl) {
+                previewEl.innerText = value;
             }
-        };
 
-        let currentPreset = 'highgrade';
-        let currentLayout = 'floorplan'; // デフォルトは間取り重視
-
-        // ユーザーの手動アップロード画像を一時保存する変数
-        let userPhotos = {
-            1: null,
-            2: null,
-            3: null
-        };
-        let userUploadedFloorplan = null;
-
-        // 全写真の再描画 (比率がずれないよう CSS absolute と object-cover で描画)
-        function renderPhotos() {
-            const p = presets[currentPreset];
-            document.getElementById('preview-photo-1').src = userPhotos[1] || p.photo1;
-            document.getElementById('preview-photo-2').src = userPhotos[2] || p.photo2;
-            document.getElementById('preview-photo-3').src = userPhotos[3] || p.photo3;
+            // 特殊ケース：アピールリボンの背景や色調整
+            if (id === 'top-ribbon') {
+                adjustA4TypographySafety();
+            }
         }
 
-        // 写真をデフォルトに戻す
-        function resetPhotos() {
-            userPhotos = { 1: null, 2: null, 3: null };
-            renderPhotos();
+        // 初期ロード時にアピールボタン群をレンダリングする
+        function renderPresetButtons() {
+            const renderGroup = (groupId, items) => {
+                const container = document.getElementById(groupId);
+                if (!container) return;
+                container.innerHTML = '';
+                items.forEach(item => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = `px-2 py-1 rounded border text-[10px] font-medium transition active:scale-95 duration-150`;
+                    btn.innerText = item;
+                    btn.onclick = () => togglePresetFeature(item);
+                    btn.id = `preset-btn-${item}`;
+                    container.appendChild(btn);
+                });
+            };
+
+            renderGroup('preset-group-security', featurePresets.security);
+            renderGroup('preset-group-water', featurePresets.water);
+            renderGroup('preset-group-comfort', featurePresets.comfort);
         }
 
-        // 間取り図の動的描画関数（親に絶対に干渉させないために絶対・フィット配置を適用）
-        function renderFloorplan() {
-            const container = document.getElementById('preview-floorplan-wrapper');
-            if (userUploadedFloorplan) {
-                container.innerHTML = `<img src="${userUploadedFloorplan}" alt="間取り図" class="max-w-full max-h-full object-contain absolute" style="left: 50%; top: 50%; transform: translate(-50%, -50%);" />`;
+        // プリセットクリック時の追加/削除トグル処理
+        function togglePresetFeature(featureName) {
+            const index = selectedFeatures.findIndex(f => f.startsWith(featureName) || featureName.startsWith(f));
+            if (index > -1) {
+                selectedFeatures.splice(index, 1);
             } else {
-                container.innerHTML = mockFloorplans[currentPreset] || mockFloorplans['highgrade'];
+                if (selectedFeatures.length >= 7) {
+                    alert("アピール条件はレイアウト上、最大7件までとなっています。不要な項目を削除してから追加してください。");
+                    return;
+                }
+                selectedFeatures.push(featureName);
             }
+            updateFeaturesUI();
         }
 
-        // 間取り図を自動生成SVGに戻す
-        function resetFloorplan() {
-            userUploadedFloorplan = null;
-            renderFloorplan();
-        }
-
-        // レイアウトプリセットの適用処理 (動的グリッド幅切り替え、崩壊防止を徹底)
-        function applyLayoutPreset(layoutName) {
-            currentLayout = layoutName;
+        // 新しい自由記述項目を追加
+        function addNewFeature() {
+            const input = document.getElementById('input-new-feature');
+            const val = input.value.trim();
+            if (!val) return;
             
-            // 1. レイアウト切替ボタンのアクティブクラスの更新
-            document.querySelectorAll('.layout-btn').forEach(btn => {
-                btn.classList.remove('border-amber-500', 'bg-amber-50/50', 'text-amber-950', 'border-2');
-                btn.classList.add('border-slate-200', 'text-slate-700');
-            });
-            const activeBtn = document.getElementById(`btn-layout-${layoutName}`);
-            if (activeBtn) {
-                activeBtn.classList.remove('border-slate-200', 'text-slate-700');
-                activeBtn.classList.add('border-amber-500', 'bg-amber-50/50', 'text-amber-950', 'border-2');
+            if (selectedFeatures.length >= 7) {
+                alert("アピール条件は最大7件までとなっています。");
+                return;
             }
 
-            // 2. グリッドセルの横幅（col-span-X）を動的に入れ替え
-            const cellExterior = document.getElementById('cell-exterior');
-            const cellFloorplan = document.getElementById('cell-floorplan');
-            const cellFeatures = document.getElementById('cell-features');
-            const infoBox = document.getElementById('info-points-box');
-
-            cellExterior.className = cellExterior.className.replace(/col-span-\d+/g, '').trim();
-            cellFloorplan.className = cellFloorplan.className.replace(/col-span-\d+/g, '').trim();
-            cellFeatures.className = cellFeatures.className.replace(/col-span-\d+/g, '').trim();
-
-            if (layoutName === 'photo') {
-                // 外観・内装をメインに見せる（写真：60% / 間取り：30% / 設備リスト：30%）
-                cellExterior.classList.add('col-span-6');
-                cellFloorplan.classList.add('col-span-3');
-                cellFeatures.classList.add('col-span-3');
-                infoBox.classList.add('hidden');
-            } else if (layoutName === 'floorplan') {
-                // 間取り図を最大に大きくする標準型（写真：33% / 間取り：41% / 設備リスト：25%）
-                cellExterior.classList.add('col-span-4');
-                cellFloorplan.classList.add('col-span-5');
-                cellFeatures.classList.add('col-span-3');
-                infoBox.classList.add('hidden');
-            } else if (layoutName === 'info') {
-                // 設備や特約、契約詳細などの文章情報を重視する（写真：25% / 間取り：25% / 設備リスト＋備考欄：50%）
-                cellExterior.classList.add('col-span-3');
-                cellFloorplan.classList.add('col-span-3');
-                cellFeatures.classList.add('col-span-6');
-                infoBox.classList.remove('hidden');
-            }
-
-            // ズームを調整
-            fitCanvasToScreen();
+            selectedFeatures.push(val);
+            input.value = ''; // クリア
+            updateFeaturesUI();
         }
 
-        // プリセットスタイル（カラー・イメージ・お部屋スペック）適用処理
-        function applyStylePreset(presetName) {
-            currentPreset = presetName;
-            const p = presets[presetName];
-
-            // 1. アクティブボタンの見た目の更新
-            document.querySelectorAll('.preset-btn').forEach(btn => {
-                btn.classList.remove('border-indigo-600', 'bg-indigo-50/50');
-                btn.classList.add('border-slate-200');
-            });
-            const activeBtn = document.getElementById(`btn-preset-${presetName}`);
-            if (activeBtn) {
-                activeBtn.classList.remove('border-slate-200');
-                activeBtn.classList.add('border-indigo-600', 'bg-indigo-50/50');
-            }
-
-            // 2. キャンバスのフォントファミリーの切り替え
-            const canvas = document.getElementById('maisoku-canvas');
-            canvas.className = canvas.className.replace(/theme-\w+/g, '').trim();
-            canvas.classList.add(p.themeClass);
-
-            // 3. アピールリボンの背景色の更新
-            const ribbon = document.getElementById('badge-top-ribbon');
-            ribbon.className = ribbon.className.replace(/bg-\w+-\d+/g, '').trim();
-            ribbon.classList.add(p.primaryBg);
-
-            // 4. 設備ヘッダー＆物件概要ヘッダーの背景色更新
-            const featHeader = document.getElementById('badge-features-header');
-            featHeader.className = featHeader.className.replace(/bg-\w+-\d+/g, '').trim();
-            featHeader.classList.add(p.featuresHeaderBg);
-
-            const outHeader = document.getElementById('badge-outline-header');
-            outHeader.className = outHeader.className.replace(/bg-\w+-\d+/g, '').trim();
-            outHeader.classList.add(p.outlineHeaderBg);
-
-            // 5. 帯のボーダー色更新
-            const obiBorder = document.getElementById('badge-obi-border');
-            obiBorder.className = obiBorder.className.replace(/border-\w+-\d+/g, '').trim();
-            obiBorder.classList.add(`border-t-2`, p.borderCol);
-
-            // 6. 駅アイコンの切り替え
-            const icon = document.getElementById('station-icon');
-            icon.className = p.iconClass;
-
-            // 7. 物件概要スペックおよびアピールコピーの自動連動更新
-            document.getElementById('input-top-ribbon').value = p.topRibbonVal;
-            document.getElementById('input-sub-catch').value = p.subCatchVal;
-            document.getElementById('input-layout').value = p.layoutVal;
-            document.getElementById('input-area').value = p.areaVal;
-            document.getElementById('input-balcony').value = p.balconyVal;
-            document.getElementById('input-rent').value = p.rentVal;
-            document.getElementById('input-service').value = p.serviceVal;
-            document.getElementById('input-structure').value = p.structureVal;
-            document.getElementById('input-built').value = p.builtVal;
-
-            updateValue('top-ribbon', p.topRibbonVal);
-            updateValue('sub-catch', p.subCatchVal);
-            updateValue('layout', p.layoutVal);
-            updateValue('area', p.areaVal);
-            updateValue('balcony', p.balconyVal);
-            updateValue('rent', p.rentVal);
-            updateValue('service', p.serviceVal);
-            updateValue('structure', p.structureVal);
-            updateValue('built', p.builtVal);
-
-            // 8. 写真および間取り図の描画実行
-            renderPhotos();
-            renderFloorplan();
+        // 選択されたアピール項目を削除
+        function removeFeatureAt(index) {
+            selectedFeatures.splice(index, 1);
+            updateFeaturesUI();
         }
 
-        // 複数写真の個別アップロード対応
+        // インプット書き換え時に直接配列を更新
+        function editFeatureAt(index, newVal) {
+            selectedFeatures[index] = newVal;
+            renderPreviewFeaturesOnly();
+        }
+
+        // プレビュー表示のみを即座に反映
+        function renderPreviewFeaturesOnly() {
+            const listEl = document.getElementById('features-list');
+            if (!listEl) return;
+            
+            listEl.innerHTML = '';
+            selectedFeatures.forEach((item, index) => {
+                const li = document.createElement('li');
+                if (index < selectedFeatures.length - 1 && index < 6) {
+                    li.className = "flex items-center space-x-1.5 border-b border-dashed border-slate-200 pb-1";
+                } else {
+                    li.className = "flex items-center space-x-1.5";
+                }
+                
+                const escapedText = escapeHTML(item);
+                li.innerHTML = `
+                    <i class="fa-solid fa-square-check text-indigo-600 text-[10px]"></i>
+                    <span class="font-bold truncate">${escapedText}</span>
+                `;
+                listEl.appendChild(li);
+            });
+        }
+
+        // アピールリストUI全体の再レンダリング (左側のインプット一覧 ＋ プリセットのボタン色 ＋ 右側プレビュー)
+        function updateFeaturesUI() {
+            const counter = document.getElementById('features-counter');
+            if (counter) {
+                counter.innerText = `${selectedFeatures.length}/7 件`;
+            }
+
+            const container = document.getElementById('selected-features-list');
+            if (container) {
+                container.innerHTML = '';
+                if (selectedFeatures.length === 0) {
+                    container.innerHTML = `<p class="text-[10px] text-slate-400 py-1 italic">アピール項目がありません。下のプリセットをクリックして追加してください。</p>`;
+                } else {
+                    selectedFeatures.forEach((item, index) => {
+                        const wrapper = document.createElement('div');
+                        wrapper.className = "flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded p-1";
+                        wrapper.innerHTML = `
+                            <span class="text-[9px] bg-indigo-100 text-indigo-800 font-bold px-1.5 py-0.5 rounded">${index + 1}</span>
+                            <input type="text" value="${escapeHTML(item)}" oninput="editFeatureAt(${index}, this.value)" class="flex-1 bg-transparent text-xs font-bold text-slate-800 outline-none focus:border-b focus:border-indigo-400">
+                            <button onclick="removeFeatureAt(${index})" class="text-slate-400 hover:text-red-600 px-1 transition text-xs" title="削除">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        `;
+                        container.appendChild(wrapper);
+                    });
+                }
+            }
+
+            document.querySelectorAll('[id^="preset-btn-"]').forEach(btn => {
+                const itemText = btn.innerText;
+                const isSelected = selectedFeatures.some(f => f.startsWith(itemText) || itemText.startsWith(f));
+                if (isSelected) {
+                    btn.className = "px-2 py-1 rounded text-[10px] font-bold transition duration-150 bg-indigo-600 border-indigo-600 text-white shadow-sm";
+                } else {
+                    btn.className = "px-2 py-1 rounded text-[10px] font-medium transition duration-150 bg-white border-slate-200 text-slate-600 hover:bg-slate-50";
+                }
+            });
+
+            renderPreviewFeaturesOnly();
+        }
+
+        // HTMLエスケープヘルパー
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        // 複数写真プレビューロード処理
         function previewMultipleImages(event, index) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    userPhotos[index] = e.target.result;
-                    renderPhotos();
+                    const imgEl = document.getElementById(`preview-photo-${index}`);
+                    if (imgEl) {
+                        imgEl.style.backgroundImage = `url('${e.target.result}')`;
+                    }
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        // 入力値のリアルタイム同期
-        function updateValue(id, value) {
-            const el = document.getElementById(`txt-${id}`);
-            if (el) {
-                el.innerText = value;
-            }
-            if (id === 'direction') {
-                document.getElementById('txt-direction-badge').innerText = value;
-            }
-        }
-
-        // 手動間取り図面アップロードプレビュー
-        function previewImage(event, targetId) {
+        // 間取り図手動アップロード
+        function previewImage(event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    userUploadedFloorplan = e.target.result;
-                    renderFloorplan();
+                    const wrapper = document.getElementById('preview-floorplan-wrapper');
+                    wrapper.innerHTML = `<img src="${e.target.result}" class="max-w-full max-h-full object-contain" alt="アップロード図面">`;
+                    hasCustomFloorplan = true;
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        // 設備アピール仕様リストの表示トグル
-        function toggleFeature(elementId, featureName, isChecked) {
-            const list = document.getElementById('features-list');
-            let item = document.getElementById(elementId);
-            
-            if (isChecked) {
-                if (!item) {
-                    item = document.createElement('li');
-                    item.id = elementId;
-                    item.className = 'flex items-center space-x-1.5 border-b border-dashed border-slate-200 pb-1 font-bold';
-                    item.innerHTML = `
-                        <i class="fa-solid fa-square-check text-amber-600 text-[10px]"></i>
-                        <span class="truncate">${featureName}</span>
-                    `;
-                    list.appendChild(item);
-                }
-            } else {
-                if (item) {
-                    item.remove();
-                }
+        // 物件写真を各テーマのデフォルトに戻す
+        function resetPhotos() {
+            setPresetPhotos(currentTheme);
+        }
+
+        // 間取り図を動的SVGに戻す
+        function resetFloorplan() {
+            hasCustomFloorplan = false;
+            setPresetFloorplan(currentTheme);
+        }
+
+        // 写真を一括ロード
+        function setPresetPhotos(theme) {
+            const photos = defaultPhotos[theme];
+            document.getElementById('preview-photo-1').style.backgroundImage = `url('${photos.photo1}')`;
+            document.getElementById('preview-photo-2').style.backgroundImage = `url('${photos.photo2}')`;
+            document.getElementById('preview-photo-3').style.backgroundImage = `url('${photos.photo3}')`;
+        }
+
+        // 間取り図を一括ロード
+        function setPresetFloorplan(theme) {
+            if (!hasCustomFloorplan) {
+                const wrapper = document.getElementById('preview-floorplan-wrapper');
+                wrapper.innerHTML = floorplanSVGs[theme];
             }
         }
 
-        // ズームフィット制御（常にアスペクト比を維持し画面にきれいに収める）
-        function fitCanvasToScreen() {
-            const workspace = document.querySelector('main');
+        // テーマプリセット適用
+        function applyStylePreset(theme) {
+            currentTheme = theme;
+            
+            document.querySelectorAll('.preset-btn').forEach(btn => {
+                btn.classList.remove('border-indigo-600', 'text-indigo-950', 'border-2');
+                btn.classList.add('border-slate-200', 'text-slate-700');
+            });
+            const activeBtn = document.getElementById(`btn-preset-${theme}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('border-slate-200', 'text-slate-700');
+                activeBtn.classList.add('border-indigo-600', 'text-indigo-950', 'border-2');
+            }
+
+            const canvas = document.getElementById('maisoku-canvas');
+            canvas.className = canvas.className.replace(/theme-\w+/g, `theme-${theme}`);
+
+            const ribbon = document.getElementById('badge-top-ribbon');
+            const featuresHeader = document.getElementById('badge-features-header');
+            const companyObi = document.getElementById('badge-footer-obi');
+
+            selectedFeatures = [...defaultFeaturesList[theme]];
+
+            if (theme === 'highgrade') {
+                ribbon.className = "bg-amber-950 text-white py-2.5 px-4 rounded flex justify-between items-center transition-all duration-300 shrink-0";
+                featuresHeader.className = "text-[10px] font-bold text-white bg-amber-950 py-1 rounded text-center tracking-wider mb-2 shrink-0 select-none";
+                companyObi.style.borderTopColor = "#451a03"; // amber-950
+
+                applyInputSet({
+                    'top-ribbon': "90㎡超・ペット可・床暖房付きRCハイグレードデザイナーズ",
+                    'building-name': "フレスタンテ中葛西",
+                    'sub-catch': "☆築浅ハイグレードマンション☆ 屋根付き駐車場あり / 小型犬・猫2匹までOK",
+                    'rent': "280,000",
+                    'layout': "2SLDK",
+                    'area': "96.49"
+                });
+            } else if (theme === 'normal') {
+                ribbon.className = "bg-blue-900 text-white py-2.5 px-4 rounded flex justify-between items-center transition-all duration-300 shrink-0";
+                featuresHeader.className = "text-[10px] font-bold text-white bg-blue-900 py-1 rounded text-center tracking-wider mb-2 shrink-0 select-none";
+                companyObi.style.borderTopColor = "#1e3a8a"; // blue-900
+
+                applyInputSet({
+                    'top-ribbon': "駅チカ徒歩3分・南向き角部屋・インターネット即日無料アパート",
+                    'building-name': "コーポラス・メゾン江戸川",
+                    'sub-catch': "☆人気の角部屋リノベーション物件☆ クローゼット2口ガス・独立洗面台",
+                    'rent': "124,000",
+                    'layout': "1LDK",
+                    'area': "42.50"
+                });
+            } else if (theme === 'casual') {
+                ribbon.className = "bg-emerald-800 text-white py-2.5 px-4 rounded flex justify-between items-center transition-all duration-300 shrink-0";
+                featuresHeader.className = "text-[10px] font-bold text-white bg-emerald-800 py-1 rounded text-center tracking-wider mb-2 shrink-0 select-none";
+                companyObi.style.borderTopColor = "#064e3b"; // emerald-950
+
+                applyInputSet({
+                    'top-ribbon': "ウッドテラス・ロフト付き・広々ファミリー向け戸建て風住まい",
+                    'building-name': "中葛西フォレストハウス",
+                    'sub-catch': "☆のびのび子育て環境に最適☆ 閑静な住宅街 / 専用庭付き・カースペース有",
+                    'rent': "195,000",
+                    'layout': "2LDK",
+                    'area': "78.20"
+                });
+            }
+
+            updateFeaturesUI();
+            setPresetPhotos(theme);
+            setPresetFloorplan(theme);
+        }
+
+        // 入力フォームの一括設定
+        function applyInputSet(data) {
+            for (const [key, value] of Object.entries(data)) {
+                const input = document.getElementById(`input-${key}`);
+                if (input) {
+                    input.value = value;
+                }
+                updateValue(key, value);
+            }
+        }
+
+        // レイアウト比率プリセット切り替え
+        function applyLayoutPreset(layout) {
+            currentLayout = layout;
+
+            document.querySelectorAll('.layout-btn').forEach(btn => {
+                btn.classList.remove('border-amber-500', 'text-amber-950', 'border-2');
+                btn.classList.add('border-slate-200', 'text-slate-700');
+            });
+            const activeBtn = document.getElementById(`btn-layout-${layout}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('border-slate-200', 'text-slate-700');
+                activeBtn.classList.add('border-amber-500', 'text-amber-950', 'border-2');
+            }
+
+            const cellExterior = document.getElementById('cell-exterior');
+            const cellFloorplan = document.getElementById('cell-floorplan');
+            const cellFeatures = document.getElementById('cell-features');
+
+            if (layout === 'photo') {
+                cellExterior.className = "col-span-5 flex flex-col justify-between h-full transition-all duration-300 overflow-hidden";
+                cellFloorplan.className = "col-span-4 flex flex-col h-full transition-all duration-300 overflow-hidden";
+                cellFeatures.className = "col-span-3 flex flex-col h-full transition-all duration-300 overflow-hidden";
+            } else if (layout === 'floorplan') {
+                cellExterior.className = "col-span-3 flex flex-col justify-between h-full transition-all duration-300 overflow-hidden";
+                cellFloorplan.className = "col-span-6 flex flex-col h-full transition-all duration-300 overflow-hidden";
+                cellFeatures.className = "col-span-3 flex flex-col h-full transition-all duration-300 overflow-hidden";
+            } else if (layout === 'info') {
+                cellExterior.className = "col-span-3 flex flex-col justify-between h-full transition-all duration-300 overflow-hidden";
+                cellFloorplan.className = "col-span-3 flex flex-col h-full transition-all duration-300 overflow-hidden";
+                cellFeatures.className = "col-span-6 flex flex-col h-full transition-all duration-300 overflow-hidden";
+            }
+        }
+
+        // レイアウト文字の幅や長さ調節ハック
+        function adjustA4TypographySafety() {
+            const ribbonText = document.getElementById('txt-top-ribbon');
+            if (ribbonText.innerText.length > 40) {
+                ribbonText.style.fontSize = "13px";
+            } else {
+                ribbonText.style.fontSize = "16px";
+            }
+        }
+
+        // A4用紙の自動ズーム（フィッティング）機能
+        function autoFitCanvas() {
             const container = document.getElementById('zoom-container');
-            if (!workspace || !container) return;
+            const mainArea = container.parentElement;
+            
+            const padX = 32;
+            const padY = 32;
+            const targetW = 1122;
+            const targetH = 793;
 
-            const workspaceWidth = workspace.clientWidth - 32; // 余白32px考慮
-            const workspaceHeight = workspace.clientHeight - 32;
-            const canvasWidth = 1122;
-            const canvasHeight = 793;
+            const availW = mainArea.clientWidth - padX;
+            const availH = mainArea.clientHeight - padY;
 
-            const scaleX = workspaceWidth / canvasWidth;
-            const scaleY = workspaceHeight / canvasHeight;
+            const scaleX = availW / targetW;
+            const scaleY = availH / targetH;
             const scale = Math.min(scaleX, scaleY, 1);
 
             container.style.transform = `scale(${scale})`;
         }
 
-        // イベントリスナー設定
-        window.addEventListener('resize', fitCanvasToScreen);
-        window.addEventListener('load', () => {
+        /* ==========================================================================
+           【新規追加機能】新規作成（クリア） ＆ 保存（エクスポート） ＆ 読込（インポート）
+           ========================================================================== */
+
+        // 1. 新規作成（すべてのフォームデータを初期化）
+        function createNewMaisoku() {
+            if (!confirm("現在の編集内容が消去されます。新しく物件情報を作成してもよろしいですか？")) {
+                return;
+            }
+
+            // 主要なテキスト項目を真っ白に、またはデフォルト値に変更
+            const emptyData = {
+                'top-ribbon': "【アピールタイトルをここに入力】",
+                'building-name': "【物件名】",
+                'sub-catch': "【アピールポイントや特記事項を入力】",
+                'rent': "0",
+                'service': "0",
+                'shikikin': "なし",
+                'reikin': "なし",
+                'deposit': "なし / なし",
+                'key-fee': "不要",
+                'layout': "1R",
+                'area': "20.00",
+                'balcony': "0.00㎡",
+                'address': "東京都江戸川区",
+                'structure': "RC造",
+                'built': "2026年築",
+                'entry': "相談",
+                'contract': "普通借家 2年",
+                'status': "空室",
+                'route': "最寄りの路線名",
+                'station': "葛西",
+                'walk': "5",
+                'room': "101号室"
+            };
+
+            applyInputSet(emptyData);
+
+            // アピール設備をクリア
+            selectedFeatures = [];
+            updateFeaturesUI();
+
+            // 間取り図、写真をリセット（選択中のノーマル等に初期化）
+            hasCustomFloorplan = false;
+            applyStylePreset('normal'); // デフォルトは標準テーマにする
+            applyLayoutPreset('photo');
+        }
+
+        // 2. データ保存（現在すべての入力状況をJSONファイルにエクスポート）
+        function exportMaisokuData() {
+            const keys = [
+                'top-ribbon', 'building-name', 'sub-catch', 'rent', 'service', 
+                'shikikin', 'reikin', 'deposit', 'key-fee', 'layout', 'area', 
+                'balcony', 'address', 'structure', 'built', 'entry', 'contract', 
+                'status', 'route', 'station', 'walk', 'room',
+                'deal', 'commission', 'ad', 'company', 'license', 'company-address', 'tel', 'fax'
+            ];
+
+            const payload = {
+                theme: currentTheme,
+                layoutPreset: currentLayout,
+                selectedFeatures: selectedFeatures,
+                hasCustomFloorplan: hasCustomFloorplan,
+                fields: {}
+            };
+
+            keys.forEach(key => {
+                const el = document.getElementById(`input-${key}`);
+                if (el) {
+                    payload.fields[key] = el.value;
+                }
+            });
+
+            // JSONオブジェクトの作成
+            const jsonString = JSON.stringify(payload, null, 2);
+            const blob = new Blob([jsonString], { type: 'application/json' });
+            
+            // 物件名を含めたファイル名の設定
+            const bldName = document.getElementById('input-building-name').value || 'property';
+            const fileName = `マイソクデータ_${bldName}.json`;
+
+            // aタグを使ったダウンロード処理
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = fileName;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        // 3. データ読込トリガー
+        function triggerImport() {
+            document.getElementById('input-import-json').click();
+        }
+
+        // 4. データ読込（エクスポートされたJSONファイルを解析してUIを完全復元）
+        function importMaisokuData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+
+                    // テーマとレイアウトの復元
+                    if (data.theme) {
+                        currentTheme = data.theme;
+                        const canvas = document.getElementById('maisoku-canvas');
+                        canvas.className = canvas.className.replace(/theme-\w+/g, `theme-${data.theme}`);
+                    }
+                    if (data.layoutPreset) {
+                        applyLayoutPreset(data.layoutPreset);
+                    }
+
+                    // テキストフィールド群の復元
+                    if (data.fields) {
+                        for (const [key, val] of Object.entries(data.fields)) {
+                            const input = document.getElementById(`input-${key}`);
+                            if (input) {
+                                input.value = val;
+                            }
+                            updateValue(key, val);
+                        }
+                    }
+
+                    // おすすめ設備の復元
+                    if (data.selectedFeatures) {
+                        selectedFeatures = data.selectedFeatures;
+                        updateFeaturesUI();
+                    }
+
+                    // テーマプリセット（ボタンハイライト、写真リセット）をテーマに合わせて適用
+                    const activeBtn = document.getElementById(`btn-preset-${currentTheme}`);
+                    if (activeBtn) {
+                        document.querySelectorAll('.preset-btn').forEach(btn => {
+                            btn.classList.remove('border-indigo-600', 'text-indigo-950', 'border-2');
+                            btn.classList.add('border-slate-200', 'text-slate-700');
+                        });
+                        activeBtn.classList.remove('border-slate-200', 'text-slate-700');
+                        activeBtn.classList.add('border-indigo-600', 'text-indigo-950', 'border-2');
+                    }
+
+                    // 写真と間取りのデフォルトをセット
+                    setPresetPhotos(currentTheme);
+                    if (!data.hasCustomFloorplan) {
+                        hasCustomFloorplan = false;
+                        setPresetFloorplan(currentTheme);
+                    }
+
+                    alert("物件データファイルを正常に読み込みました。");
+                } catch (err) {
+                    alert("ファイルを読み込めませんでした。マイソク専用の正しいJSONファイルかご確認ください。");
+                    console.error(err);
+                }
+            };
+            reader.readAsText(file);
+            
+            // inputのバリューをクリアして同じファイルを連続選択可能にする
+            event.target.value = '';
+        }
+
+        // 初期ロード設定
+        window.onload = function() {
+            renderPresetButtons();
             applyStylePreset('highgrade');
-            applyLayoutPreset('floorplan'); // デフォルトは間取り図重視
-            fitCanvasToScreen();
-        });
+            applyLayoutPreset('photo');
+            
+            autoFitCanvas();
+            window.addEventListener('resize', autoFitCanvas);
+        }
     </script>
 </body>
 </html>
