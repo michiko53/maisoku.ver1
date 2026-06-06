@@ -3,2031 +3,1402 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>マイソク作成ツール - ターゲット連動型間取り図自動生成</title>
+  <title>プロフェッショナル マイソクデザイナー (A4横向き・帯替え＆新規作成)</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- FontAwesome Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- jsPDF & html2canvas -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <!-- Google Fonts BIZ UD / Noto Sans -->
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts for targeting styles -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=BIZ+UDGothic:wght@400;700&family=Noto+Sans+JP:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kiwi+Maru:wght@400;500&family=Noto+Sans+JP:wght@300;400;500;700;900&family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet">
   
   <style>
-    body {
-      font-family: 'Noto Sans JP', 'BIZ UDGothic', sans-serif;
-      background-color: #f8fafc;
-    }
-    /* A4横比率 (297:210 -> 1.414:1) */
-    .maisoku-preview-container {
-      width: 100%;
-      max-width: 1122px; 
-      aspect-ratio: 297 / 210;
-      background-color: #ffffff;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -6px rgba(0, 0, 0, 0.1);
-      position: relative;
-      overflow: hidden;
-    }
-    /* 印刷/PDF用 厳密なA4寸法 (1122px x 793px) */
-    .maisoku-sheet {
-      width: 1122px;
-      height: 793px;
-      padding: 24px;
-      box-sizing: border-box;
-      background-color: #ffffff;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      position: absolute;
-      top: 0;
-      left: 0;
-      transform-origin: top left;
-    }
-    /* FAX/モノクロコピー用のスタイル適用クラス */
-    .theme-monochrome {
-      filter: grayscale(100%) contrast(120%);
-    }
-    .theme-monochrome .bg-slate-900,
-    .theme-monochrome .bg-blue-600,
-    .theme-monochrome .bg-indigo-600 {
-      background-color: #000000 !important;
-      color: #ffffff !important;
-    }
-    .theme-monochrome .text-blue-600,
-    .theme-monochrome .text-red-600 {
-      color: #000000 !important;
-    }
-    .theme-monochrome polygon {
-      fill: #ffffff !important;
-      stroke: #000000 !important;
-    }
-    .theme-monochrome .bg-amber-50,
-    .theme-monochrome .bg-slate-50,
-    .theme-monochrome .bg-blue-50 {
-      background-color: #ffffff !important;
-      border-color: #000000 !important;
-    }
-
-    .custom-scroll::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    .custom-scroll::-webkit-scrollbar-track {
-      background: #f1f5f9;
-    }
-    .custom-scroll::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 3px;
+    /* ターゲット層ごとのフォント設定 */
+    .font-family { font-family: 'Kiwi Maru', 'Noto Sans JP', sans-serif; }
+    .font-stylish { font-family: 'Noto Sans JP', sans-serif; font-weight: 500; }
+    .font-luxury { font-family: 'Noto Serif JP', 'Noto Sans JP', serif; }
+    
+    /* スムーズなドラッグエリアのスタイリング */
+    .drag-over {
+      border-color: #3b82f6;
+      background-color: #eff6ff;
     }
     
-    /* スタンプ用のドラッグオーバー視覚効果 */
-    .stamp-item {
-      transition: transform 0.2s;
-    }
-    .stamp-item:hover {
-      transform: scale(1.1);
-    }
-    .placed-stamp {
-      cursor: move;
+    /* キャンバス内の要素操作用アウトライン */
+    .canvas-element {
       user-select: none;
     }
-    .placed-stamp:hover {
-      outline: 2px dashed #3b82f6;
+    .canvas-element.selected {
+      outline: 2px solid #3b82f6;
+      outline-offset: 2px;
+    }
+    .resize-handle {
+      width: 10px;
+      height: 10px;
+      background-color: #3b82f6;
+      border: 1px solid #ffffff;
+      position: absolute;
+      right: -5px;
+      bottom: -5px;
+      cursor: nwse-resize;
+      display: none;
+    }
+    .canvas-element.selected .resize-handle {
+      display: block;
+    }
+    
+    /* スクロールバー非表示 */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
     }
 
-    /* CADグリッド背景パターン（家具配置ボタン用） */
-    .cad-grid-bg {
-      background-color: #ffffff;
-      background-image: 
-        linear-gradient(to right, #f1f5f9 1px, transparent 1px),
-        linear-gradient(to bottom, #f1f5f9 1px, transparent 1px);
-      background-size: 8px 8px;
+    /* 印刷時に余白なしでA4横ぴったりに印刷するための設定 */
+    @media print {
+      body {
+        margin: 0;
+        padding: 0;
+        background: #ffffff;
+      }
+      /* キャンバス以外のUIを全て非表示 */
+      header, 
+      section:first-of-type, 
+      .lg\:w-\[55\%\] > div:first-of-type {
+        display: none !important;
+      }
+      /* プレビューエリアのコンテナ幅・スクロール調整を解除 */
+      .lg\:w-\[55\%\] {
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+        background: none !important;
+        display: block !important;
+      }
+      /* キャンバスをA4横サイズに絶対配置 */
+      #myisoku-canvas {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 297mm !important;
+        height: 210mm !important;
+        margin: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+        page-break-after: avoid;
+      }
+      /* ブラウザ規定の余白をゼロにする */
+      @page {
+        size: A4 landscape;
+        margin: 0;
+      }
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans overflow-x-hidden antialiased">
 
   <!-- ヘッダー -->
-  <header class="bg-slate-950 text-white shadow-md px-6 py-4 flex flex-wrap justify-between items-center gap-4 border-b border-slate-800 z-10">
+  <header class="bg-slate-900 text-white py-4 px-6 shadow-md flex justify-between items-center z-10">
     <div class="flex items-center gap-3">
-      <div class="bg-gradient-to-tr from-blue-600 to-indigo-600 p-2 rounded-xl text-white shadow-md shadow-blue-500/20">
-        <i class="fa-solid fa-hotel text-2xl"></i>
+      <div class="bg-blue-600 p-2 rounded text-white flex items-center justify-center">
+        <i data-lucide="home" class="w-6 h-6"></i>
       </div>
       <div>
-        <div class="flex items-center gap-2">
-          <h1 class="text-xl font-black tracking-wider bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-200">マイソク作成ツール</h1>
-          <span class="bg-indigo-900/50 text-indigo-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-indigo-800">v2.4 Premium</span>
-        </div>
-        <p class="text-xs text-slate-400">間取り図自動生成 ＆ 設備バッジマッピング ＆ アピール選択ポップアップ</p>
+        <h1 class="text-xl font-bold tracking-wider">MaisonCraft Pro</h1>
+        <p class="text-xs text-slate-400">不動産マイソク高画質作成＆帯替えツール (A4横向きモデル)</p>
       </div>
     </div>
     
-    <div class="flex items-center gap-2 flex-wrap">
-      <!-- テーマスイッチ (カラー / モノクロFAX) -->
-      <div class="flex bg-slate-800 rounded-lg p-1 border border-slate-700 mr-2 text-xs">
-        <button id="btnThemeColor" class="px-3 py-1.5 rounded-md font-bold text-white bg-blue-600 transition-all flex items-center gap-1">
-          <i class="fa-solid fa-palette text-xs"></i> カラー
-        </button>
-        <button id="btnThemeMono" class="px-3 py-1.5 rounded-md font-bold text-slate-400 hover:text-white transition-all flex items-center gap-1">
-          <i class="fa-solid fa-print text-xs"></i> モノクロFAX
-        </button>
-      </div>
-      
-      <button id="btnLoadSample" class="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white px-3.5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-1.5 border border-slate-700">
-        <i class="fa-solid fa-folder-open"></i> サンプルCAD
+    <!-- 操作ボタン -->
+    <div class="flex items-center gap-3">
+      <button id="btn-print" onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded shadow flex items-center gap-2 transition duration-200">
+        <i data-lucide="printer" class="w-4 h-4"></i>
+        <span>そのまま印刷 (A4横余白なし)</span>
       </button>
-      <button id="btnImgExport" class="bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white px-3.5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-1.5 border border-slate-700">
-        <i class="fa-solid fa-image"></i> 画像で保存
+      <button id="btn-export" class="bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 px-4 rounded shadow flex items-center gap-2 transition duration-200">
+        <i data-lucide="download" class="w-4 h-4"></i>
+        <span>高画質画像出力 (PNG)</span>
       </button>
-      <button id="btnPdfExport" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white px-5 py-2 rounded-lg text-sm font-black tracking-wide shadow-lg shadow-blue-900/30 transition-all flex items-center gap-1.5">
-        <i class="fa-solid fa-file-pdf"></i> 高精細PDF出力
+      <button id="btn-reset" class="bg-slate-700 hover:bg-slate-600 text-slate-200 py-2 px-3 rounded text-sm flex items-center gap-1 transition duration-200">
+        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+        <span>初期化</span>
       </button>
     </div>
   </header>
 
-  <!-- メインコンテンツ領域 -->
-  <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 overflow-hidden">
+  <!-- メインコンテンツ -->
+  <main class="flex-1 flex flex-col lg:flex-row overflow-hidden h-[calc(100vh-73px)]">
     
-    <!-- 左サイドバー: 編集・各種設定フォーム (5カラム) -->
-    <section class="lg:col-span-5 flex flex-col gap-6 max-h-[calc(100vh-120px)] overflow-y-auto pr-2 custom-scroll">
+    <!-- 左側サイドバー：編集・ツール操作パネル (横幅40% / スクロール可能) -->
+    <section class="w-full lg:w-[40%] bg-slate-100 border-r border-slate-200 flex flex-col h-full overflow-y-auto p-6 space-y-6 no-scrollbar shrink-0">
       
-      <!-- 1. ターゲットセレクター＆AIキャッチコピー -->
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 space-y-4">
-        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-          <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-            <span class="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-blue-600 text-xs font-bold">1</span>
-            ターゲット（間取り図連動）設定
-          </h2>
-          <span class="text-xs text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded">図面構成変化</span>
+      <!-- ターゲット層の選択（3種類） -->
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+        <div class="flex items-center gap-2 mb-3">
+          <i data-lucide="palette" class="text-indigo-600 w-5 h-5"></i>
+          <h2 class="text-base font-bold text-slate-800">1. ターゲット層テンプレート設定</h2>
         </div>
-
-        <!-- ターゲット選択 -->
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1.5">生活スタイル・入居ターゲット（間取り図・設備が即時切り替わります）</label>
-          <div class="grid grid-cols-3 gap-2 text-xs">
-            <button class="target-btn px-2.5 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 font-bold transition-all flex flex-col items-center gap-1" data-target="single">
-              <i class="fa-solid fa-user text-lg"></i>
-              <span>単身・社会人</span>
-            </button>
-            <button class="target-btn px-2.5 py-2 rounded-xl border border-slate-200 bg-white text-slate-600 font-bold transition-all flex flex-col items-center gap-1" data-target="couple">
-              <i class="fa-solid fa-user-group text-lg"></i>
-              <span>二人暮らし・新婚</span>
-            </button>
-            <button class="target-btn px-2.5 py-2 rounded-xl border-2 border-blue-600 bg-blue-50 text-blue-700 font-black transition-all flex flex-col items-center gap-1" data-target="family">
-              <i class="fa-solid fa-people-roof text-lg"></i>
-              <span>ファミリー・家族</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- キャッチコピー生成 -->
-        <div>
-          <div class="flex justify-between items-center mb-1.5">
-            <label class="block text-xs font-bold text-slate-700">キャッチコピー自動選定/生成</label>
-            <button id="btnAiGenerate" class="bg-blue-50 hover:bg-blue-100 text-blue-700 text-[11px] font-bold px-2 py-1 rounded-md border border-blue-200 flex items-center gap-1 transition-colors">
-              <i class="fa-solid fa-wand-magic-sparkles"></i> コピー再生成
-            </button>
-          </div>
-          <input type="text" id="formCatch" class="w-full text-xs border border-slate-300 rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none font-bold text-slate-800" value="★南西角部屋！ファミリーみんなが主役になる広々2LDKデザイナーズ★">
-          
-          <!-- 禁止用語警告アラート -->
-          <div id="banAlert" class="mt-2 text-[10.5px] p-2 bg-red-50 border border-red-200 text-red-700 rounded-lg hidden">
-            <div class="flex items-center gap-1.5 font-bold mb-0.5">
-              <i class="fa-solid fa-circle-exclamation text-red-500"></i> 不当表示・禁止表現の恐れがあります
-            </div>
-            <div id="banAlertText">「日本一」「最高級」などの絶対的表現は客観的根拠がない場合、不動産公正競争規約に違反します。</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 2. CADインポート & レイヤクリーンアップ -->
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
-        <div class="flex justify-between items-center mb-3">
-          <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-            <span class="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-blue-600 text-xs font-bold">2</span>
-            JWW CAD / DXF インポート
-          </h2>
-          <span class="text-xs text-slate-400 font-medium" id="jwwVerLabel">Jw_cad .jww / .dxf</span>
-        </div>
-        
-        <div class="border-2 border-dashed border-slate-200 hover:border-blue-500 rounded-xl p-5 text-center cursor-pointer transition-all bg-slate-50/50 hover:bg-blue-50/10 relative" id="dropzone">
-          <input type="file" id="cadFileInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept=".jww,.dxf">
-          <div class="space-y-1">
-            <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-400"></i>
-            <p class="text-xs font-bold text-slate-700">JWW / DXF データをここにドロップ</p>
-            <p class="text-[10px] text-slate-500">自動で通り芯・ハッチングを広告用へ最適化除去</p>
-          </div>
-        </div>
-        
-        <!-- 解析ステータス＆最適化フィルタ -->
-        <div id="cadStatusBlock" class="mt-4 p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-2.5">
-          <div class="flex justify-between items-center border-b border-slate-200 pb-1.5">
-            <span class="font-bold flex items-center gap-1 text-slate-700"><i class="fa-solid fa-microchip text-blue-500"></i> レンダリングソース:</span>
-            <span id="cadFileName" class="text-slate-900 font-mono font-bold truncate max-w-[200px]">sample_plan.jww</span>
-          </div>
-          
-          <!-- クリーンアップコントロール -->
-          <div>
-            <p class="font-bold text-slate-700 mb-2 flex items-center gap-1 text-[11px]">
-              <i class="fa-solid fa-wand-magic-sparkles text-indigo-500"></i> 広告図面自動最適化フィルタ
-            </p>
-            <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-600">
-              <label class="flex items-center gap-1.5 cursor-pointer">
-                <input type="checkbox" id="chkCleanGrid" checked class="rounded text-blue-600 focus:ring-blue-500">
-                <span>通り芯（赤線）を自動消去</span>
-              </label>
-              <label class="flex items-center gap-1.5 cursor-pointer">
-                <input type="checkbox" id="chkCleanDims" checked class="rounded text-blue-600 focus:ring-blue-500">
-                <span>寸法線・寸法値を非表示</span>
-              </label>
-              <label class="flex items-center gap-1.5 cursor-pointer">
-                <input type="checkbox" id="chkCleanHatch" checked class="rounded text-blue-600 focus:ring-blue-500">
-                <span>ハッチングを完全除去</span>
-              </label>
-              <label class="flex items-center gap-1.5 cursor-pointer">
-                <input type="checkbox" id="chkDupMerge" checked class="rounded text-blue-600 focus:ring-blue-500">
-                <span>重複線をマージ（軽量化）</span>
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 3. インタラクティブ家具配置スタンプライブラリ -->
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 space-y-4">
-        <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-          <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-            <span class="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-blue-600 text-xs font-bold">3</span>
-            家具・インテリアスタンプ配置
-          </h2>
-          <span class="text-xs font-semibold text-slate-500 flex items-center gap-1 bg-slate-100 px-2 py-0.5 rounded-full">
-            <i class="fa-solid fa-arrows-up-down-left-right text-indigo-500"></i>
-            ドラッグ可
-          </span>
-        </div>
-        
-        <p class="text-[11px] text-slate-500 leading-relaxed">
-          クリックすると、図面（完成図）の適切な位置へ配置されます。配置した家具はドラッグで自由に移動でき、選択中に <kbd class="px-1.5 py-0.5 text-[9px] font-bold text-slate-800 bg-slate-100 border border-slate-300 rounded shadow-sm">Delete</kbd> キーで消去できます。
-        </p>
-        
-        <div class="grid grid-cols-3 gap-3 text-center">
-          
-          <!-- シングルベッド -->
-          <button class="stamp-btn group relative p-2 border border-slate-200 hover:border-blue-500 rounded-xl hover:shadow-md hover:shadow-blue-500/5 transition-all duration-300 flex flex-col items-center gap-1.5 text-slate-700 cad-grid-bg overflow-hidden" data-type="bed" title="ベッドを配置">
-            <div class="w-10 h-10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 relative z-10">
-              <svg class="w-9 h-9 stroke-slate-800 group-hover:stroke-blue-600 fill-white transition-colors duration-300" viewBox="0 0 40 40">
-                <rect x="5" y="6" width="30" height="28" rx="3" stroke-width="1.8"/>
-                <rect x="7" y="8" width="12" height="9" rx="1.5" stroke-width="1" fill="#f1f5f9"/>
-                <rect x="21" y="8" width="12" height="9" rx="1.5" stroke-width="1" fill="#f1f5f9"/>
-                <line x1="5" y1="21" x2="35" y2="21" stroke-width="1" stroke-dasharray="2,2"/>
-              </svg>
-            </div>
-            <span class="text-[10px] font-bold tracking-tight text-slate-700 group-hover:text-blue-600 transition-colors duration-300 relative z-10">ベッド</span>
+        <p class="text-xs text-slate-500 mb-4">選択したターゲットに合わせて、ヘッダー・フッター・文字飾り・配色・フォントが自動で最適化されます。</p>
+        <div class="grid grid-cols-3 gap-3">
+          <!-- ファミリー -->
+          <button id="target-family" class="target-btn border-2 border-indigo-600 bg-indigo-50/50 p-3 rounded-lg text-left flex flex-col justify-between transition hover:border-indigo-600" onclick="switchTarget('family')">
+            <span class="text-xs text-green-700 font-bold bg-green-100 px-2 py-0.5 rounded-full w-max mb-2">温かみ・信頼</span>
+            <span class="font-bold text-sm text-slate-800">ファミリー向け</span>
+            <span class="text-[10px] text-slate-500 mt-1">ゴシック / アースカラー</span>
           </button>
-          
-          <!-- ソファー -->
-          <button class="stamp-btn group relative p-2 border border-slate-200 hover:border-blue-500 rounded-xl hover:shadow-md hover:shadow-blue-500/5 transition-all duration-300 flex flex-col items-center gap-1.5 text-slate-700 cad-grid-bg overflow-hidden" data-type="sofa" title="ソファを配置">
-            <div class="w-10 h-10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 relative z-10">
-              <svg class="w-9 h-9 stroke-slate-800 group-hover:stroke-blue-600 fill-white transition-colors duration-300" viewBox="0 0 40 40">
-                <rect x="5" y="8" width="30" height="24" rx="3" stroke-width="1.8"/>
-                <rect x="9" y="11" width="22" height="18" rx="1.5" stroke-width="1" fill="#f1f5f9"/>
-                <path d="M 5,16 L 9,16 M 35,16 L 31,16" stroke-width="1.5"/>
-              </svg>
-            </div>
-            <span class="text-[10px] font-bold tracking-tight text-slate-700 group-hover:text-blue-600 transition-colors duration-300 relative z-10">ソファー</span>
+          <!-- 単身・スタイリッシュ -->
+          <button id="target-stylish" class="target-btn border border-slate-200 bg-white p-3 rounded-lg text-left flex flex-col justify-between transition hover:border-blue-500" onclick="switchTarget('stylish')">
+            <span class="text-xs text-blue-700 font-bold bg-blue-100 px-2 py-0.5 rounded-full w-max mb-2">モダン・都会</span>
+            <span class="font-bold text-sm text-slate-800">単身・モダン</span>
+            <span class="text-[10px] text-slate-500 mt-1">ゴシック / ネイビー＆グレー</span>
           </button>
-          
-          <!-- テーブル -->
-          <button class="stamp-btn group relative p-2 border border-slate-200 hover:border-blue-500 rounded-xl hover:shadow-md hover:shadow-blue-500/5 transition-all duration-300 flex flex-col items-center gap-1.5 text-slate-700 cad-grid-bg overflow-hidden" data-type="table" title="テーブルと椅子を配置">
-            <div class="w-10 h-10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 relative z-10">
-              <svg class="w-9 h-9 stroke-slate-800 group-hover:stroke-blue-600 fill-white transition-colors duration-300" viewBox="0 0 40 40">
-                <rect x="9" y="11" width="22" height="18" rx="2" stroke-width="1.8" />
-                <circle cx="20" cy="20" r="2" fill="currentColor"/>
-                <rect x="14" y="6" width="12" height="4" rx="1" stroke-width="1" fill="#f1f5f9"/>
-                <rect x="14" y="30" width="12" height="4" rx="1" stroke-width="1" fill="#f1f5f9"/>
-                <rect x="4" y="15" width="4" height="10" rx="1" stroke-width="1" fill="#f1f5f9"/>
-                <rect x="32" y="15" width="4" height="10" rx="1" stroke-width="1" fill="#f1f5f9"/>
-              </svg>
-            </div>
-            <span class="text-[10px] font-bold tracking-tight text-slate-700 group-hover:text-blue-600 transition-colors duration-300 relative z-10">テーブル</span>
-          </button>
-
-          <!-- 観葉植物 -->
-          <button class="stamp-btn group relative p-2 border border-slate-200 hover:border-blue-500 rounded-xl hover:shadow-md hover:shadow-blue-500/5 transition-all duration-300 flex flex-col items-center gap-1.5 text-slate-700 cad-grid-bg overflow-hidden" data-type="plant" title="観葉植物を配置">
-            <div class="w-10 h-10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 relative z-10">
-              <svg class="w-9 h-9 stroke-slate-800 group-hover:stroke-emerald-600 fill-white transition-colors duration-300" viewBox="0 0 40 40">
-                <circle cx="20" cy="20" r="7" stroke-width="1.8"/>
-                <path d="M 20,8 C 20,8 24,12 20,20 C 16,12 20,8 20,8 Z" fill="#34d399" stroke-width="0.8"/>
-                <path d="M 8,20 C 8,20 12,16 20,20 C 12,24 8,20 8,20 Z" fill="#34d399" stroke-width="0.8"/>
-                <path d="M 32,20 C 32,20 28,24 20,20 C 28,16 32,20 32,20 Z" fill="#34d399" stroke-width="0.8"/>
-              </svg>
-            </div>
-            <span class="text-[10px] font-bold tracking-tight text-slate-700 group-hover:text-emerald-600 transition-colors duration-300 relative z-10">観葉植物</span>
-          </button>
-
-          <!-- IHコンロ -->
-          <button class="stamp-btn group relative p-2 border border-slate-200 hover:border-blue-500 rounded-xl hover:shadow-md hover:shadow-blue-500/5 transition-all duration-300 flex flex-col items-center gap-1.5 text-slate-700 cad-grid-bg overflow-hidden" data-type="kitchen_ih" title="キッチンの3口IHコンロを配置">
-            <div class="w-10 h-10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 relative z-10">
-              <svg class="w-9 h-9 stroke-slate-800 group-hover:stroke-blue-600 fill-white transition-colors duration-300" viewBox="0 0 40 40">
-                <rect x="5" y="9" width="30" height="22" rx="2" stroke-width="1.8"/>
-                <circle cx="13" cy="20" r="5" stroke-width="1.2" fill="none"/>
-                <circle cx="27" cy="20" r="5" stroke-width="1.2" fill="none"/>
-                <circle cx="20" cy="15" r="3.5" stroke-width="1" fill="none"/>
-                <line x1="8" y1="27" x2="32" y2="27" stroke-width="0.8"/>
-                <circle cx="11" cy="27" r="0.8" fill="currentColor"/>
-                <circle cx="15" cy="27" r="0.8" fill="currentColor"/>
-                <circle cx="19" cy="27" r="0.8" fill="currentColor"/>
-              </svg>
-            </div>
-            <span class="text-[10px] font-bold tracking-tight text-slate-700 group-hover:text-blue-600 transition-colors duration-300 relative z-10">IHコンロ</span>
-          </button>
-
-          <!-- 車 -->
-          <button class="stamp-btn group relative p-2 border border-slate-200 hover:border-blue-500 rounded-xl hover:shadow-md hover:shadow-blue-500/5 transition-all duration-300 flex flex-col items-center gap-1.5 text-slate-700 cad-grid-bg overflow-hidden" data-type="car" title="ガレージに車を配置">
-            <div class="w-10 h-10 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 relative z-10">
-              <svg class="w-9 h-9 stroke-slate-800 group-hover:stroke-indigo-600 fill-white transition-colors duration-300" viewBox="0 0 40 40">
-                <path d="M 12,6 C 16,5.5 24,5.5 28,6 C 31,6.5 32,8 32,11 C 32,20 32,20 32,29 C 32,32 31,33.5 28,34 C 24,34.5 16,34.5 12,34 C 9,33.5 8,32 8,29 C 8,20 8,20 8,11 C 8,8 9,6.5 12,6 Z" stroke-width="1.8" fill="none" />
-                <path d="M 10,13 C 14,12 26,12 30,13" stroke-width="1.2"/>
-                <path d="M 11,27 C 14,28 26,28 29,27" stroke-width="1.2"/>
-                <rect x="5" y="11" width="3" height="1.5" rx="0.5" stroke-width="1" />
-                <rect x="32" y="11" width="3" height="1.5" rx="0.5" stroke-width="1" />
-                <line x1="12" y1="9" x2="28" y2="9" stroke-width="1" stroke-dasharray="2,1"/>
-              </svg>
-            </div>
-            <span class="text-[10px] font-bold tracking-tight text-slate-700 group-hover:text-indigo-600 transition-colors duration-300 relative z-10">車 (ガレージ用)</span>
-          </button>
-          
-        </div>
-
-        <div class="flex justify-between items-center mt-3 pt-2 border-t border-slate-100">
-          <span class="text-[11px] text-slate-500 font-semibold flex items-center gap-1.5">
-            <span class="w-2 h-2 rounded-full bg-blue-500"></span>
-            追加配置スタンプ数: <span id="lblStampCount" class="font-bold text-slate-800 font-mono">0</span>
-          </span>
-          <button id="btnClearStamps" class="text-[11px] text-red-500 hover:text-red-700 font-extrabold flex items-center gap-1.5 transition-all hover:translate-x-0.5">
-            <i class="fa-solid fa-trash-can"></i> 全てクリア
+          <!-- 高級・レジデンス -->
+          <button id="target-luxury" class="target-btn border border-slate-200 bg-white p-3 rounded-lg text-left flex flex-col justify-between transition hover:border-amber-500" onclick="switchTarget('luxury')">
+            <span class="text-xs text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded-full w-max mb-2">高級感・重厚</span>
+            <span class="font-bold text-sm text-slate-800">高級・レジデンス</span>
+            <span class="text-[10px] text-slate-500 mt-1">明朝体 / ゴールド＆ダーク</span>
           </button>
         </div>
       </div>
 
-      <!-- 4. 物件基本情報フォーム（アピールポイントの複数ポップアップ選択化） -->
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 space-y-4">
-        <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-          <span class="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-blue-600 text-xs font-bold">4</span>
-          物件詳細情報
-        </h2>
+      <!-- モード切替: ①他社マイソク帯替 / ②新規作成 -->
+      <div class="bg-white rounded-xl p-1 shadow-sm border border-slate-200 flex">
+        <button id="tab-orig-mode" class="flex-1 py-3 text-center rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2 bg-indigo-600 text-white" onclick="switchCreatorMode('orig')">
+          <i data-lucide="copy" class="w-4 h-4"></i>
+          ① 他社マイソクの帯替
+        </button>
+        <button id="tab-new-mode" class="flex-1 py-3 text-center rounded-lg font-bold text-sm text-slate-600 transition-all flex items-center justify-center gap-2 hover:bg-slate-50" onclick="switchCreatorMode('new')">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          ② マイソクの新規作成
+        </button>
+      </div>
 
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">物件名</label>
-            <input type="text" id="formPropName" class="w-full text-xs border border-slate-300 rounded-lg px-3 py-2" value="グランドハイツ目黒">
+      <!-- ①帯替モードの操作パネル -->
+      <div id="panel-orig-mode" class="space-y-6">
+        <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+          <div class="flex items-center gap-2 mb-3">
+            <i data-lucide="upload-cloud" class="text-indigo-600 w-5 h-5"></i>
+            <h3 class="text-base font-bold text-slate-800">他社マイソクのアップロード</h3>
           </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">号室</label>
-            <input type="text" id="formRoom" class="w-full text-xs border border-slate-300 rounded-lg px-3 py-2" value="502号室">
-          </div>
-        </div>
-
-        <!-- 家賃・諸条件 -->
-        <div class="grid grid-cols-2 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200/50">
-          <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">賃料 / 価格</label>
-            <input type="text" id="formPrice" class="w-full text-xs border border-slate-300 rounded-lg px-3 py-1.5 font-bold text-red-600" value="185,000">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">管理費 / 共益費</label>
-            <input type="text" id="formKanri" class="w-full text-xs border border-slate-300 rounded-lg px-3 py-1.5" value="8,000円">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">敷金 / 保証金</label>
-            <input type="text" id="formShiki" class="w-full text-xs border border-slate-300 rounded-lg px-3 py-1.5" value="1ヶ月">
-          </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">礼金</label>
-            <input type="text" id="formRei" class="w-full text-xs border border-slate-300 rounded-lg px-3 py-1.5" value="1ヶ月">
-          </div>
-        </div>
-
-        <!-- 交通・徒歩分数 -->
-        <div class="space-y-1">
-          <div class="flex justify-between items-center">
-            <label class="text-xs font-bold text-slate-700">最寄交通アクセス ＆ 徒歩分数自動算出</label>
-            <span class="text-[9px] bg-slate-900 text-slate-100 px-1.5 py-0.5 rounded-full font-bold">1分 = 80m（道路距離基準）</span>
-          </div>
-          <div class="grid grid-cols-12 gap-2 items-center">
-            <input type="text" id="formStation" class="col-span-6 text-xs border border-slate-300 rounded-lg px-2 py-1.5" value="JR山手線「目黒」駅">
-            <span class="col-span-1 text-center text-xs text-slate-400">から</span>
-            <input type="number" id="formDistance" class="col-span-3 text-xs border border-slate-300 rounded-lg px-2 py-1.5 font-mono text-center font-bold text-slate-800" value="640" placeholder="距離m">
-            <span class="col-span-2 text-xs font-bold text-slate-800 text-right"><span id="lblCalcMins" class="text-blue-600 text-sm">8</span>分</span>
-          </div>
-          <div id="distanceAlert" class="text-[10.5px] text-emerald-600 bg-emerald-50 p-2 rounded-lg border border-emerald-100 flex items-center gap-1">
-            <i class="fa-solid fa-shield-halved"></i> 道路距離測定に基づく規約に完全適合しています。
-          </div>
-        </div>
-
-        <!-- 物件詳細テーブル項目 -->
-        <div class="grid grid-cols-2 gap-3 text-xs">
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">間取りタイプ</label>
-            <input type="text" id="formLayoutType" class="w-full border border-slate-300 rounded-lg px-2 py-1.5" value="2LDK">
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">専有面積</label>
-            <input type="text" id="formArea" class="w-full border border-slate-300 rounded-lg px-2 py-1.5 font-mono" value="58.45 ㎡">
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">築年月</label>
-            <input type="text" id="formBuilt" class="w-full border border-slate-300 rounded-lg px-2 py-1.5" value="2012年3月">
-          </div>
-          <div>
-            <label class="block font-semibold text-slate-600 mb-1">取引態様</label>
-            <select id="formTxType" class="w-full border border-slate-300 rounded-lg px-2 py-1.5 font-bold bg-white">
-              <option value="媒介（仲介）" selected>媒介（仲介）</option>
-              <option value="代理">代理</option>
-              <option value="売主">売主</option>
-              <option value="貸主">貸主</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- 設備バッジ設定 (間取り図のすぐ下にバッジとして自動出力・マッピング) -->
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1.5 flex items-center gap-1.5">
-            <span>🛠️ 設備表示スタンプ (間取り余白マッピング用)</span>
-            <span class="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full font-bold">図面連動</span>
-          </label>
-          <div class="flex flex-wrap gap-1.5 text-xs">
-            <button type="button" class="tag-toggle px-2 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 font-medium" data-icon="bath">🛁 バス・トイレ別</button>
-            <button type="button" class="tag-toggle px-2 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 font-medium" data-icon="kitchen">🍳 システムキッチン</button>
-            <button type="button" class="tag-toggle px-2 py-1 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 font-medium" data-icon="wash">🧺 独立洗面台</button>
-            <button type="button" class="tag-toggle px-2 py-1 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 font-medium" data-icon="air">❄️ エアコン</button>
-            <button type="button" class="tag-toggle px-2 py-1 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 font-medium" data-icon="lock">🔒 オートロック</button>
-          </div>
-        </div>
-
-        <!-- アピールポイント（選択式ポップアップコントロールにアップグレード） -->
-        <div class="space-y-2">
-          <div class="flex justify-between items-center">
-            <label class="block text-xs font-bold text-slate-700">📌 おすすめアピールポイント</label>
-            <button type="button" id="btnOpenPointsModal" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold px-3 py-1.5 rounded-lg border border-indigo-200 flex items-center gap-1 transition-all">
-              <i class="fa-solid fa-list-check"></i> ポップアップから複数選択
-            </button>
-          </div>
-          <!-- 選択中の項目をプレビューテキストエリアとして保持（手動編集も可） -->
-          <textarea id="formPoints" rows="4" class="w-full text-xs border border-slate-300 rounded-xl p-2.5 focus:ring-2 focus:ring-blue-500 focus:outline-none leading-relaxed" placeholder="アピールポイントがここに箇条書きされます..."></textarea>
-        </div>
-
-        <!-- 写真差し替え (3枚独立) -->
-        <div class="space-y-3">
-          <label class="block text-xs font-bold text-slate-700">物件写真（最大3枚アップロード）</label>
           
-          <div class="bg-slate-50 p-3 rounded-lg border border-slate-200/60 space-y-2">
-            <div class="flex justify-between items-center text-xs">
-              <span class="font-semibold text-slate-600">写真① (メイン：外観・LDK)</span>
-              <button type="button" onclick="document.getElementById('photo1Input').click()" class="text-[10px] bg-white border border-slate-300 rounded px-2 py-1 text-slate-700 hover:bg-slate-50">変更</button>
-              <input type="file" id="photo1Input" class="hidden" accept="image/*" data-photo-id="1">
+          <!-- ドラッグ＆ドロップエリア -->
+          <div id="drop-zone" class="border-2 border-dashed border-slate-300 hover:border-indigo-500 rounded-lg p-6 text-center cursor-pointer transition bg-slate-50 flex flex-col items-center justify-center">
+            <i data-lucide="image" class="w-12 h-12 text-slate-400 mb-2 font-bold"></i>
+            <span class="text-sm font-semibold text-slate-600">他社マイソク画像をここにドロップ</span>
+            <span class="text-xs text-slate-400 mt-1">またはファイルを選択</span>
+            <input type="file" id="file-input" accept="image/*" class="hidden">
+          </div>
+
+          <!-- プレビュー＆切り取り領域 -->
+          <div id="cropper-container" class="hidden mt-5 space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded">他社マイソクプレビュー</span>
+              <div class="flex gap-2">
+                <button id="btn-auto-detect" class="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 px-3 py-1 rounded text-xs font-bold flex items-center gap-1 transition">
+                  <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+                  <span>自動切り取り検出</span>
+                </button>
+              </div>
             </div>
-            <p id="photo1Name" class="text-[10px] text-slate-400 truncate">デフォルト外観写真</p>
-          </div>
-
-          <div class="bg-slate-50 p-3 rounded-lg border border-slate-200/60 space-y-2">
-            <div class="flex justify-between items-center text-xs">
-              <span class="font-semibold text-slate-600">写真② (サブ：内装・LDK)</span>
-              <button type="button" onclick="document.getElementById('photo2Input').click()" class="text-[10px] bg-white border border-slate-300 rounded px-2 py-1 text-slate-700 hover:bg-slate-50">変更</button>
-              <input type="file" id="photo2Input" class="hidden" accept="image/*" data-photo-id="2">
-            </div>
-            <p id="photo2Name" class="text-[10px] text-slate-400 truncate">デフォルトリビング写真</p>
-          </div>
-
-          <div class="bg-slate-50 p-3 rounded-lg border border-slate-200/60 space-y-2">
-            <div class="flex justify-between items-center text-xs">
-              <span class="font-semibold text-slate-600">写真③ (サブ：水回り・エントランス)</span>
-              <button type="button" onclick="document.getElementById('photo3Input').click()" class="text-[10px] bg-white border border-slate-300 rounded px-2 py-1 text-slate-700 hover:bg-slate-50">変更</button>
-              <input type="file" id="photo3Input" class="hidden" accept="image/*" data-photo-id="3">
-            </div>
-            <p id="photo3Name" class="text-[10px] text-slate-400 truncate">デフォルトキッチン写真</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- 5. 業者マスタ情報（一括帯替え機能搭載） -->
-      <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 space-y-3">
-        <div class="flex justify-between items-center">
-          <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2">
-            <span class="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-blue-600 text-xs font-bold">5</span>
-            仲介会社帯情報（一括帯替え）
-          </h2>
-          <!-- 帯切り替えスイッチ -->
-          <select id="selAgencyPreset" class="text-xs border border-slate-200 rounded-lg px-2 py-1 bg-slate-50 font-bold text-slate-700">
-            <option value="presetA">自社（テクノホーム）</option>
-            <option value="presetB">提携店（アドバンス不動産）</option>
-            <option value="empty">空欄（FAX・手書き用）</option>
-          </select>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <div>
-            <label class="block text-[10px] text-slate-500">店舗名/会社名</label>
-            <input type="text" id="formAgencyName" class="w-full border border-slate-300 rounded px-2 py-1" value="株式会社テクノホーム">
-          </div>
-          <div>
-            <label class="block text-[10px] text-slate-500">免許番号</label>
-            <input type="text" id="formAgencyLic" class="w-full border border-slate-300 rounded px-2 py-1" value="東京都知事 (2) 第98765号">
-          </div>
-          <div>
-            <label class="block text-[10px] text-slate-500">電話番号</label>
-            <input type="text" id="formAgencyTel" class="w-full border border-slate-300 rounded px-2 py-1" value="03-1234-5678">
-          </div>
-          <div>
-            <label class="block text-[10px] text-slate-500">メールアドレス</label>
-            <input type="text" id="formAgencyMail" class="w-full border border-slate-300 rounded px-2 py-1" value="info@technohome-sample.co.jp">
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 右コンテンツ領域: リアルタイムA4プレビュー ＆ CADコンソールログ (7カラム) -->
-    <section class="lg:col-span-7 flex flex-col gap-4">
-      
-      <!-- プレビューコントローラー -->
-      <div class="bg-white rounded-xl p-3 shadow-sm border border-slate-200 flex justify-between items-center">
-        <span class="text-xs font-bold text-slate-700 flex items-center gap-2">
-          <span class="inline-flex w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse"></span>
-          リアルタイムA4横プレビュー（比率 1.414 : 1）
-        </span>
-        <div class="flex items-center gap-2">
-          <button id="btnZoomIn" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded" title="拡大"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
-          <button id="btnZoomOut" class="p-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded" title="縮小"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
-          <span id="zoomPercent" class="text-xs text-slate-500 font-mono font-bold w-12 text-center">85%</span>
-        </div>
-      </div>
-
-      <!-- プレビュー用紙外枠（スクロール可能コンテナ） -->
-      <div class="flex-1 bg-slate-200 rounded-2xl overflow-auto flex justify-center items-start p-4 border border-slate-300/60 relative shadow-inner min-h-[520px]">
-        
-        <div class="maisoku-preview-container" id="maisokuScaleWrapper">
-          
-          <!-- マイソク印刷シート -->
-          <div class="maisoku-sheet" id="maisokuPrintTarget">
             
-            <!-- 上部: Z型レイアウト最上部（帯・キャッチコピー・タイトル） -->
-            <div class="border-b-4 border-slate-900 pb-3">
-              <div class="text-xs font-bold text-slate-500 tracking-wider mb-1" id="pvCatch">★駅チカ・角部屋！陽当たり良好なフルリノベーション2LDK★</div>
-              <div class="flex justify-between items-end">
-                <div class="flex items-baseline gap-2">
-                  <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight" id="pvPropName">グランドハイツ目黒</h2>
-                  <span class="text-xl font-bold text-slate-700" id="pvRoom">502号室</span>
-                </div>
-                <div class="text-right flex items-baseline gap-1 bg-slate-950 text-white px-3.5 py-1 rounded-lg">
-                  <span class="text-xs font-medium">賃料</span>
-                  <span class="text-2xl font-black text-amber-300 font-mono" id="pvPrice">185,000</span>
-                  <span class="text-xs font-medium">円</span>
-                </div>
+            <div class="relative bg-slate-800 rounded-lg overflow-hidden border border-slate-700 flex justify-center items-center h-[300px]">
+              <img id="source-image" src="" alt="Source" class="max-w-full max-h-full object-contain">
+              <!-- クロッピング用オーバーレイ(手動切り取り枠) -->
+              <div id="manual-crop-box" class="absolute border-2 border-dashed border-red-500 cursor-move hidden" style="width: 120px; height: 120px; top: 20px; left: 20px; z-index: 50;">
+                <span class="absolute -top-6 left-0 bg-red-500 text-white text-[10px] px-1 rounded font-bold pointer-events-none">手動切り取り範囲</span>
+                <div id="crop-resize-handle" class="absolute right-0 bottom-0 w-4 h-4 bg-red-500 cursor-se-resize"></div>
               </div>
             </div>
 
-            <!-- 中央メインエリア (黄金比: 写真50% / アピール33% / 間取り17% 分配) -->
-            <div class="grid grid-cols-12 gap-3 my-3 flex-1 overflow-hidden">
-              
-              <!-- 1. 写真エリア (左側 5割 = 6カラム) -->
-              <div class="col-span-6 grid grid-rows-3 gap-2 h-[460px] overflow-hidden">
-                <!-- メイン画像 (大枠：上部2/3) -->
-                <div class="row-span-2 rounded-xl overflow-hidden relative border border-slate-200 shadow-sm bg-slate-100">
-                  <img id="pvPhoto1" src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80" alt="外観写真" class="w-full h-full object-cover">
-                  <div class="absolute bottom-1.5 left-1.5 bg-black/60 text-[9px] text-white px-2 py-0.5 rounded font-bold">
-                    
-                  </div>
-                </div>
-                
-                <!-- サブ画像2枚並び (下部1/3) -->
-                <div class="grid grid-cols-2 gap-2">
-                  <div class="rounded-xl overflow-hidden relative border border-slate-200 shadow-sm bg-slate-100">
-                    <img id="pvPhoto2" src="https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=300&q=80" alt="内装写真1" class="w-full h-full object-cover">
-                    <div class="absolute bottom-1.5 left-1.5 bg-black/60 text-[9px] text-white px-2 py-0.5 rounded font-bold">
-                      
-                    </div>
-                  </div>
-                  <div class="rounded-xl overflow-hidden relative border border-slate-200 shadow-sm bg-slate-100">
-                    <img id="pvPhoto3" src="https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=300&q=80" alt="内装写真2" class="w-full h-full object-cover">
-                    <div class="absolute bottom-1.5 left-1.5 bg-black/60 text-[9px] text-white px-2 py-0.5 rounded font-bold">
-                      
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- 2. アピール＆物件スペック等エリア (中央 3割 = 4カラム) -->
-              <div class="col-span-4 flex flex-col gap-2 justify-between overflow-hidden">
-                <!-- 交通アクセス -->
-                <div class="bg-slate-950 text-white p-2.5 rounded-xl shadow-sm">
-                  <div class="text-[8px] uppercase tracking-wider text-slate-400 font-bold">Location & Access</div>
-                  <div class="text-xs font-bold flex items-center justify-between mt-0.5">
-                    <span id="pvStation" class="truncate max-w-[130px]">JR山手線「目黒」駅</span>
-                    <span class="text-amber-300 font-mono text-sm whitespace-nowrap"><span id="pvMins" class="text-base font-bold">8</span>分</span>
-                  </div>
-                </div>
-
-                <!-- アピールポイント -->
-                <div class="bg-amber-50/50 border border-amber-100 rounded-xl p-2.5 flex-1 overflow-hidden shadow-sm flex flex-col">
-                  <div class="text-[9px] font-bold text-amber-800 uppercase tracking-wider mb-1 flex items-center gap-1">
-                    <i class="fa-solid fa-star"></i> Recommend Points
-                  </div>
-                  <ul class="text-[10px] text-slate-700 space-y-1 font-semibold list-none pl-0 flex-1 overflow-y-auto custom-scroll" id="pvPoints">
-                    <!-- 動的挿入 -->
-                  </ul>
-                </div>
-
-                <!-- 基本スペック表 -->
-                <table class="w-full text-[9px] border-collapse bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
-                  <tbody>
-                    <tr class="border-b border-slate-150">
-                      <td class="bg-slate-100 font-bold py-1 px-1.5 w-14 text-slate-700 border-r border-slate-200">間取り</td>
-                      <td class="py-1 px-1.5 border-r border-slate-200 truncate" id="pvLayoutType">2LDK</td>
-                      <td class="bg-slate-100 font-bold py-1 px-1.5 w-14 text-slate-700 border-r border-slate-200">面積</td>
-                      <td class="py-1.5 px-1.5 truncate" id="pvArea">58.45 ㎡</td>
-                    </tr>
-                    <tr class="border-b border-slate-150">
-                      <td class="bg-slate-100 font-bold py-1 px-1.5 text-slate-700 border-r border-slate-200">築年月</td>
-                      <td class="py-1 px-1.5 border-r border-slate-200 truncate" id="pvBuilt">2012年3月</td>
-                      <td class="bg-slate-100 font-bold py-1 px-1.5 text-slate-700 border-r border-slate-200">取引態様</td>
-                      <td class="py-1.5 px-1.5 font-bold text-blue-800 truncate" id="pvTxType">媒介</td>
-                    </tr>
-                    <tr class="border-b border-slate-150">
-                      <td class="bg-slate-100 font-bold py-1 px-1.5 text-slate-700 border-r border-slate-200">管理費等</td>
-                      <td class="py-1 px-1.5 border-r border-slate-200 truncate" id="pvKanri">8,000円</td>
-                      <td class="bg-slate-100 font-bold py-1 px-1.5 text-slate-700 border-r border-slate-200">敷/礼</td>
-                      <td class="py-1.5 px-1.5 truncate" id="pvShikiRei">1ヶ月/1ヶ月</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <!-- 3. 間取り図エリア (右側 2割 = 2カラム - ここがターゲットに合わせて変化します) -->
-              <div class="col-span-2 border-2 border-dashed border-slate-200 rounded-xl p-2 flex flex-col relative bg-slate-50/40" id="floorPlanWrapper">
-                <div class="absolute top-1 left-1 bg-slate-900/80 text-[7px] text-white px-1.5 py-0.5 rounded font-bold tracking-wider z-10 whitespace-nowrap">
-                  間取り図 (<span id="pvTargetLabel">単身向け</span>)
-                </div>
-                
-                <!-- CAD描画用SVG -->
-                <div class="flex-1 flex justify-center items-center overflow-hidden relative" id="svgContainer">
-                  <svg id="cadSvg" class="w-full h-full" viewBox="0 0 500 500">
-                    <!-- CAD線、文字データ、家具がここに動的挿入 -->
-                  </svg>
-                </div>
-                
-                <!-- 設備表示スタンプ（間取り余白へのマッピング） -->
-                <div class="flex flex-col gap-1 mt-1 border-t border-slate-100 pt-1.5" id="pvBadgeContainer">
-                  <!-- JSでバッジとして動的に差し込み表示されます -->
-                </div>
-              </div>
-
-            </div>
-
-            <!-- 最下部: 業者情報帯 -->
-            <div class="border-2 border-slate-900 rounded-xl p-2.5 bg-slate-50 flex items-center justify-between gap-4 mt-auto shadow-sm" id="pvAgencyBlock">
-              <div class="flex-1 border-r border-slate-300 pr-3">
-                <div class="text-[9px] text-slate-500 font-bold">不動産取引元付・仲介会社</div>
-                <div class="text-sm font-black text-slate-900 tracking-wide mt-0.5" id="pvAgencyName">株式会社テクノホーム</div>
-                <div class="text-[10px] text-slate-600 mt-0.5" id="pvAgencyLic">東京都知事 (2) 第98765号</div>
-              </div>
-              <div class="flex-1 border-r border-slate-300 pr-3">
-                <div class="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[10px] text-slate-700 font-medium">
-                  <div>TEL: <span class="font-bold font-mono text-xs text-slate-900" id="pvAgencyTel">03-1234-5678</span></div>
-                  <div>FAX: <span class="font-bold font-mono text-xs text-slate-900">03-1234-5679</span></div>
-                  <div class="col-span-2 truncate">Mail: <span class="font-mono text-[9px]" id="pvAgencyMail">info@technohome-sample.co.jp</span></div>
-                </div>
-              </div>
-              <div class="w-48 text-center flex flex-col justify-center items-center bg-slate-950 text-white p-1.5 rounded-lg">
-                <div class="text-[9px] tracking-wider text-slate-400">手数料負担</div>
-                <div class="text-xs font-bold flex justify-around w-full mt-0.5">
-                  <span>客付: 50%</span>
-                  <span>元付: 50%</span>
-                </div>
+            <!-- 自動・手動切り取りの操作 -->
+            <div class="bg-indigo-50 rounded-lg p-3 space-y-2">
+              <p class="text-xs font-semibold text-indigo-900">切り取りモード設定</p>
+              <div class="flex gap-2">
+                <button id="btn-toggle-manual" class="flex-1 bg-white hover:bg-slate-100 border border-indigo-300 text-indigo-700 font-bold py-1.5 px-3 rounded text-xs transition flex items-center justify-center gap-1">
+                  <i data-lucide="crop" class="w-3.5 h-3.5"></i>
+                  <span>手動切り取り枠を表示/非表示</span>
+                </button>
+                <button id="btn-crop-submit" class="flex-1 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-1.5 px-3 rounded text-xs transition flex items-center justify-center gap-1">
+                  <i data-lucide="scissors" class="w-3.5 h-3.5"></i>
+                  <span>切り取って配置</span>
+                </button>
               </div>
             </div>
 
+            <!-- 抽出されたパーツ一覧 -->
+            <div class="space-y-2">
+              <h4 class="text-xs font-bold text-slate-700">切り取られたパーツ (クリックで配置)</h4>
+              <div id="extracted-parts" class="flex gap-2 overflow-x-auto pb-2 no-scrollbar min-h-[80px]">
+                <div class="text-xs text-slate-400 italic flex items-center justify-center w-full border border-dashed rounded-lg py-4">まだ抽出されたパーツはありません。</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ②新規作成モードの操作パネル -->
+      <div id="panel-new-mode" class="hidden space-y-6">
+        <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
+          <div class="flex items-center gap-2 mb-3">
+            <i data-lucide="folder-open" class="text-indigo-600 w-5 h-5"></i>
+            <h3 class="text-base font-bold text-slate-800">アセットライブラリ</h3>
+          </div>
+          <p class="text-xs text-slate-500 mb-3">サーバー上の高品質なサンプル素材や、ローカルから追加した素材をマイソクキャンバスに即座に配置できます。</p>
+
+          <!-- カテゴリ切り替え -->
+          <div class="flex border-b border-slate-200 mb-4 text-xs font-bold">
+            <button class="asset-tab-btn flex-1 py-2 text-center border-b-2 border-indigo-600 text-indigo-600" onclick="switchAssetTab('gaikan')">外観写真</button>
+            <button class="asset-tab-btn flex-1 py-2 text-center border-b-2 border-transparent text-slate-500 hover:text-slate-700" onclick="switchAssetTab('naisou')">内装写真</button>
+            <button class="asset-tab-btn flex-1 py-2 text-center border-b-2 border-transparent text-slate-500 hover:text-slate-700" onclick="switchAssetTab('madori')">間取り図</button>
+          </div>
+
+          <!-- アセットグリッド -->
+          <div id="asset-container" class="grid grid-cols-3 gap-2 max-h-[220px] overflow-y-auto pr-1">
+            <!-- 動的にアセットが追加されます -->
+          </div>
+
+          <div class="mt-4 border-t border-slate-100 pt-3">
+            <label class="block text-xs font-bold text-slate-700 mb-2">手元の写真/間取りを追加する</label>
+            <input type="file" id="new-asset-upload" accept="image/*" class="block w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
+          </div>
+        </div>
+      </div>
+
+      <!-- 共通: テキスト情報入力フォーム（ヘッダーとフッターに自動同期） -->
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200 space-y-4">
+        <div class="flex items-center gap-2 border-b border-slate-100 pb-2">
+          <i data-lucide="file-text" class="text-indigo-600 w-5 h-5"></i>
+          <h3 class="text-base font-bold text-slate-800">物件詳細情報の入力 (リアルタイム同期)</h3>
+        </div>
+
+        <div class="space-y-3">
+          <div class="bg-indigo-50/50 p-3 rounded-lg border border-indigo-100 space-y-3">
+            <span class="text-xs font-extrabold text-indigo-700 block">【ヘッダー・メイン情報】</span>
+            
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">物件名</label>
+              <input type="text" id="input-title" value="メゾン・ド・フルール 302号室" class="w-full text-sm border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">賃料</label>
+                <input type="text" id="input-rent" value="89,000円" class="w-full text-sm border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">広さ / 間取り</label>
+                <input type="text" id="input-size" value="1LDK (42.5㎡)" class="w-full text-sm border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
+            <span class="text-xs font-extrabold text-slate-700 block">【ヘッダー・サブ情報】</span>
+            
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">アピール推し文句</label>
+              <input type="text" id="input-sub-appeal" value="★駅徒歩3分の好立地！南向き日当たり良好・インターネット無料！" class="w-full text-sm border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">敷金・礼金情報</label>
+                <input type="text" id="input-shikirei" value="敷金 1ヶ月 / 礼金 なし" class="w-full text-sm border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">交通アクセス</label>
+                <input type="text" id="input-traffic" value="東京メトロ千代田線「代々木公園」駅 徒歩3分" class="w-full text-sm border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-indigo-500 outline-none">
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-amber-50/50 p-3 rounded-lg border border-amber-100 space-y-3">
+            <span class="text-xs font-extrabold text-amber-800 block">【フッター情報設定（右1/3編集エリア）】</span>
+            
+            <div class="grid grid-cols-2 gap-2">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">AD（広告料）率</label>
+                <input type="text" id="input-ad" value="AD 100%" class="w-full text-sm border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-amber-500 outline-none font-bold text-red-600">
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">取引態様</label>
+                <input type="text" id="input-taiou" value="媒介 (手数料100%分)" class="w-full text-sm border border-slate-300 rounded px-3 py-2 focus:ring-2 focus:ring-amber-500 outline-none font-bold">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 共通: アイコン＆セールス文言リスト追加パネル -->
+      <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200 space-y-4">
+        <div class="flex items-center gap-2 border-b border-slate-100 pb-2">
+          <i data-lucide="tag" class="text-indigo-600 w-5 h-5"></i>
+          <h3 class="text-base font-bold text-slate-800">アイコン・ポピュラー文言の配置</h3>
+        </div>
+        <p class="text-xs text-slate-500">クリックするとマイソク中央のデザイン領域に追加されます。キャンバス上で自由にドラッグして移動やリサイズが可能です。</p>
+
+        <!-- アピール文言 -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-2">おすすめ訴求帯・リボン</label>
+          <div class="flex flex-wrap gap-1.5">
+            <button class="bg-red-500 hover:bg-red-600 text-white text-[11px] font-bold py-1 px-2.5 rounded shadow-sm" onclick="addTextToCanvas('インターネット無料！', 'bg-red-500 text-white font-bold px-3 py-1.5 rounded-full')">📶 インターネット無料</button>
+            <button class="bg-blue-500 hover:bg-blue-600 text-white text-[11px] font-bold py-1 px-2.5 rounded shadow-sm" onclick="addTextToCanvas('南向き日当たり抜群', 'bg-blue-500 text-white font-bold px-3 py-1.5 rounded-full')">☀️ 南向き日当り抜群</button>
+            <button class="bg-green-600 hover:bg-green-700 text-white text-[11px] font-bold py-1 px-2.5 rounded shadow-sm" onclick="addTextToCanvas('ペット飼育相談可能', 'bg-green-600 text-white font-bold px-3 py-1.5 rounded-full')">🐾 ペット飼育相談可</button>
+            <button class="bg-amber-500 hover:bg-amber-600 text-white text-[11px] font-bold py-1 px-2.5 rounded shadow-sm" onclick="addTextToCanvas('敷金・礼金 ゼロゼロ！', 'bg-amber-500 text-white font-bold px-3 py-1.5 rounded-full')">🪙 礼金敷金ナシ</button>
+            <button class="bg-purple-600 hover:bg-purple-700 text-white text-[11px] font-bold py-1 px-2.5 rounded shadow-sm" onclick="addTextToCanvas('リノベーション済', 'bg-purple-600 text-white font-bold px-3 py-1.5 rounded-full')">🔨 リノベーション済</button>
+            <button class="bg-rose-500 hover:bg-rose-600 text-white text-[11px] font-bold py-1 px-2.5 rounded shadow-sm" onclick="addTextToCanvas('新築未入居物件', 'bg-rose-500 text-white font-bold px-3 py-1.5 rounded-full')">✨ 新築未入居</button>
           </div>
         </div>
 
-      </div>
+        <!-- BOB型 特選設備アイコン (4分割・2分割等に整列されたセットで配置) -->
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="block text-xs font-bold text-slate-700">BOB型 特選設備ブロック (枠付)</label>
+            <span class="text-[9px] bg-slate-200 px-1.5 py-0.5 rounded font-bold text-slate-600">実務定番</span>
+          </div>
+          <div class="space-y-2">
+            <!-- 4分割コンパクトBOB -->
+            <button class="w-full text-left bg-indigo-50 border border-indigo-200 rounded p-2.5 hover:bg-indigo-100 transition flex items-center gap-3.5" onclick="addBobBlockToCanvas('4-split')">
+              <div class="grid grid-cols-2 gap-1 w-14 shrink-0 pointer-events-none">
+                <div class="bg-emerald-800 text-white text-[9px] text-center font-bold p-0.5 rounded-sm">🔒</div>
+                <div class="bg-emerald-800 text-white text-[9px] text-center font-bold p-0.5 rounded-sm">📦</div>
+                <div class="bg-emerald-800 text-white text-[9px] text-center font-bold p-0.5 rounded-sm">🛁</div>
+                <div class="bg-emerald-800 text-white text-[9px] text-center font-bold p-0.5 rounded-sm">🚽</div>
+              </div>
+              <div>
+                <p class="text-xs font-bold text-indigo-950">4分割スタンダードBOB</p>
+                <p class="text-[10px] text-indigo-600 mt-0.5">オートロック、宅配BOX、追い焚き、温水便座</p>
+              </div>
+            </button>
 
-      <!-- 下部コンソールログ -->
-      <div class="bg-slate-950 text-emerald-400 p-4 rounded-2xl font-mono text-xs space-y-2 border border-slate-800">
-        <div class="flex justify-between items-center text-slate-400 border-b border-slate-800 pb-1.5">
-          <span class="flex items-center gap-1.5 font-bold"><i class="fa-solid fa-terminal text-emerald-500"></i> CADデータ抽出コンソール & 統合制御</span>
-          <button id="btnClearConsole" class="hover:text-white transition-colors text-[10px]"><i class="fa-solid fa-trash-can"></i> クリア</button>
-        </div>
-        <div id="consoleOutput" class="h-24 overflow-y-auto space-y-1 custom-scroll text-[11px] leading-relaxed">
-          <div class="text-slate-400">[SYSTEM] システム起動完了。JWW / DXF の自動最適化処理エンジン搭載。</div>
-          <div class="text-slate-400">[SYSTEM] ターゲットに最適化された間取り図が、実CADレイアウト上にインテリジェントに再描画されます。</div>
+            <!-- 2x3 充実設備BOB -->
+            <button class="w-full text-left bg-indigo-50 border border-indigo-200 rounded p-2.5 hover:bg-indigo-100 transition flex items-center gap-3.5" onclick="addBobBlockToCanvas('6-split')">
+              <div class="grid grid-cols-2 gap-0.5 w-14 shrink-0 pointer-events-none">
+                <div class="bg-slate-800 text-white text-[8px] text-center p-0.5">🔒</div>
+                <div class="bg-slate-800 text-white text-[8px] text-center p-0.5">📦</div>
+                <div class="bg-slate-800 text-white text-[8px] text-center p-0.5">🍳</div>
+                <div class="bg-slate-800 text-white text-[8px] text-center p-0.5">🛁</div>
+                <div class="bg-slate-800 text-white text-[8px] text-center p-0.5">🚿</div>
+                <div class="bg-slate-800 text-white text-[8px] text-center p-0.5">🌀</div>
+              </div>
+              <div>
+                <p class="text-xs font-bold text-indigo-950">6分割デラックスBOB</p>
+                <p class="text-[10px] text-indigo-600 mt-0.5">上記4点 ＋ システムK、浴室乾燥</p>
+              </div>
+            </button>
+
+            <!-- 個別アイコンBOB -->
+            <div class="grid grid-cols-4 gap-1.5 pt-1">
+              <button class="border border-slate-300 hover:bg-slate-50 text-[10px] py-1.5 px-1 rounded bg-white font-bold flex flex-col items-center" onclick="addBobUnitToCanvas('オートロック', '🔒')">
+                <span class="text-base">🔒</span><span>オートロック</span>
+              </button>
+              <button class="border border-slate-300 hover:bg-slate-50 text-[10px] py-1.5 px-1 rounded bg-white font-bold flex flex-col items-center" onclick="addBobUnitToCanvas('宅配ボックス', '📦')">
+                <span class="text-base">📦</span><span>宅配BOX</span>
+              </button>
+              <button class="border border-slate-300 hover:bg-slate-50 text-[10px] py-1.5 px-1 rounded bg-white font-bold flex flex-col items-center" onclick="addBobUnitToCanvas('温水洗浄便座', '🚽')">
+                <span class="text-base">🚽</span><span>温水便座</span>
+              </button>
+              <button class="border border-slate-300 hover:bg-slate-50 text-[10px] py-1.5 px-1 rounded bg-white font-bold flex flex-col items-center" onclick="addBobUnitToCanvas('システムＫ', '🍳')">
+                <span class="text-base">🍳</span><span>システムK</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
     </section>
 
+    <!-- 右側：マイソクリアルタイムプレビュー＆キャンバス (横幅60% / 横スクロール可能に設計) -->
+    <section class="w-full lg:w-[60%] bg-slate-700 flex flex-col items-center justify-start overflow-y-auto p-4 lg:p-8 space-y-4 select-none relative h-full">
+      
+      <!-- 編集上の注意・ヘルプ -->
+      <div class="w-full max-w-[842px] bg-slate-800/80 backdrop-blur text-slate-300 text-xs py-2 px-3 rounded-lg border border-slate-600 flex justify-between items-center shrink-0">
+        <div class="flex items-center gap-1.5">
+          <i data-lucide="info" class="w-4 h-4 text-sky-400"></i>
+          <span>A4横向き仕様（横842px × 縦595px）印刷時は余白なしでぴったり出力されます。</span>
+        </div>
+        <button onclick="deleteSelectedElement()" class="text-rose-400 hover:text-rose-300 font-bold flex items-center gap-1 bg-rose-950/40 px-2 py-0.5 rounded border border-rose-800/50">
+          <i data-lucide="trash" class="w-3.5 h-3.5"></i> 削除
+        </button>
+      </div>
+
+      <!-- マイソクメインキャンバス本体（横向き A4比率: 横842px × 縦595px） -->
+      <div id="myisoku-canvas" class="w-[842px] h-[595px] bg-white shadow-2xl relative flex flex-col overflow-hidden font-family shrink-0 transition-all duration-300 border border-slate-900">
+        
+        <!-- ==================== ヘッダーセクション ==================== -->
+        <header id="canvas-header" class="bg-emerald-800 text-white px-6 py-3.5 transition-all duration-300 border-b-4 border-amber-400 shrink-0">
+          <!-- サブ情報（帯上の推し文言） -->
+          <div class="flex justify-between items-center mb-2">
+            <div id="canvas-appeal" class="text-xs font-bold leading-snug tracking-wider bg-white text-emerald-900 px-3 py-1 rounded w-full line-clamp-1">
+              ★駅徒歩3分の好立地！南向き日当たり良好・インターネット無料！
+            </div>
+          </div>
+          
+          <!-- メイン情報 -->
+          <div class="flex justify-between items-end gap-4">
+            <div class="flex-1">
+              <span class="text-[9px] uppercase tracking-widest text-slate-300 font-bold block mb-0.5">Recommended Property</span>
+              <h1 id="canvas-title" class="text-2xl font-black leading-tight tracking-wide drop-shadow-sm line-clamp-1">メゾン・ド・フルール 302号室</h1>
+            </div>
+            
+            <div class="text-right flex items-baseline gap-4 shrink-0">
+              <div>
+                <span class="text-[8px] text-slate-300 block text-left">賃料(管理費込)</span>
+                <span id="canvas-rent" class="text-2xl font-black text-amber-300 tracking-tight">89,000円</span>
+              </div>
+              <div class="border-l border-emerald-600 pl-4">
+                <span class="text-[8px] text-slate-300 block text-left">面積/間取り</span>
+                <span id="canvas-size" class="text-lg font-black text-white block">1LDK (42.5㎡)</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- サブ付帯情報 (敷礼・交通) -->
+          <div class="grid grid-cols-2 gap-4 mt-2 pt-2 border-t border-emerald-700/60 text-xs">
+            <div class="flex items-center gap-2">
+              <span class="bg-amber-400 text-emerald-950 px-2 py-0.5 rounded text-[9px] font-black shrink-0">条件</span>
+              <span id="canvas-shikirei" class="font-bold line-clamp-1">敷金 1ヶ月 / 礼金 なし</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="bg-white text-emerald-900 px-2 py-0.5 rounded text-[9px] font-black shrink-0">交通</span>
+              <span id="canvas-traffic" class="font-bold line-clamp-1">東京メトロ千代田線「代々木公園」駅 徒歩3分</span>
+            </div>
+          </div>
+        </header>
+
+        <!-- ==================== 中央コンテンツレイアウトエリア ==================== -->
+        <div id="canvas-middle-zone" class="flex-1 bg-slate-50 relative overflow-hidden p-4 border-b border-dashed border-slate-300">
+          
+          <!-- 中央飾り背景 -->
+          <div id="canvas-bg-decoration" class="absolute inset-0 pointer-events-none opacity-[0.03] bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px]"></div>
+          
+          <!-- プレースホルダー -->
+          <div id="canvas-guide-text" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 p-8 pointer-events-none text-center">
+            <i data-lucide="layout-template" class="w-12 h-12 mb-3 text-slate-300"></i>
+            <p class="text-sm font-bold">マイソク中央デザイン領域 (A4横サイズ)</p>
+            <p class="text-[11px] mt-1 text-slate-400">パーツを切り取って、またはアセットライブラリから<br>このエリアへドラッグ＆リサイズ配置してください。</p>
+          </div>
+
+        </div>
+
+        <!-- ==================== フッターセクション ==================== -->
+        <footer id="canvas-footer" class="h-[95px] bg-slate-100 border-t-4 border-emerald-800 flex transition-all duration-300 shrink-0">
+          
+          <!-- 左2/3：会社情報固定エリア -->
+          <div class="w-2/3 p-3 border-r border-slate-300 flex flex-col justify-between">
+            <div class="flex items-start justify-between">
+              <div>
+                <span class="text-[8px] bg-emerald-800 text-white font-bold px-1.5 py-0.5 rounded">元付（図面作成会社）</span>
+                <h3 class="text-sm font-black text-slate-800 mt-1 leading-tight tracking-wide">株式会社 住宅ランドエステート</h3>
+                <p class="text-[8px] text-slate-500 mt-0.5">東京都知事 (3) 第987654号</p>
+              </div>
+              <div class="text-right text-[8px] text-slate-500">
+                <p>定休日: 毎週水曜日/日曜日 | 営業時間: 09:00 - 18:00</p>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4 mt-1 pt-1 border-t border-slate-200">
+              <div class="text-[10px] text-slate-700 flex items-center gap-2">
+                <span class="font-bold text-[8px] text-slate-400">TEL</span>
+                <span class="font-black text-sm text-slate-800">03-1234-5678</span>
+              </div>
+              <div class="text-[10px] text-slate-700 flex items-center gap-2">
+                <span class="font-bold text-[8px] text-slate-400">FAX</span>
+                <span class="font-black text-sm text-slate-800">03-1234-5679</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 右1/3：AD、媒介契約等 毎回編集可能スペース -->
+          <div class="w-1/3 bg-white p-3 flex justify-between items-center gap-3">
+            <div class="flex-1 flex flex-col justify-center h-full">
+              <span class="text-[8px] text-slate-400 font-bold block mb-1 text-center">取引態様</span>
+              <div id="canvas-taiou" class="text-xs font-bold bg-slate-100 text-slate-800 py-1.5 px-1 rounded border border-slate-200 text-center line-clamp-1">
+                媒介 (手数料100%分)
+              </div>
+            </div>
+            
+            <div class="flex-1 flex flex-col justify-center h-full border-l border-dashed border-slate-200 pl-3">
+              <span class="text-[8px] text-slate-400 font-bold block mb-1 text-center">手数料配分・AD</span>
+              <div id="canvas-ad" class="text-sm font-black text-rose-600 tracking-wider bg-rose-50 border border-rose-200 py-1 px-1 rounded text-center">
+                AD 100%
+              </div>
+            </div>
+          </div>
+
+        </footer>
+
+      </div>
+
+    </section>
   </main>
 
-  <!-- アピールポイント複数選択ポップアップモーダル -->
-  <div id="pointsModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden transition-opacity duration-300">
-    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl m-4 flex flex-col max-h-[85vh]">
-      <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
-        <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
-          <i class="fa-solid fa-list-check text-indigo-600"></i>
-          アピールポイント一括選択
-        </h3>
-        <button id="btnCloseModal" class="text-slate-400 hover:text-slate-600 transition-colors">
-          <i class="fa-solid fa-xmark text-lg"></i>
-        </button>
-      </div>
+  <!-- HTML Canvasに描画＆劣化なしの高精細保存を可能にするJS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-      <!-- モーダル内リスト (スクロール可能領域) -->
-      <div class="flex-1 overflow-y-auto custom-scroll space-y-4 pr-1 text-xs">
-        
-        <!-- カテゴリ1: 立地・利便性 -->
-        <div>
-          <h4 class="font-bold text-indigo-700 bg-indigo-50 px-2 py-1 rounded-md mb-2">📍 立地・交通アクセス</h4>
-          <div class="space-y-1.5 pl-1">
-            <label class="flex items-start gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded transition-all">
-              <input type="checkbox" class="modal-point-checkbox rounded text-indigo-600 mt-0.5" value="周辺は緑豊かな公園多数。小学校・中学校まで徒歩5分以内の好立地">
-              <span>周辺は緑豊かな公園多数。小学校・中学校まで徒歩5分以内</span>
-            </label>
-            <label class="flex items-start gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded transition-all">
-              <input type="checkbox" class="modal-point-checkbox rounded text-indigo-600 mt-0.5" value="最寄駅から主要ターミナル駅まで乗換なしでダイレクトアクセス可能">
-              <span>最寄駅から主要ターミナル駅まで乗換なしでアクセス可能</span>
-            </label>
-            <label class="flex items-start gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded transition-all">
-              <input type="checkbox" class="modal-point-checkbox rounded text-indigo-600 mt-0.5" value="深夜まで営業の大型スーパー・コンビニが至近にありお買い物至便">
-              <span>深夜営業スーパー・コンビニが至近でお買い物便利</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- カテゴリ2: 内装・居住クオリティ -->
-        <div>
-          <h4 class="font-bold text-amber-700 bg-amber-50 px-2 py-1 rounded-md mb-2">✨ 内装・居室の魅力</h4>
-          <div class="space-y-1.5 pl-1">
-            <label class="flex items-start gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded transition-all">
-              <input type="checkbox" class="modal-point-checkbox rounded text-indigo-600 mt-0.5" value="南西角部屋につき、朝から夕方までリビング全体が陽当たり抜群">
-              <span>南西角部屋につき日当たり・通風良好</span>
-            </label>
-            <label class="flex items-start gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded transition-all">
-              <input type="checkbox" class="modal-point-checkbox rounded text-indigo-600 mt-0.5" value="令和6年フルリノベーション施工。新築同様の清潔感あふれる内装">
-              <span>デザイン性の高いフルリノベーション施工済み</span>
-            </label>
-            <label class="flex items-start gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded transition-all">
-              <input type="checkbox" class="modal-point-checkbox rounded text-indigo-600 mt-0.5" value="各居室に大容量クローゼット＆シューズボックス完備で抜群の収納力">
-              <span>各室大容量クローゼット完備でスッキリ収納</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- カテゴリ3: 水回り・家事効率 -->
-        <div>
-          <h4 class="font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md mb-2">🚿 水回り・快適設備</h4>
-          <div class="space-y-1.5 pl-1">
-            <label class="flex items-start gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded transition-all">
-              <input type="checkbox" class="modal-point-checkbox rounded text-indigo-600 mt-0.5" value="追い焚き機能＆浴室乾燥機、温水洗浄便座など充実の最新水回りスペック">
-              <span>追い焚き機能＆浴室乾燥機など最新水回り完備</span>
-            </label>
-            <label class="flex items-start gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded transition-all">
-              <input type="checkbox" class="modal-point-checkbox rounded text-indigo-600 mt-0.5" value="家事がスムーズに捗る人気の対面型3口システムIHキッチンを採用">
-              <span>料理が捗る対面3口IHシステムキッチン</span>
-            </label>
-            <label class="flex items-start gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded transition-all">
-              <input type="checkbox" class="modal-point-checkbox rounded text-indigo-600 mt-0.5" value="朝の準備に大変重宝する大型鏡付きワイド独立洗面台を採用">
-              <span>朝の準備がスムーズなワイド独立洗面台</span>
-            </label>
-          </div>
-        </div>
-
-        <!-- カテゴリ4: セキュリティ・その他 -->
-        <div>
-          <h4 class="font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded-md mb-2">🔒 防犯・建物共用部</h4>
-          <div class="space-y-1.5 pl-1">
-            <label class="flex items-start gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded transition-all">
-              <input type="checkbox" class="modal-point-checkbox rounded text-indigo-600 mt-0.5" value="セキュリティ万全：オートロック、モニター付インターホン＆防犯カメラ設置">
-              <span>オートロック＆TVモニター付インターホンで安心</span>
-            </label>
-            <label class="flex items-start gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded transition-all">
-              <input type="checkbox" class="modal-point-checkbox rounded text-indigo-600 mt-0.5" value="不在時でも荷物を受け取れる、便利な宅配ボックスを共用部に完備">
-              <span>不在時も安心の共用部宅配ボックス完備</span>
-            </label>
-            <label class="flex items-start gap-2 cursor-pointer hover:bg-slate-50 p-1 rounded transition-all">
-              <input type="checkbox" class="modal-point-checkbox rounded text-indigo-600 mt-0.5" value="ペット相談可能（小型犬または猫1匹まで。飼育時敷金追加）">
-              <span>大切な家族と暮らせるペット飼育相談可能</span>
-            </label>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- モーダルフッター -->
-      <div class="border-t border-slate-100 pt-3 mt-4 flex justify-end gap-2 text-xs font-bold">
-        <button id="btnClearModalSelections" class="px-3.5 py-2 text-slate-500 hover:bg-slate-100 rounded-xl transition-all">選択をクリア</button>
-        <button id="btnApplyModalSelections" class="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg shadow-indigo-600/20 transition-all flex items-center gap-1">
-          <i class="fa-solid fa-check"></i>
-          アピールポイントに適用
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- JWW 疑似バイナリ解析 & レンダリングロジックのスクリプト -->
   <script>
-    // -------------------------------------------------------------
-    // アプリケーション状態管理
-    // -------------------------------------------------------------
-    const state = {
-      cadFileName: "sample_family_plan.jww",
-      cadLines: [],   // {x1, y1, x2, y2, color, layer, isWall, isGrid, isDim}
-      cadTexts: [],   // {x, y, text, size, color}
-      cadArcs: [],    // {x, y, r, startAngle, endAngle}
-      zoom: 0.85,
-      activeTags: ['bath', 'kitchen', 'wash'],
-      placedStamps: [], // ユーザーが手動で置いたスタンプ {id, type, x, y, angle}
-      selectedStampId: null,
-      isDraggingStamp: false,
-      activeTargetGroup: 'family' // 初期値はファミリーに設定
+    // --- 状態管理 ---
+    let appState = {
+      targetType: 'family', // 'family', 'stylish', 'luxury'
+      creatorMode: 'orig', // 'orig' (帯替え), 'new' (新規)
+      activeAssetTab: 'gaikan',
+      selectedElement: null,
+      isDragging: false,
+      isResizing: false,
+      dragStartX: 0,
+      dragStartY: 0,
+      elemStartX: 0,
+      elemStartY: 0,
+      elemStartWidth: 0,
+      elemStartHeight: 0,
+      manualCropping: false,
+      manualCropArea: { x: 50, y: 50, w: 150, h: 150 },
+      isResizingCrop: false
     };
 
-    // 業者情報プリセットマスタ (一括帯替え機能)
-    const agencyPresets = {
-      presetA: {
-        name: "株式会社テクノホーム",
-        lic: "東京都知事 (2) 第98765号",
-        tel: "03-1234-5678",
-        mail: "info@technohome-sample.co.jp"
+    // --- ターゲット層テンプレート設定定義 (配色、フォント、太さ等) ---
+    const targetConfigs = {
+      family: {
+        fontClass: 'font-family',
+        headerBg: 'bg-emerald-800',
+        headerBorder: 'border-b-4 border-amber-400',
+        titleColor: 'text-white',
+        rentColor: 'text-amber-300',
+        appealBg: 'bg-white text-emerald-900',
+        footerBorder: 'border-t-4 border-emerald-800',
+        footerBg: 'bg-slate-100',
+        decorBg: 'bg-[radial-gradient(#15803d_1px,transparent_1px)] opacity-[0.05]'
       },
-      presetB: {
-        name: "アドバンス不動産販売 恵比寿店",
-        lic: "東京都知事 (3) 第12345号",
-        tel: "03-8888-9999",
-        mail: "contact@advance-re.co.jp"
+      stylish: {
+        fontClass: 'font-stylish',
+        headerBg: 'bg-slate-900',
+        headerBorder: 'border-b-4 border-sky-500',
+        titleColor: 'text-white',
+        rentColor: 'text-sky-400',
+        appealBg: 'bg-slate-800 text-sky-300',
+        footerBorder: 'border-t-4 border-slate-950',
+        footerBg: 'bg-slate-100',
+        decorBg: 'bg-[linear-gradient(45deg,#e2e8f0_25%,transparent_25%),linear-gradient(-45deg,#e2e8f0_25%,transparent_25%)] opacity-[0.08]'
       },
-      empty: {
-        name: "",
-        lic: "",
-        tel: "",
-        mail: ""
+      luxury: {
+        fontClass: 'font-luxury',
+        headerBg: 'bg-stone-900',
+        headerBorder: 'border-b-4 border-amber-600',
+        titleColor: 'text-amber-100',
+        rentColor: 'text-amber-400',
+        appealBg: 'bg-amber-950 text-amber-200 border border-amber-800/40',
+        footerBorder: 'border-t-4 border-stone-900',
+        footerBg: 'bg-stone-100',
+        decorBg: 'bg-[radial-gradient(#b45309_1px,transparent_1px)] opacity-[0.04]'
       }
     };
 
-    // 物件ターゲット別のAIおまかせキャッチコピー
-    const aiTemplates = {
-      single: [
-        "★目黒駅徒歩8分！通勤通学に最適なフルリノベ築浅1K★",
-        "★充実のセキュリティ＆高速インターネット完備！都市型スタイリッシュワンルーム★",
-        "★敷礼ゼロゼロ！初期費用を抑えて目黒ライフをスタート★"
+    // サンプルアセット
+    const sampleAssets = {
+      gaikan: [
+        { name: 'モダンアパートメント', url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=300&q=80' },
+        { name: '北欧風一戸建', url: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=300&q=80' },
+        { name: 'タワーマンション', url: 'https://images.unsplash.com/photo-1582407947304-fd86f028f716?auto=format&fit=crop&w=300&q=80' }
       ],
-      couple: [
-        "★南西角部屋の明るい空間！共働き夫婦に贈るデザインリノベ2LDK★",
-        "★収納充実！平日の家事をラクにする最新食洗器＆浴室乾燥機付★",
-        "★駅徒歩8分＆深夜まで営業 of スーパー至近で生活利便性抜群★"
+      naisou: [
+        { name: '広々リビング', url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=300&q=80' },
+        { name: 'オシャレなキッチン', url: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=300&q=80' },
+        { name: '清潔感のある寝室', url: 'https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=300&q=80' }
       ],
-      family: [
-        "★南西角部屋！ファミリーみんなが主役になる広々2LDKデザイナーズ★",
-        "★周辺は緑豊かな公園多数。小学校・中学校まで徒歩5分以内の好立地★",
-        "★ご家族の会話が弾む対面キッチン＆大容量WIC完備ファミリーレジデンス★"
+      madori: [
+        { name: '1LDK間取り図', url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 100 100"><rect x="5" y="5" width="90" height="90" fill="none" stroke="black" stroke-width="2"/><line x1="50" y1="5" x2="50" y2="95" stroke="black" stroke-width="1.5" stroke-dasharray="2,2"/><line x1="5" y1="50" x2="50" y2="50" stroke="black" stroke-width="1.5"/><text x="15" y="30" font-family="sans-serif" font-size="6" font-weight="bold">洋室 6.0帖</text><text x="60" y="50" font-family="sans-serif" font-size="6" font-weight="bold">LDK 12帖</text><rect x="5" y="70" width="15" height="15" fill="none" stroke="black" stroke-width="1"/><text x="7" y="80" font-family="sans-serif" font-size="4">浴室</text><rect x="25" y="70" width="15" height="15" fill="none" stroke="black" stroke-width="1"/><text x="27" y="80" font-family="sans-serif" font-size="4">洗面</text></svg>' },
+        { name: '2LDK間取り図', url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 100 100"><rect x="5" y="5" width="90" height="90" fill="none" stroke="black" stroke-width="2"/><line x1="30" y1="5" x2="30" y2="95" stroke="black" stroke-width="1.5"/><line x1="30" y1="50" x2="95" y2="50" stroke="black" stroke-width="1.5"/><text x="8" y="30" font-family="sans-serif" font-size="5">和室 4.5帖</text><text x="8" y="75" font-family="sans-serif" font-size="5">洋室 5帖</text><text x="50" y="25" font-family="sans-serif" font-size="6" font-weight="bold">LD 14帖</text><rect x="40" y="65" width="20" height="20" fill="none" stroke="black" stroke-width="1"/><text x="44" y="77" font-family="sans-serif" font-size="4">K 3帖</text></svg>' }
       ]
     };
 
-    // -------------------------------------------------------------
-    // ターゲット別のCAD間取り・完成図の生成データ (切り替えでコア部分が完全連動)
-    // -------------------------------------------------------------
-    const targetCadDatabase = {
-      single: {
-        label: "単身・社会人",
-        layoutType: "1K / ワンルーム",
-        area: "26.85 ㎡",
-        price: "98,000",
-        kanri: "5,000円",
-        built: "2018年5月",
-        points: "・都心アクセス抜群の駅近デザイン賃貸ワンルーム\n・使い勝手の良いスクエア型洋室（8.2帖）\n・浴室換気乾燥機＆独立洗面台付きで朝の準備も快適\n・防犯カメラ＆TVモニター付きインターホン完備",
-        images: [
-          "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?auto=format&fit=crop&w=600&q=80", // シングル向け洋室
-          "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=300&q=80", // 内装ベッド周辺
-          "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?auto=format&fit=crop&w=300&q=80"  // コンパクト洗面台
-        ],
-        // CAD間取り構成 (1K用に壁・テキスト・ビルトイン家具を調整)
-        lines: [
-          // 外壁
-          [80, 50, 420, 50], [420, 50, 420, 450], [420, 450, 80, 450], [80, 450, 80, 50],
-          // 内壁 (廊下と洋室の仕切り)
-          [80, 180, 420, 180],
-          // バス・トイレ仕切り
-          [240, 50, 240, 180]
-        ],
-        texts: [
-          {x: 250, y: 310, text: '洋室 (8.2帖)', size: 16, color: '#0f172a'},
-          {x: 160, y: 110, text: 'キッチンスペース', size: 11, color: '#475569'},
-          {x: 330, y: 110, text: '浴室/洗面', size: 11, color: '#475569'}
-        ],
-        arcs: [
-          {x: 240, y: 180, r: 35, startAngle: 180, endAngle: 270} // 居室へのドア
-        ],
-        tags: ['bath', 'wash', 'air'],
-        // ターゲット連動による「デフォルトで配置される家具(完成図として固定)」
-        defaultStamps: [
-          { id: 101, type: 'bed', x: 370, y: 390, angle: 90 },     // シングルベッドを壁際配置
-          { id: 102, type: 'table', x: 140, y: 240, angle: 0 },   // デスクPC机
-          { id: 103, type: 'plant', x: 380, y: 220, angle: 0 },   // ミニ観葉植物
-          { id: 104, type: 'kitchen_ih', x: 140, y: 100, angle: 0 } // IHコンロ
-        ]
-      },
-      couple: {
-        label: "二人暮らし・新婚向け",
-        layoutType: "1LDK",
-        area: "44.15 ㎡",
-        price: "148,000",
-        kanri: "7,000円",
-        built: "2015年10月",
-        points: "・新婚やカップルに最適な、広々12帖の開放的なLDK\n・寝室はダブルベッドがゆったり置ける独立した洋室（6帖）\n・大容量のウォークインクローゼットで二人分の荷物もスッキリ\n・会話が弾む、人気の対面式システムキッチン採用",
-        images: [
-          "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=600&q=80", // おしゃれなLDK
-          "https://images.unsplash.com/photo-1540518614846-7eded433c457?auto=format&fit=crop&w=300&q=80", // ベッドルーム
-          "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&w=300&q=80"  // システムキッチン
-        ],
-        lines: [
-          // 外壁
-          [60, 50, 440, 50], [440, 50, 440, 450], [440, 450, 60, 450], [60, 450, 60, 50],
-          // LDKと寝室の間仕切り
-          [220, 50, 220, 450],
-          // 水回り間仕切り
-          [220, 280, 440, 280]
-        ],
-        texts: [
-          {x: 140, y: 250, text: 'LDK (12帖)', size: 16, color: '#0f172a'},
-          {x: 330, y: 150, text: '寝室 (6帖)', size: 14, color: '#0f172a'},
-          {x: 330, y: 370, text: 'バス・トイレ', size: 11, color: '#475569'}
-        ],
-        arcs: [
-          {x: 220, y: 280, r: 40, startAngle: 0, endAngle: 90}
-        ],
-        tags: ['bath', 'kitchen', 'wash', 'air'],
-        defaultStamps: [
-          { id: 201, type: 'bed', x: 330, y: 95, angle: 0 },       // ダブルベッドを寝室へ
-          { id: 202, type: 'sofa', x: 120, y: 350, angle: -90 },   // 2人掛けソファをLDKへ
-          { id: 203, type: 'table', x: 130, y: 180, angle: 0 },    // ダイニングテーブル
-          { id: 204, type: 'kitchen_ih', x: 110, y: 80, angle: 0 } // IHコンロ
-        ]
-      },
-      family: {
-        label: "ファミリー向け",
-        layoutType: "2LDK",
-        area: "58.45 ㎡",
-        price: "185,000",
-        kanri: "8,000円",
-        built: "2012年3月",
-        points: "・南西角部屋につき、朝から夕方までリビング全体がポカポカ！\n・家族みんなで使える広々2LDK（主寝室＋子供部屋に最適）\n・追い焚き付きの1坪タイプ浴室＆ワイドサイズ独立洗面台\n・スーパーまで徒歩2分、閑静な第一種低層住宅エリアで子育て環境抜群",
-        images: [
-          "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=600&q=80", // ファミリー向けマンション外観
-          "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=300&q=80", // 広いリビング
-          "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=300&q=80"  // ユニットバス
-        ],
-        lines: [
-          // 外壁
-          [50, 50, 450, 50], [450, 50, 450, 450], [450, 450, 50, 450], [50, 450, 50, 50],
-          // LDKと洋室の間仕切り
-          [250, 50, 250, 300], 
-          [50, 300, 450, 300],
-          [200, 300, 200, 450],
-          [200, 370, 50, 370]
-        ],
-        texts: [
-          {x: 150, y: 160, text: 'LDK (12.5帖)', size: 16, color: '#0f172a'},
-          {x: 350, y: 160, text: '子供部屋 (6帖)', size: 14, color: '#0f172a'},
-          {x: 125, y: 340, text: '洗面/浴室', size: 11, color: '#334155'},
-          {x: 125, y: 410, text: 'トイレ', size: 11, color: '#334155'},
-          {x: 350, y: 360, text: '主寝室 (6.2帖)', size: 14, color: '#0f172a'}
-        ],
-        arcs: [
-          {x: 250, y: 300, r: 40, startAngle: 180, endAngle: 270}
-        ],
-        tags: ['bath', 'kitchen', 'wash', 'air', 'lock'],
-        defaultStamps: [
-          { id: 301, type: 'bed', x: 350, y: 410, angle: 90 },     // 子供部屋シングルベッド
-          { id: 302, type: 'sofa', x: 130, y: 220, angle: 180 },   // 大型L字ソファ
-          { id: 303, type: 'table', x: 150, y: 80, angle: 0 },     // 家族用4人掛けダイニング
-          { id: 304, type: 'plant', x: 220, y: 260, angle: 0 },    // 大きな観葉植物
-          { id: 305, type: 'kitchen_ih', x: 100, y: 80, angle: 0 }, // キッチンのIHコンロ
-          { id: 306, type: 'car', x: 420, y: 310, angle: -90 }     // カースペースの車
-        ]
-      }
-    };
+    // --- DOM要素の初期取得 ---
+    const myisokuCanvas = document.getElementById('myisoku-canvas');
+    const canvasHeader = document.getElementById('canvas-header');
+    const canvasFooter = document.getElementById('canvas-footer');
+    const canvasMiddleZone = document.getElementById('canvas-middle-zone');
+    const canvasBgDecoration = document.getElementById('canvas-bg-decoration');
+    
+    // 同期対象要素
+    const canvasTitle = document.getElementById('canvas-title');
+    const canvasRent = document.getElementById('canvas-rent');
+    const canvasSize = document.getElementById('canvas-size');
+    const canvasAppeal = document.getElementById('canvas-appeal');
+    const canvasShikirei = document.getElementById('canvas-shikirei');
+    const canvasTraffic = document.getElementById('canvas-traffic');
+    const canvasTaiou = document.getElementById('canvas-taiou');
+    const canvasAd = document.getElementById('canvas-ad');
 
-    // -------------------------------------------------------------
-    // ターゲット変更に伴う間取り＆マイソク情報の統合書き換え
-    // -------------------------------------------------------------
-    function switchTargetGroup(targetGroup) {
-      state.activeTargetGroup = targetGroup;
-      const data = targetCadDatabase[targetGroup];
-      
-      if (!data) return;
+    // フォーム入力要素
+    const inputTitle = document.getElementById('input-title');
+    const inputRent = document.getElementById('input-rent');
+    const inputSize = document.getElementById('input-size');
+    const inputSubAppeal = document.getElementById('input-sub-appeal');
+    const inputShikirei = document.getElementById('input-shikirei');
+    const inputTraffic = document.getElementById('input-traffic');
+    const inputAd = document.getElementById('input-ad');
+    const inputTaiou = document.getElementById('input-taiou');
 
-      logToConsole(`[TARGET LINK] 入居ターゲットを「${data.label}」へ一括変更しました。間取り完成図を自動再構築します。`);
+    // モード切替タブ
+    const tabOrigMode = document.getElementById('tab-orig-mode');
+    const tabNewMode = document.getElementById('tab-new-mode');
+    const panelOrigMode = document.getElementById('panel-orig-mode');
+    const panelNewMode = document.getElementById('panel-new-mode');
 
-      // 1. 基本フォームのバインド（自動書き換え）
-      document.getElementById('formLayoutType').value = data.layoutType;
-      document.getElementById('formArea').value = data.area;
-      document.getElementById('formPrice').value = data.price;
-      document.getElementById('formKanri').value = data.kanri;
-      document.getElementById('formBuilt').value = data.built;
-      document.getElementById('formPoints').value = data.points;
-      
-      // 2. 設備表示タグのバインド
-      state.activeTags = [...data.tags];
-      // タグのトグルボタンUI of 表示状態を全更新
-      document.querySelectorAll('.tag-toggle').forEach(btn => {
-        const icon = btn.getAttribute('data-icon');
-        if (state.activeTags.includes(icon)) {
-          btn.classList.add('bg-blue-50', 'text-blue-700', 'border-blue-200');
-          btn.classList.remove('bg-slate-100', 'text-slate-600', 'border-slate-200');
-        } else {
-          btn.classList.remove('bg-blue-50', 'text-blue-700', 'border-blue-200');
-          btn.classList.add('bg-slate-100', 'text-slate-600', 'border-slate-200');
-        }
-      });
+    // 画像・帯替え系
+    const dropZone = document.getElementById('drop-zone');
+    const fileInput = document.getElementById('file-input');
+    const cropperContainer = document.getElementById('cropper-container');
+    const sourceImage = document.getElementById('source-image');
+    const manualCropBox = document.getElementById('manual-crop-box');
+    const cropResizeHandle = document.getElementById('crop-resize-handle');
+    const btnToggleManual = document.getElementById('btn-toggle-manual');
+    const btnCropSubmit = document.getElementById('btn-crop-submit');
+    const btnAutoDetect = document.getElementById('btn-auto-detect');
+    const extractedParts = document.getElementById('extracted-parts');
 
-      // 3. 写真（3枚）をターゲット別に差し替え
-      document.getElementById('pvPhoto1').src = data.images[0];
-      document.getElementById('pvPhoto2').src = data.images[1];
-      document.getElementById('pvPhoto3').src = data.images[2];
+    // 新規作成アセット系
+    const assetContainer = document.getElementById('asset-container');
+    const newAssetUpload = document.getElementById('new-asset-upload');
 
-      // 4. CAD間取り座標・文字データをデータベースから即時リセット
-      state.cadLines = [];
-      data.lines.forEach(line => {
-        state.cadLines.push({
-          x1: line[0], y1: line[1], x2: line[2], y2: line[3],
-          color: line[0] === 50 || line[0] === 60 || line[0] === 80 ? '#1e293b' : '#475569', 
-          layer: line[0] === 50 || line[0] === 60 || line[0] === 80 ? '0_外壁' : '1_内壁',
-          isWall: true
+    // 全体ボタン
+    const btnExport = document.getElementById('btn-export');
+    const btnReset = document.getElementById('btn-reset');
+
+    // --- 初期起動セットアップ ---
+    window.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      setupFormSync();
+      renderAssets();
+      switchTarget('family'); // 初期ターゲット
+      setupFileDrop();
+    });
+
+    // --- リアルタイムデータ同期ロジック ---
+    function setupFormSync() {
+      const syncMap = [
+        { input: inputTitle, canvas: canvasTitle },
+        { input: inputRent, canvas: canvasRent },
+        { input: inputSize, canvas: canvasSize },
+        { input: inputSubAppeal, canvas: canvasAppeal },
+        { input: inputShikirei, canvas: canvasShikirei },
+        { input: inputTraffic, canvas: canvasTraffic },
+        { input: inputTaiou, canvas: canvasTaiou },
+        { input: inputAd, canvas: canvasAd }
+      ];
+
+      syncMap.forEach(pair => {
+        pair.input.addEventListener('input', () => {
+          pair.canvas.textContent = pair.input.value;
         });
       });
-      state.cadTexts = [...data.texts];
-      state.cadArcs = [...data.arcs];
-
-      // 5. デフォルト最適配置家具スタンプのセット
-      state.placedStamps = JSON.parse(JSON.stringify(data.defaultStamps));
-
-      // 6. プレビューの文言ラベル更新
-      document.getElementById('pvTargetLabel').textContent = `${data.label}完成図`;
-
-      // 7. 各種自動生成＆再描画
-      triggerAICopy(); // キャッチコピー再生成
-      renderCADToSVG();
-      updateMaisokuPreview();
     }
 
-    // -------------------------------------------------------------
-    // JWW / DXF バイナリ解析ロジック（インポート対応）
-    // -------------------------------------------------------------
-    async function parseJWWBinary(arrayBuffer, fileName) {
-      logToConsole(`[JWW PARSER] バイナリ解析を開始: ${fileName}`);
-      const view = new DataView(arrayBuffer);
-      const decoder = new TextDecoder('shift-jis');
-
-      let headerStr = "";
-      try {
-        const headerBytes = new Uint8Array(arrayBuffer, 0, 8);
-        headerStr = decoder.decode(headerBytes);
-      } catch(e) {
-        headerStr = "Unknown";
-      }
-
-      logToConsole(`[JWW PARSER] シグネチャ確認: "${headerStr}"`);
-
-      let lineCount = 0;
-      let textCount = 0;
-      let arcCount = 0;
-
-      const parsedLines = [];
-      const parsedTexts = [];
-      const parsedArcs = [];
-
-      if (fileName.endsWith('.dxf')) {
-        const textContent = new TextDecoder('utf-8').decode(arrayBuffer);
-        logToConsole(`[DXF PARSER] DXFオートパースを検出しました。`);
-        // 簡易DXFパーサー
-        let lines = textContent.split('\n');
-        let inEntities = false;
-        
-        for (let i = 0; i < lines.length; i++) {
-          let line = lines[i].trim();
-          if (line === "ENTITIES") inEntities = true;
-          if (line === "ENDSEC") inEntities = false;
-          
-          if (inEntities && line === "LINE") {
-            let x1 = 0, y1 = 0, x2 = 0, y2 = 0;
-            for(let j = 0; j < 10; j++) {
-              let code = lines[i+j*2+1]?.trim();
-              let val = parseFloat(lines[i+j*2+2]?.trim());
-              if (code === "10") x1 = val;
-              if (code === "20") y1 = val;
-              if (code === "11") x2 = val;
-              if (code === "21") y2 = val;
-            }
-            parsedLines.push({ x1, y1, x2, y2, color: '#334155', layer: 'DXF_LINE', isWall: true });
-            lineCount++;
-          }
-        }
-      } else {
-        // JWWバイナリスキャンシミュレーション
-        const seed = arrayBuffer.byteLength;
-        const widthVal = 350 + (seed % 100);
-        const heightVal = 300 + (seed % 80);
-
-        // 外壁
-        parsedLines.push({x1: 50, y1: 50, x2: 50 + widthVal, y2: 50, color: '#1e293b', layer: '0_外壁', isWall: true});
-        parsedLines.push({x1: 50 + widthVal, y1: 50, x2: 50 + widthVal, y2: 50 + heightVal, color: '#1e293b', layer: '0_外壁', isWall: true});
-        parsedLines.push({x1: 50 + widthVal, y1: 50 + heightVal, x2: 50, y2: 50 + heightVal, color: '#1e293b', layer: '0_外壁', isWall: true});
-        parsedLines.push({x1: 50, y1: 50 + heightVal, x2: 50, y2: 50, color: '#1e293b', layer: '0_外壁', isWall: true});
-
-        // 内部仕切り
-        parsedLines.push({x1: 50 + widthVal * 0.6, y1: 50, x2: 50 + widthVal * 0.6, y2: 50 + heightVal, color: '#475569', layer: '1_内壁', isWall: true});
-        parsedLines.push({x1: 50, y1: 50 + heightVal * 0.5, x2: 50 + widthVal * 0.6, y2: 50 + heightVal * 0.5, color: '#475569', layer: '1_内壁', isWall: true});
-
-        // テキスト
-        parsedTexts.push({x: 50 + widthVal * 0.3, y: 50 + heightVal * 0.25, text: '洋室', size: 14, color: '#0f172a'});
-        parsedTexts.push({x: 50 + widthVal * 0.3, y: 50 + heightVal * 0.75, text: 'LDK', size: 13, color: '#0f172a'});
-        parsedTexts.push({x: 50 + widthVal * 0.8, y: 50 + heightVal * 0.5, text: '和室', size: 13, color: '#0f172a'});
-
-        lineCount = parsedLines.length;
-        textCount = parsedTexts.length;
-      }
-
-      state.cadLines = parsedLines;
-      state.cadTexts = parsedTexts;
-      state.cadArcs = parsedArcs;
-      state.cadFileName = fileName;
-
-      // 画面状態更新
-      document.getElementById('cadFileName').textContent = fileName;
-      document.getElementById('cadStatusBlock').classList.remove('hidden');
-
-      logToConsole(`[SYSTEM] JWW自動最適化パース完了。不要なハッチング・通り芯レイヤを除去しました。`);
-      renderCADToSVG();
-    }
-
-    // -------------------------------------------------------------
-    // SVG間取り図レンダリング ＆ クローズド着彩
-    // -------------------------------------------------------------
-    function renderCADToSVG() {
-      const svg = document.getElementById('cadSvg');
-      svg.innerHTML = ''; // クリア
-
-      if (state.cadLines.length === 0) {
-        svg.innerHTML = `<text x="150" y="250" fill="#94a3b8" font-size="14">CAD図面が読み込まれていません</text>`;
-        return;
-      }
-
-      const hideGrid = document.getElementById('chkCleanGrid').checked;
-      const hideDims = document.getElementById('chkCleanDims').checked;
-      const hideHatch = document.getElementById('chkCleanHatch').checked;
-      const enableMerge = document.getElementById('chkDupMerge').checked;
-
-      // スケーリングマトリクス
-      let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-      state.cadLines.forEach(l => {
-        if (hideGrid && l.isGrid) return;
-        if (hideDims && l.isDim) return;
-        if (hideHatch && l.isHatch) return;
-        
-        minX = Math.min(minX, l.x1, l.x2);
-        maxX = Math.max(maxX, l.x1, l.x2);
-        minY = Math.min(minY, l.y1, l.y2);
-        maxY = Math.max(maxY, l.y1, l.y2);
-      });
-
-      if (minX === Infinity) { minX = 0; maxX = 500; minY = 0; maxY = 500; }
-
-      const dx = maxX - minX;
-      const dy = maxY - minY;
-      const pad = 25; // 2割領域用にパディングをコンパクトに
-      const scale = Math.min((500 - pad * 2) / (dx || 1), (500 - pad * 2) / (dy || 1));
+    // --- ターゲット別テーマ変更ロジック ---
+    function switchTarget(target) {
+      appState.targetType = target;
       
-      const offsetX = (500 - dx * scale) / 2 - minX * scale;
-      const offsetY = (500 - dy * scale) / 2 - minY * scale;
+      // ボタンアクティブ状態反映
+      document.querySelectorAll('.target-btn').forEach(btn => {
+        btn.classList.remove('border-indigo-600', 'bg-indigo-50/50', 'border-blue-500', 'bg-blue-50/50', 'border-amber-500', 'bg-amber-50/50');
+        btn.classList.add('border-slate-200', 'bg-white');
+      });
 
-      const transX = (x) => x * scale + offsetX;
-      const transY = (y) => y * scale + offsetY;
-
-      // 自動着彩バックグラウンド処理 (ターゲットに応じて境界ポリゴンを変更)
-      let colorRooms = [];
-      if (state.activeTargetGroup === 'single') {
-        colorRooms = [
-          { points: [[80,50], [240,50], [240,180], [80,180]], fill: '#F0F7FF', stroke: '#C2E0FF' }, // キッチン水回り
-          { points: [[240,50], [420,50], [420,180], [240,180]], fill: '#FFF5F5', stroke: '#FED7D7' }, // 浴室洗面
-          { points: [[80,180], [420,180], [420,450], [80,450]], fill: '#FAF6F0', stroke: '#EADBC8' }  // 洋室
-        ];
-      } else if (state.activeTargetGroup === 'couple') {
-        colorRooms = [
-          { points: [[60,50], [220,50], [220,450], [60,450]], fill: '#FAF6F0', stroke: '#EADBC8' }, // LDK
-          { points: [[220,50], [440,50], [440,280], [220,280]], fill: '#F1F8F5', stroke: '#D1E7DD' }, // 寝室
-          { points: [[220,280], [440,280], [440,450], [220,450]], fill: '#F0F7FF', stroke: '#C2E0FF' } // 水回り
-        ];
-      } else {
-        colorRooms = [
-          { points: [[50,50], [250,50], [250,300], [50,300]], fill: '#FAF6F0', stroke: '#EADBC8' }, // LDK
-          { points: [[250,50], [450,50], [450,300], [250,300]], fill: '#F1F8F5', stroke: '#D1E7DD' }, // 洋室
-          { points: [[50,300], [200,300], [200,450], [50,450]], fill: '#F0F7FF', stroke: '#C2E0FF' }, // 水回り
-          { points: [[200,300], [450,300], [450,450], [200,450]], fill: '#FFF5F5', stroke: '#FED7D7' }  // 主寝室
-        ];
+      const activeBtn = document.getElementById(`target-${target}`);
+      if (target === 'family') {
+        activeBtn.classList.add('border-indigo-600', 'bg-indigo-50/50');
+      } else if (target === 'stylish') {
+        activeBtn.classList.add('border-blue-500', 'bg-blue-50/50');
+      } else if (target === 'luxury') {
+        activeBtn.classList.add('border-amber-500', 'bg-amber-50/50');
       }
 
-      colorRooms.forEach(room => {
-        let pointsStr = room.points.map(p => `${transX(p[0])},${transY(p[1])}`).join(' ');
-        const poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-        poly.setAttribute('points', pointsStr);
-        poly.setAttribute('fill', room.fill);
-        poly.setAttribute('stroke', room.stroke);
-        poly.setAttribute('stroke-width', '1');
-        svg.appendChild(poly);
-      });
+      // キャンバス全体クラス変更
+      myisokuCanvas.className = `w-[842px] h-[595px] bg-white shadow-2xl relative flex flex-col overflow-hidden shrink-0 border border-slate-900 transition-all duration-300 ${targetConfigs[target].fontClass}`;
 
-      // 線描画
-      let renderedLines = [...state.cadLines];
-      if (enableMerge) {
-        const temp = [];
-        renderedLines.forEach(l => {
-          const isDup = temp.some(existing => {
-            const dStart = Math.hypot(existing.x1 - l.x1, existing.y1 - l.y1);
-            const dEnd = Math.hypot(existing.x2 - l.x2, existing.y2 - l.y2);
-            return dStart < 1.0 && dEnd < 1.0;
-          });
-          if (!isDup) temp.push(l);
-        });
-        renderedLines = temp;
-      }
-
-      renderedLines.forEach(l => {
-        if (hideGrid && l.isGrid) return;
-        if (hideDims && l.isDim) return;
-        if (hideHatch && l.isHatch) return;
-
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', transX(l.x1));
-        line.setAttribute('y1', transY(l.y1));
-        line.setAttribute('x2', transX(l.x2));
-        line.setAttribute('y2', transY(l.y2));
-
-        if (l.isWall) {
-          if (l.layer && l.layer.includes('外壁')) {
-            line.setAttribute('stroke', '#0f172a');
-            line.setAttribute('stroke-width', '3.5');
-            line.setAttribute('stroke-linecap', 'round');
-          } else {
-            line.setAttribute('stroke', '#334155');
-            line.setAttribute('stroke-width', '2');
-          }
-        } else if (l.isGrid) {
-          line.setAttribute('stroke', '#fca5a5');
-          line.setAttribute('stroke-width', '0.5');
-          line.setAttribute('stroke-dasharray', '4,4');
-        } else if (l.isDim) {
-          line.setAttribute('stroke', '#0d9488');
-          line.setAttribute('stroke-width', '0.6');
-        } else {
-          line.setAttribute('stroke', '#64748b');
-          line.setAttribute('stroke-width', '1.2');
-        }
-        svg.appendChild(line);
-      });
-
-      // 円弧
-      state.cadArcs.forEach(arc => {
-        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        const r = arc.r * scale;
-        const cx = transX(arc.x);
-        const cy = transY(arc.y);
-        
-        const startRad = (arc.startAngle * Math.PI) / 180;
-        const endRad = (arc.endAngle * Math.PI) / 180;
-        const x1 = cx + r * Math.cos(startRad);
-        const y1 = cy - r * Math.sin(startRad);
-        const x2 = cx + r * Math.cos(endRad);
-        const y2 = cy - r * Math.sin(endRad);
-        
-        const largeArcFlag = arc.endAngle - arc.startAngle <= 180 ? 0 : 1;
-        const d = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArcFlag} 0 ${x2} ${y2} Z`;
-        
-        path.setAttribute('d', d);
-        path.setAttribute('fill', 'rgba(148, 163, 184, 0.15)');
-        path.setAttribute('stroke', '#94a3b8');
-        path.setAttribute('stroke-width', '1');
-        path.setAttribute('stroke-dasharray', '2,2');
-        svg.appendChild(path);
-      });
-
-      // 設備連動アイコン (水回りに自動マッピング)
-      if (state.activeTags.includes('bath')) {
-        const bathX = state.activeTargetGroup === 'single' ? 330 : 330;
-        const bathY = state.activeTargetGroup === 'single' ? 110 : 370;
-        const bath = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        bath.innerHTML = `
-          <rect x="${transX(bathX - 25)}" y="${transY(bathY - 15)}" width="45" height="35" rx="5" fill="none" stroke="#94a3b8" stroke-width="1.5" />
-          <ellipse cx="${transX(bathX - 3)}" cy="${transY(bathY + 2)}" rx="15" ry="10" fill="none" stroke="#cbd5e1" stroke-width="1" />
-        `;
-        svg.appendChild(bath);
-      }
-      if (state.activeTags.includes('kitchen')) {
-        const kitX = state.activeTargetGroup === 'single' ? 110 : 100;
-        const kitY = state.activeTargetGroup === 'single' ? 80 : 80;
-        const kitchen = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        kitchen.innerHTML = `
-          <rect x="${transX(kitX)}" y="${transY(kitY)}" width="70" height="25" fill="none" stroke="#94a3b8" stroke-width="1.5" />
-          <circle cx="${transX(kitX + 20)}" cy="${transY(kitY + 12)}" r="6" fill="none" stroke="#cbd5e1" stroke-width="1.2" />
-        `;
-        svg.appendChild(kitchen);
-      }
-
-      // テキスト
-      state.cadTexts.forEach(t => {
-        if (hideDims && t.isDim) return;
-        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        text.setAttribute('x', transX(t.x));
-        text.setAttribute('y', transY(t.y));
-        text.setAttribute('font-family', 'BIZ UDGothic, sans-serif');
-        text.setAttribute('font-weight', 'bold');
-        text.setAttribute('font-size', `${t.size}px`);
-        text.setAttribute('fill', t.color || '#1e293b');
-        text.setAttribute('text-anchor', 'middle');
-        text.textContent = t.text;
-        svg.appendChild(text);
-      });
-
-      // 配置された家具スタンプのレンダリング
-      renderPlacedStamps(svg, transX, transY);
-    }
-
-    // -------------------------------------------------------------
-    // 家具スタンプのインタラクティブ描画と操作 (座標変換対応)
-    // -------------------------------------------------------------
-    function renderPlacedStamps(svg, transX, transY) {
-      state.placedStamps.forEach(stamp => {
-        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        g.setAttribute('class', 'placed-stamp');
-        g.setAttribute('id', `stamp-${stamp.id}`);
-        // スケーリング済みの座標を適用してグループを配置
-        g.setAttribute('transform', `translate(${transX(stamp.x)}, ${transY(stamp.y)}) rotate(${stamp.angle})`);
-        
-        let pathData = '';
-        if (stamp.type === 'bed') {
-          // 極上のシングルベッドCADシンボル（枕、二重フレーム、シーツシーム）
-          pathData = `
-            <rect x="-22" y="-17" width="44" height="34" rx="4" fill="#ffffff" stroke="#3b82f6" stroke-width="2" />
-            <rect x="-20" y="-15" width="40" height="30" rx="2" fill="none" stroke="#3b82f6" stroke-width="1" />
-            <rect x="-17" y="-11" width="10" height="9" rx="1.5" fill="#f1f5f9" stroke="#475569" stroke-width="1.2" />
-            <rect x="-17" y="2" width="10" height="9" rx="1.5" fill="#f1f5f9" stroke="#475569" stroke-width="1.2" />
-            <line x1="-3" y1="-15" x2="-3" y2="15" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,2"/>
-          `;
-        } else if (stamp.type === 'sofa') {
-          // 意匠クオリティアップ版2人掛けソファー
-          pathData = `
-            <rect x="-16" y="-22" width="32" height="44" rx="5" fill="#ffffff" stroke="#3b82f6" stroke-width="2" />
-            <!-- クッション背もたれ -->
-            <rect x="-12" y="-17" width="23" height="34" rx="3" fill="#f8fafc" stroke="#475569" stroke-width="1.2" />
-            <!-- ひじ掛けライン -->
-            <line x1="-16" y1="-14" x2="-12" y2="-14" stroke="#3b82f6" stroke-width="1.5" />
-            <line x1="-16" y1="14" x2="-12" y2="14" stroke="#3b82f6" stroke-width="1.5" />
-            <!-- クッション分割シーム -->
-            <line x1="-12" y1="0" x2="11" y2="0" stroke="#94a3b8" stroke-width="1" stroke-dasharray="2,2"/>
-          `;
-        } else if (stamp.type === 'table') {
-          // 精緻なダイニングテーブルと対面4脚の椅子セット
-          pathData = `
-            <!-- テーブル本体 -->
-            <rect x="-20" y="-14" width="40" height="28" rx="2" fill="#ffffff" stroke="#3b82f6" stroke-width="2" />
-            <circle cx="0" cy="0" r="3" fill="#cbd5e1" />
-            <!-- 上下左右の椅子4脚配置 -->
-            <rect x="-12" y="-20" width="10" height="4" rx="1" fill="#f8fafc" stroke="#475569" stroke-width="1.2" />
-            <rect x="2" y="-20" width="10" height="4" rx="1" fill="#f8fafc" stroke="#475569" stroke-width="1.2" />
-            <rect x="-12" y="16" width="10" height="4" rx="1" fill="#f8fafc" stroke="#475569" stroke-width="1.2" />
-            <rect x="2" y="16" width="10" height="4" rx="1" fill="#f8fafc" stroke="#475569" stroke-width="1.2" />
-          `;
-        } else if (stamp.type === 'plant') {
-          // 意匠度抜群の観葉植物ベクター（立体的な葉の陰影構造）
-          pathData = `
-            <circle cx="0" cy="0" r="9" fill="#ffffff" stroke="#10b981" stroke-width="2" />
-            <circle cx="0" cy="0" r="6" fill="#f0fdf4" stroke="#34d399" stroke-width="1" />
-            <!-- 美しい複数の葉のCAD意匠 -->
-            <path d="M 0,-15 C 0,-15 5,-5 0,0 C -5,-5 0,-15 0,-15 Z" fill="#34d399" stroke="#047857" stroke-width="1" />
-            <path d="M -15,0 C -15,0 -5,-5 0,0 C -5,5 -15,0 -15,0 Z" fill="#34d399" stroke="#047857" stroke-width="1" />
-            <path d="M 15,0 C 15,0 5,5 0,0 C 5,-5 15,0 15,0 Z" fill="#34d399" stroke="#047857" stroke-width="1" />
-            <path d="M 10,-10 C 10,-10 2,-2 0,0 C 5,5 10,-10 10,-10 Z" fill="#059669" stroke="#047857" stroke-width="0.8" />
-            <path d="M -10,10 C -10,10 -2,2 0,0 C -5,-5 -10,10 -10,10 Z" fill="#059669" stroke="#047857" stroke-width="0.8" />
-          `;
-        } else if (stamp.type === 'kitchen_ih') {
-          // 精確なキッチンの3口IHコンロ（サークル、コントロール、排気孔ライン）
-          pathData = `
-            <rect x="-22" y="-15" width="44" height="30" rx="3" fill="#ffffff" stroke="#3b82f6" stroke-width="2" />
-            <rect x="-19" y="-12" width="38" height="24" rx="1.5" fill="none" stroke="#cbd5e1" stroke-width="1" />
-            <!-- ヒーターサークル -->
-            <circle cx="-10" cy="0" r="7" stroke="#3b82f6" stroke-width="1.2" fill="none"/>
-            <circle cx="-10" cy="0" r="5" stroke="#cbd5e1" stroke-width="0.8" fill="none"/>
-            <circle cx="10" cy="0" r="7" stroke="#3b82f6" stroke-width="1.2" fill="none"/>
-            <circle cx="10" cy="0" r="5" stroke="#cbd5e1" stroke-width="0.8" fill="none"/>
-            <circle cx="0" cy="-4" r="4.5" stroke="#3b82f6" stroke-width="1" fill="none"/>
-            <!-- 排気口グリッド -->
-            <line x1="-15" y1="8" x2="15" y2="8" stroke="#3b82f6" stroke-width="1.2" />
-            <!-- 操作部パネル -->
-            <line x1="-19" y1="-8" x2="-19" y2="8" stroke="#cbd5e1" stroke-width="1" />
-            <circle cx="-16" cy="-4" r="0.8" fill="#475569" />
-            <circle cx="-16" cy="0" r="0.8" fill="#475569" />
-            <circle cx="-16" cy="4" r="0.8" fill="#475569" />
-          `;
-        } else if (stamp.type === 'car') {
-          // ガレージ、カースペース用の高級CAD車シンボル
-          pathData = `
-            <!-- 車体メイン輪郭 -->
-            <path d="M -13,-34 C -5,-35 5,-35 13,-34 C 18,-33.5 19,-31 19,-26 C 19,-10 19,10 19,26 C 19,31 18,33.5 13,34 C 5,35 -5,35 -13,34 C -18,33.5 -19,31 -19,26 C -19,10 -19,-10 -19,-26 C -19,-31 -18,-33.5 -13,-34 Z" fill="#ffffff" stroke="#6366f1" stroke-width="2" />
-            <!-- ウィンドウガラス（フロント＆リア） -->
-            <path d="M -15,-20 C -7,-22 7,-22 15,-20" stroke="#6366f1" stroke-width="1.5" fill="none" />
-            <path d="M -14,19 C -6,21 6,21 14,19" stroke="#6366f1" stroke-width="1.5" fill="none" />
-            <!-- ルーフ（天井）のアウトライン -->
-            <rect x="-12" y="-16" width="24" height="31" rx="4" fill="none" stroke="#94a3b8" stroke-width="1" />
-            <!-- ヘッドライト（黄色いワンポイント意匠） -->
-            <path d="M -15,-32 C -15,-32 -13,-34 -11,-34" stroke="#6366f1" stroke-width="1.5" fill="none" />
-            <path d="M 15,-32 C 15,-32 13,-34 11,-34" stroke="#6366f1" stroke-width="1.5" fill="none" />
-            <!-- サイドミラー -->
-            <path d="M -19,-22 C -23,-22 -23,-20 -20,-18" stroke="#6366f1" stroke-width="1.5" fill="none" />
-            <path d="M 19,-22 C 23,-22 23,-20 20,-18" stroke="#6366f1" stroke-width="1.5" fill="none" />
-            <!-- ボンネットシーム -->
-            <line x1="-18" y1="-25" x2="18" y2="-25" stroke="#94a3b8" stroke-width="1" stroke-dasharray="2,2"/>
-          `;
-        }
-
-        g.innerHTML = pathData;
-
-        // ドラッグイベント登録
-        g.addEventListener('mousedown', (e) => startDragStamp(e, stamp, transX, transY));
-        svg.appendChild(g);
-      });
-
-      document.getElementById('lblStampCount').textContent = state.placedStamps.length;
-    }
-
-    // スタンプドラッグ操作（逆マトリクス変換で実CAD座標に保存）
-    function startDragStamp(e, stamp, transX, transY) {
-      e.stopPropagation();
-      state.selectedStampId = stamp.id;
-      state.isDraggingStamp = true;
+      // 各セクションの配色反映
+      const config = targetConfigs[target];
       
-      const svg = document.getElementById('cadSvg');
-      const rect = svg.getBoundingClientRect();
+      // ヘッダー配色
+      canvasHeader.className = `${config.headerBg} text-white px-6 py-3.5 transition-all duration-300 ${config.headerBorder}`;
+      canvasTitle.className = `text-2xl font-black leading-tight tracking-wide drop-shadow-sm line-clamp-1 ${config.titleColor}`;
+      canvasRent.className = `text-2xl font-black tracking-tight ${config.rentColor}`;
+      canvasAppeal.className = `text-xs font-bold leading-snug tracking-wider px-3 py-1 rounded w-full line-clamp-1 ${config.appealBg}`;
 
-      // 現在の逆変換用計算式（画面ピクセルからCADの実座標 50~450 の座標にスケール逆変換）
-      const reverseX = (pixelX) => {
-        const svgX = (pixelX / rect.width) * 500;
-        // 実描画スケール offsetX を引いて割り戻す
-        const hideGrid = document.getElementById('chkCleanGrid').checked;
-        const hideDims = document.getElementById('chkCleanDims').checked;
-        const hideHatch = document.getElementById('chkCleanHatch').checked;
-        
-        let minX = Infinity, maxX = -Infinity;
-        state.cadLines.forEach(l => {
-          if (hideGrid && l.isGrid) return;
-          if (hideDims && l.isDim) return;
-          if (hideHatch && l.isHatch) return;
-          minX = Math.min(minX, l.x1, l.x2);
-          maxX = Math.max(maxX, l.x1, l.x2);
-        });
-        const dx = maxX - minX || 1;
-        const pad = 25;
-        const scale = Math.min((500 - pad * 2) / dx, (500 - pad * 2) / (dx || 1));
-        const offsetX = (500 - dx * scale) / 2 - minX * scale;
-        return (svgX - offsetX) / scale;
-      };
+      // 背景テクスチャ
+      canvasBgDecoration.className = `absolute inset-0 pointer-events-none ${config.decorBg}`;
 
-      const reverseY = (pixelY) => {
-        const svgY = (pixelY / rect.height) * 500;
-        const hideGrid = document.getElementById('chkCleanGrid').checked;
-        const hideDims = document.getElementById('chkCleanDims').checked;
-        const hideHatch = document.getElementById('chkCleanHatch').checked;
-        
-        let minY = Infinity, maxY = -Infinity;
-        state.cadLines.forEach(l => {
-          if (hideGrid && l.isGrid) return;
-          if (hideDims && l.isDim) return;
-          if (hideHatch && l.isHatch) return;
-          minY = Math.min(minY, l.y1, l.y2);
-          maxY = Math.max(maxY, l.y1, l.y2);
-        });
-        const dy = maxY - minY || 1;
-        const pad = 25;
-        const scale = Math.min((500 - pad * 2) / (dy || 1), (500 - pad * 2) / dy);
-        const offsetY = (500 - dy * scale) / 2 - minY * scale;
-        return (svgY - offsetY) / scale;
-      };
-      
-      function onMouseMove(moveEvent) {
-        if (!state.isDraggingStamp) return;
-        const mouseX = moveEvent.clientX - rect.left;
-        const mouseY = moveEvent.clientY - rect.top;
-        
-        const targetStamp = state.placedStamps.find(s => s.id === stamp.id);
-        if (targetStamp) {
-          targetStamp.x = Math.round(reverseX(mouseX));
-          targetStamp.y = Math.round(reverseY(moveY));
-          
-          const element = document.getElementById(`stamp-${stamp.id}`);
-          if (element) {
-            // スケール変換済みの位置で表示移動をスムーズ化
-            element.setAttribute('transform', `translate(${transX(targetStamp.x)}, ${transY(targetStamp.y)}) rotate(${targetStamp.angle})`);
-          }
-        }
-      }
-
-      function onMouseUp() {
-        state.isDraggingStamp = false;
-        window.removeEventListener('mousemove', onMouseMove);
-        window.removeEventListener('mouseup', onMouseUp);
-      }
-
-      window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('mouseup', onMouseUp);
+      // フッター配色
+      canvasFooter.className = `h-[95px] border-t-4 flex transition-all duration-300 ${config.footerBg} ${config.footerBorder}`;
     }
 
-    // 新規スタンプ配置
-    function addNewStamp(type) {
-      const id = Date.now();
-      state.placedStamps.push({
-        id: id,
-        type: type,
-        x: 250,
-        y: 250,
-        angle: 0
-      });
-      logToConsole(`[SYSTEM] 家具スタンプ（${type}）を配置。ドラッグで移動。`);
-      renderCADToSVG();
-    }
-
-    // -------------------------------------------------------------
-    // AIキャッチコピー生成エンジン＆不当表示バリデータ
-    // -------------------------------------------------------------
-    const banWords = ['日本一', '最高', '最大', '格安', '完全', '完売', '絶対', '日本初', '世界初', '超格安'];
-
-    function validateCatchCopy(text) {
-      const detected = [];
-      banWords.forEach(word => {
-        if (text.includes(word)) {
-          detected.push(word);
-        }
-      });
-
-      const alertBlock = document.getElementById('banAlert');
-      if (detected.length > 0) {
-        document.getElementById('banAlertText').innerHTML = `表示中のコピーに禁止用語 <strong>「${detected.join(', ')}」</strong> が含まれています。不動産公正競争規約に違反する不当表示を防ぐため、客観的根拠の併記または表現 of 変更を推奨します。`;
-        alertBlock.classList.remove('hidden');
-        logToConsole(`[WARNING] 不当表示禁止ワード検知: ${detected.join(', ')}`, 'error');
+    // --- ① 帯替え・② 新規作成モード切替 ---
+    function switchCreatorMode(mode) {
+      appState.creatorMode = mode;
+      if (mode === 'orig') {
+        tabOrigMode.className = "flex-1 py-3 text-center rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2 bg-indigo-600 text-white shadow";
+        tabNewMode.className = "flex-1 py-3 text-center rounded-lg font-bold text-sm text-slate-600 transition-all flex items-center justify-center gap-2 hover:bg-slate-50";
+        panelOrigMode.classList.remove('hidden');
+        panelNewMode.classList.add('hidden');
       } else {
-        alertBlock.classList.add('hidden');
+        tabNewMode.className = "flex-1 py-3 text-center rounded-lg font-bold text-sm transition-all flex items-center justify-center gap-2 bg-indigo-600 text-white shadow";
+        tabOrigMode.className = "flex-1 py-3 text-center rounded-lg font-bold text-sm text-slate-600 transition-all flex items-center justify-center gap-2 hover:bg-slate-50";
+        panelNewMode.classList.remove('hidden');
+        panelOrigMode.classList.add('hidden');
       }
     }
 
-    function triggerAICopy() {
-      const currentList = aiTemplates[state.activeTargetGroup];
-      const randomCopy = currentList[Math.floor(Math.random() * currentList.length)];
-      document.getElementById('formCatch').value = randomCopy;
-      updateMaisokuPreview();
-      validateCatchCopy(randomCopy);
-      logToConsole(`[AI COPIER] ターゲット「${state.activeTargetGroup}」向けの高反響キャッチコピーを自動選定しました。`);
-    }
-
-    // -------------------------------------------------------------
-    // マイソク情報 リアルタイムバインディング & 徒歩分数規約演算
-    // -------------------------------------------------------------
-    function updateMaisokuPreview() {
-      const catchVal = document.getElementById('formCatch').value;
-      document.getElementById('pvCatch').textContent = catchVal;
-      validateCatchCopy(catchVal);
-
-      document.getElementById('pvPropName').textContent = document.getElementById('formPropName').value;
-      document.getElementById('pvRoom').textContent = document.getElementById('formRoom').value;
-      document.getElementById('pvPrice').textContent = document.getElementById('formPrice').value;
-      document.getElementById('pvStation').textContent = document.getElementById('formStation').value;
-      document.getElementById('pvLayoutType').textContent = document.getElementById('formLayoutType').value;
-      document.getElementById('pvArea').textContent = document.getElementById('formArea').value;
-      document.getElementById('pvBuilt').textContent = document.getElementById('formBuilt').value;
-      document.getElementById('pvTxType').textContent = document.getElementById('formTxType').value;
-      document.getElementById('pvKanri').textContent = document.getElementById('formKanri').value;
-      
-      const shiki = document.getElementById('formShiki').value;
-      const rei = document.getElementById('formRei').value;
-      document.getElementById('pvShikiRei').textContent = `${shiki} / ${rei}`;
-
-      // 業者情報（帯）更新
-      document.getElementById('pvAgencyName').textContent = document.getElementById('formAgencyName').value;
-      document.getElementById('pvAgencyLic').textContent = `免許番号: ${document.getElementById('formAgencyLic').value}`;
-      document.getElementById('pvAgencyTel').textContent = document.getElementById('formAgencyTel').value;
-      document.getElementById('pvAgencyMail').textContent = document.getElementById('formAgencyMail').value;
-
-      // 徒歩分数の自動計算＆法的チェック
-      const distMeters = parseInt(document.getElementById('formDistance').value) || 0;
-      const calculatedMins = Math.ceil(distMeters / 80);
-      document.getElementById('lblCalcMins').textContent = calculatedMins;
-      document.getElementById('pvMins').textContent = `${calculatedMins}分`;
-
-      const alertBlock = document.getElementById('distanceAlert');
-      if (distMeters <= 0) {
-        alertBlock.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> 徒歩距離を入力してください。`;
-        alertBlock.className = "text-[10.5px] text-amber-600 bg-amber-50 p-2 rounded-lg border border-amber-100 flex items-center gap-1";
-      } else {
-        alertBlock.innerHTML = `<i class="fa-solid fa-shield-halved"></i> 規約適合：徒歩分数換算 (${distMeters}m ÷ 80m = ${calculatedMins}分) で算出。`;
-        alertBlock.className = "text-[10.5px] text-emerald-600 bg-emerald-50 p-2 rounded-lg border border-emerald-100 flex items-center gap-1";
-      }
-
-      // アピールポイントの箇条書き
-      const pointsText = document.getElementById('formPoints').value;
-      const pointsArray = pointsText.split('\n').filter(p => p.trim() !== '');
-      const pvPointsUl = document.getElementById('pvPoints');
-      pvPointsUl.innerHTML = '';
-      pointsArray.forEach(p => {
-        const li = document.createElement('li');
-        li.className = 'truncate';
-        li.textContent = p.startsWith('・') || p.startsWith('-') ? p : `・ ${p}`;
-        pvPointsUl.appendChild(li);
-      });
-
-      // 設備バッジ (間取り図エリアのすぐ下の専用バッジコンテナへ自動描画配置)
-      const badgeContainer = document.getElementById('pvBadgeContainer');
-      badgeContainer.innerHTML = '';
-      const iconMap = {
-        bath: { label: 'バス・トイレ別', icon: 'fa-bath', bg: 'bg-blue-100 text-blue-800 border border-blue-200' },
-        kitchen: { label: 'システムキッチン', icon: 'fa-kitchen-set', bg: 'bg-amber-100 text-amber-800 border border-amber-200' },
-        wash: { label: '独立洗面台', icon: 'fa-soap', bg: 'bg-emerald-100 text-emerald-800 border border-emerald-200' },
-        air: { label: 'エアコン完備', icon: 'fa-snowflake', bg: 'bg-sky-100 text-sky-800 border border-sky-200' },
-        lock: { label: 'オートロック', icon: 'fa-lock', bg: 'bg-slate-100 text-slate-800 border border-slate-200' }
-      };
-
-      state.activeTags.forEach(tag => {
-        const spec = iconMap[tag];
-        if (spec) {
-          const span = document.createElement('span');
-          span.className = `${spec.bg} text-[8px] font-bold px-1 py-0.5 rounded flex items-center justify-center gap-0.5 shadow-sm truncate`;
-          span.innerHTML = `<i class="fa-solid ${spec.icon}"></i> ${spec.label}`;
-          badgeContainer.appendChild(span);
-        }
-      });
-    }
-
-    // 一括帯替え
-    function changeAgencyPreset(presetKey) {
-      const data = agencyPresets[presetKey];
-      if (data) {
-        document.getElementById('formAgencyName').value = data.name;
-        document.getElementById('formAgencyLic').value = data.lic;
-        document.getElementById('formAgencyTel').value = data.tel;
-        document.getElementById('formAgencyMail').value = data.mail;
-        updateMaisokuPreview();
-        logToConsole(`[帯替え] 仲介会社情報をマスタデータ【${presetKey}】へ一括変更しました。`);
-      }
-    }
-
-    // -------------------------------------------------------------
-    // ドラッグ＆ドロップ ＆ ファイル読み込み
-    // -------------------------------------------------------------
-    function setupFileListeners() {
-      const dropzone = document.getElementById('dropzone');
-      const fileInput = document.getElementById('cadFileInput');
-
-      dropzone.addEventListener('dragover', (e) => {
+    // --- ファイルアップロード＆ドラッグドロップ処理 ---
+    function setupFileDrop() {
+      dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
-        dropzone.classList.add('border-blue-500', 'bg-blue-50/20');
+        dropZone.classList.add('drag-over');
       });
 
-      dropzone.addEventListener('dragleave', () => {
-        dropzone.classList.remove('border-blue-500', 'bg-blue-50/20');
+      dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('drag-over');
       });
 
-      dropzone.addEventListener('drop', (e) => {
+      dropZone.addEventListener('drop', (e) => {
         e.preventDefault();
-        dropzone.classList.remove('border-blue-500', 'bg-blue-50/20');
+        dropZone.classList.remove('drag-over');
         const file = e.dataTransfer.files[0];
-        if (file) handleFile(file);
+        if (file && file.type.startsWith('image/')) {
+          loadImage(file);
+        }
+      });
+
+      dropZone.addEventListener('click', () => {
+        fileInput.click();
       });
 
       fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
-        if (file) handleFile(file);
+        if (file) loadImage(file);
       });
+    }
 
-      // 写真3枚の独立アップロード処理
-      for (let i = 1; i <= 3; i++) {
-        const input = document.getElementById(`photo${i}Input`);
-        input.addEventListener('change', (e) => {
-          const file = e.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-              document.getElementById(`pvPhoto${i}`).src = event.target.result;
-              document.getElementById(`photo${i}Name`).textContent = file.name;
-              logToConsole(`[SYSTEM] 写真${i}を差し替えました: ${file.name}`);
-            };
-            reader.readAsDataURL(file);
+    function loadImage(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        sourceImage.src = e.target.result;
+        cropperContainer.classList.remove('hidden');
+        appState.manualCropping = true;
+        manualCropBox.classList.remove('hidden');
+        resetManualCropBox();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function resetManualCropBox() {
+      const containerW = sourceImage.parentElement.clientWidth;
+      const containerH = sourceImage.parentElement.clientHeight;
+      
+      appState.manualCropArea = {
+        x: Math.max(20, (containerW / 2) - 100),
+        y: Math.max(20, (containerH / 2) - 100),
+        w: 150,
+        h: 150
+      };
+      
+      updateCropBoxUI();
+    }
+
+    function updateCropBoxUI() {
+      manualCropBox.style.left = `${appState.manualCropArea.x}px`;
+      manualCropBox.style.top = `${appState.manualCropArea.y}px`;
+      manualCropBox.style.width = `${appState.manualCropArea.w}px`;
+      manualCropBox.style.height = `${appState.manualCropArea.h}px`;
+    }
+
+    manualCropBox.addEventListener('mousedown', (e) => {
+      if (e.target === cropResizeHandle) {
+        appState.isResizingCrop = true;
+      } else {
+        appState.isDraggingCrop = true;
+      }
+      appState.dragStartX = e.clientX;
+      appState.dragStartY = e.clientY;
+      appState.elemStartX = appState.manualCropArea.x;
+      appState.elemStartY = appState.manualCropArea.y;
+      appState.elemStartWidth = appState.manualCropArea.w;
+      appState.elemStartHeight = appState.manualCropArea.h;
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (appState.isDraggingCrop) {
+        const dx = e.clientX - appState.dragStartX;
+        const dy = e.clientY - appState.dragStartY;
+        appState.manualCropArea.x = appState.elemStartX + dx;
+        appState.manualCropArea.y = appState.elemStartY + dy;
+        updateCropBoxUI();
+      } else if (appState.isResizingCrop) {
+        const dx = e.clientX - appState.dragStartX;
+        const dy = e.clientY - appState.dragStartY;
+        appState.manualCropArea.w = Math.max(40, appState.elemStartWidth + dx);
+        appState.manualCropArea.h = Math.max(40, appState.elemStartHeight + dy);
+        updateCropBoxUI();
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      appState.isDraggingCrop = false;
+      appState.isResizingCrop = false;
+    });
+
+    btnToggleManual.addEventListener('click', () => {
+      appState.manualCropping = !appState.manualCropping;
+      if (appState.manualCropping) {
+        manualCropBox.classList.remove('hidden');
+        resetManualCropBox();
+      } else {
+        manualCropBox.classList.add('hidden');
+      }
+    });
+
+    // --- 高精度画像切り取り処理 ---
+    btnCropSubmit.addEventListener('click', () => {
+      if (!sourceImage.src || sourceImage.src === "") return;
+
+      const canvasTemp = document.createElement('canvas');
+      const ctx = canvasTemp.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        const naturalW = img.naturalWidth;
+        const naturalH = img.naturalHeight;
+
+        const container = sourceImage.parentElement;
+        const containerW = container.clientWidth;
+        const containerH = container.clientHeight;
+
+        const imgRatio = naturalW / naturalH;
+        const containerRatio = containerW / containerH;
+
+        let renderW, renderH, renderX, renderY;
+
+        if (imgRatio > containerRatio) {
+          renderW = containerW;
+          renderH = containerW / imgRatio;
+          renderX = 0;
+          renderY = (containerH - renderH) / 2;
+        } else {
+          renderH = containerH;
+          renderW = containerH * imgRatio;
+          renderX = (containerW - renderW) / 2;
+          renderY = 0;
+        }
+
+        const cropAreaX = appState.manualCropArea.x;
+        const cropAreaY = appState.manualCropArea.y;
+        const cropAreaW = appState.manualCropArea.w;
+        const cropAreaH = appState.manualCropArea.h;
+
+        const relativeX = cropAreaX - renderX;
+        const relativeY = cropAreaY - renderY;
+
+        const scaleX = naturalW / renderW;
+        const scaleY = naturalH / renderH;
+
+        const realX = relativeX * scaleX;
+        const realY = relativeY * scaleY;
+        const realW = cropAreaW * scaleX;
+        const realH = cropAreaH * scaleY;
+
+        canvasTemp.width = realW;
+        canvasTemp.height = realH;
+
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+
+        ctx.drawImage(img, realX, realY, realW, realH, 0, 0, realW, realH);
+
+        try {
+          const dataUrl = canvasTemp.toDataURL('image/png', 1.0);
+          addExtractedPart(dataUrl);
+          addImageToCanvas(dataUrl);
+        } catch (e) {
+          console.error("切り出し失敗:", e);
+        }
+      };
+
+      img.src = sourceImage.src;
+    });
+
+    btnAutoDetect.addEventListener('click', () => {
+      if (!sourceImage.src || sourceImage.src === "") return;
+
+      const img = new Image();
+      img.onload = () => {
+        const w = img.naturalWidth;
+        const h = img.naturalHeight;
+
+        const regions = [
+          { name: '外観候補', x: w * 0.05, y: h * 0.15, width: w * 0.42, height: h * 0.35 },
+          { name: '間取り図候補', x: w * 0.52, y: h * 0.15, width: w * 0.43, height: h * 0.48 },
+          { name: '内装候補', x: w * 0.05, y: h * 0.55, width: w * 0.42, height: h * 0.32 }
+        ];
+
+        extractedParts.innerHTML = '';
+
+        regions.forEach(r => {
+          const canvasTemp = document.createElement('canvas');
+          canvasTemp.width = r.width;
+          canvasTemp.height = r.height;
+          const ctx = canvasTemp.getContext('2d');
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, r.x, r.y, r.width, r.height, 0, 0, r.width, r.height);
+          
+          try {
+            const dataUrl = canvasTemp.toDataURL('image/png', 1.0);
+            addExtractedPart(dataUrl);
+          } catch (err) {
+            console.error("自動検出パーツの切り出しに失敗しました:", err);
           }
         });
+      };
+      img.src = sourceImage.src;
+    });
+
+    function addExtractedPart(dataUrl) {
+      if (extractedParts.querySelector('div.italic')) {
+        extractedParts.innerHTML = '';
+      }
+
+      const wrapper = document.createElement('div');
+      wrapper.className = "relative group shrink-0 border-2 border-slate-200 hover:border-indigo-500 rounded-lg overflow-hidden w-[75px] h-[75px] bg-slate-100 cursor-pointer transition";
+      
+      const img = document.createElement('img');
+      img.src = dataUrl;
+      img.className = "w-full h-full object-cover pointer-events-none";
+      wrapper.appendChild(img);
+
+      const plusIcon = document.createElement('div');
+      plusIcon.className = "absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition pointer-events-none";
+      plusIcon.innerHTML = '<i data-lucide="plus-circle" class="w-5 h-5"></i>';
+      wrapper.appendChild(plusIcon);
+
+      wrapper.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        addImageToCanvas(dataUrl);
+      };
+
+      extractedParts.appendChild(wrapper);
+      lucide.createIcons();
+    }
+
+    function switchAssetTab(tab) {
+      appState.activeAssetTab = tab;
+      document.querySelectorAll('.asset-tab-btn').forEach(btn => {
+        btn.classList.remove('border-indigo-600', 'text-indigo-600');
+        btn.classList.add('border-transparent', 'text-slate-500');
+      });
+      event.target.classList.add('border-indigo-600', 'text-indigo-600');
+      renderAssets();
+    }
+
+    function renderAssets() {
+      assetContainer.innerHTML = '';
+      const assets = sampleAssets[appState.activeAssetTab];
+      
+      assets.forEach(asset => {
+        const item = document.createElement('div');
+        item.className = "group relative border border-slate-200 rounded-lg overflow-hidden aspect-square bg-slate-50 cursor-pointer hover:border-indigo-500 transition";
+        item.innerHTML = `
+          <img src="${asset.url}" class="w-full h-full object-cover pointer-events-none">
+          <div class="absolute inset-x-0 bottom-0 bg-slate-900/70 text-white text-[9px] px-1 py-0.5 truncate text-center pointer-events-none">${asset.name}</div>
+          <div class="absolute inset-0 bg-indigo-600/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center pointer-events-none">
+            <span class="bg-indigo-600 text-white font-bold text-[10px] px-2 py-1 rounded shadow-md">配置する</span>
+          </div>
+        `;
+        
+        item.onclick = (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          addImageToCanvas(asset.url);
+        };
+        
+        assetContainer.appendChild(item);
+      });
+    }
+
+    newAssetUpload.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          sampleAssets[appState.activeAssetTab].unshift({
+            name: 'アップロード素材',
+            url: ev.target.result
+          });
+          renderAssets();
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // ==========================================
+    //   キャンバス・デザイナー操作（ドラッグ＆リサイズ）
+    // ==========================================
+    let zIndexCounter = 10;
+
+    function addImageToCanvas(src) {
+      document.getElementById('canvas-guide-text').style.display = 'none';
+
+      const item = document.createElement('div');
+      item.className = "canvas-element absolute group cursor-move bg-white p-1 border shadow-md rounded";
+      item.style.left = "80px";
+      item.style.top = "60px";
+      item.style.width = "240px";
+      item.style.zIndex = ++zIndexCounter;
+
+      const img = document.createElement('img');
+      img.src = src;
+      img.className = "w-full h-auto object-cover rounded-sm pointer-events-none";
+
+      const handle = document.createElement('div');
+      handle.className = "resize-handle";
+
+      item.appendChild(img);
+      item.appendChild(handle);
+      canvasMiddleZone.appendChild(item);
+
+      makeElementInteractable(item);
+      selectElement(item);
+    }
+
+    function addTextToCanvas(text, bgClass) {
+      document.getElementById('canvas-guide-text').style.display = 'none';
+
+      const item = document.createElement('div');
+      item.className = `canvas-element absolute group cursor-move shadow-md ${bgClass}`;
+      item.style.left = "150px";
+      item.style.top = "20px";
+      item.style.zIndex = ++zIndexCounter;
+      item.style.whiteSpace = "nowrap";
+
+      const content = document.createElement('span');
+      content.textContent = text;
+      content.className = "text-xs font-bold";
+
+      const handle = document.createElement('div');
+      handle.className = "resize-handle";
+
+      item.appendChild(content);
+      item.appendChild(handle);
+      canvasMiddleZone.appendChild(item);
+
+      makeElementInteractable(item);
+      selectElement(item);
+    }
+
+    // --- BOB型 単体アイコン枠の追加 ---
+    function addBobUnitToCanvas(label, emoji) {
+      document.getElementById('canvas-guide-text').style.display = 'none';
+
+      const item = document.createElement('div');
+      item.className = "canvas-element absolute group cursor-move bg-white border-2 border-emerald-800 text-emerald-950 p-2 rounded shadow-md flex flex-col items-center justify-center font-bold text-center";
+      item.style.width = "75px";
+      item.style.height = "75px";
+      item.style.left = "40px";
+      item.style.top = "240px";
+      item.style.zIndex = ++zIndexCounter;
+
+      const content = document.createElement('div');
+      content.innerHTML = `
+        <div class="text-xl leading-none mb-1 pointer-events-none">${emoji}</div>
+        <div class="text-[9px] font-black leading-tight tracking-tighter text-emerald-950 pointer-events-none">${label}</div>
+      `;
+
+      const handle = document.createElement('div');
+      handle.className = "resize-handle";
+
+      item.appendChild(content);
+      item.appendChild(handle);
+      canvasMiddleZone.appendChild(item);
+
+      makeElementInteractable(item);
+      selectElement(item);
+    }
+
+    // --- BOB型 グリッド（複数分割）一括アイコンブロックの追加 ---
+    function addBobBlockToCanvas(type) {
+      document.getElementById('canvas-guide-text').style.display = 'none';
+
+      const item = document.createElement('div');
+      item.className = "canvas-element absolute group cursor-move bg-white border-4 border-slate-900 p-1.5 shadow-lg select-none flex flex-col";
+      item.style.left = "280px";
+      item.style.top = "180px";
+      item.style.zIndex = ++zIndexCounter;
+
+      let contentHtml = "";
+
+      if (type === '4-split') {
+        item.style.width = "170px";
+        contentHtml = `
+          <div class="grid grid-cols-2 gap-1 bg-slate-900 pointer-events-none">
+            <div class="bg-white p-2 flex flex-col items-center justify-center h-[70px] border border-slate-200">
+              <span class="text-xl">🔒</span>
+              <span class="text-[9px] font-black mt-1 text-slate-800">オートロック</span>
+            </div>
+            <div class="bg-white p-2 flex flex-col items-center justify-center h-[70px] border border-slate-200">
+              <span class="text-xl">📦</span>
+              <span class="text-[9px] font-black mt-1 text-slate-800">宅配ボックス</span>
+            </div>
+            <div class="bg-white p-2 flex flex-col items-center justify-center h-[70px] border border-slate-200">
+              <span class="text-xl">🛁</span>
+              <span class="text-[9px] font-black mt-1 text-slate-800">追い焚き機能</span>
+            </div>
+            <div class="bg-white p-2 flex flex-col items-center justify-center h-[70px] border border-slate-200">
+              <span class="text-xl">🚽</span>
+              <span class="text-[9px] font-black mt-1 text-slate-800">温水洗浄便座</span>
+            </div>
+          </div>
+        `;
+      } else if (type === '6-split') {
+        item.style.width = "250px";
+        contentHtml = `
+          <div class="grid grid-cols-3 gap-1 bg-slate-900 pointer-events-none">
+            <div class="bg-white p-2 flex flex-col items-center justify-center h-[70px] border border-slate-200">
+              <span class="text-xl">🔒</span>
+              <span class="text-[9px] font-black mt-1 text-slate-800">オートロック</span>
+            </div>
+            <div class="bg-white p-2 flex flex-col items-center justify-center h-[70px] border border-slate-200">
+              <span class="text-xl">📦</span>
+              <span class="text-[9px] font-black mt-1 text-slate-800">宅配ボックス</span>
+            </div>
+            <div class="bg-white p-2 flex flex-col items-center justify-center h-[70px] border border-slate-200">
+              <span class="text-xl">🍳</span>
+              <span class="text-[9px] font-black mt-1 text-slate-800">システムＫ</span>
+            </div>
+            <div class="bg-white p-2 flex flex-col items-center justify-center h-[70px] border border-slate-200">
+              <span class="text-xl">🛁</span>
+              <span class="text-[9px] font-black mt-1 text-slate-800">追い焚き機能</span>
+            </div>
+            <div class="bg-white p-2 flex flex-col items-center justify-center h-[70px] border border-slate-200">
+              <span class="text-xl">🚽</span>
+              <span class="text-[9px] font-black mt-1 text-slate-800">温水洗浄便座</span>
+            </div>
+            <div class="bg-white p-2 flex flex-col items-center justify-center h-[70px] border border-slate-200">
+              <span class="text-xl">🌀</span>
+              <span class="text-[9px] font-black mt-1 text-slate-800">浴室乾燥機</span>
+            </div>
+          </div>
+        `;
+      }
+
+      const container = document.createElement('div');
+      container.innerHTML = contentHtml;
+
+      const handle = document.createElement('div');
+      handle.className = "resize-handle";
+
+      item.appendChild(container);
+      item.appendChild(handle);
+      canvasMiddleZone.appendChild(item);
+
+      makeElementInteractable(item);
+      selectElement(item);
+    }
+
+    function makeElementInteractable(elem) {
+      elem.addEventListener('mousedown', (e) => {
+        selectElement(elem);
+        
+        if (e.target.classList.contains('resize-handle')) {
+          appState.isResizing = true;
+        } else {
+          appState.isDragging = true;
+        }
+
+        appState.dragStartX = e.clientX;
+        appState.dragStartY = e.clientY;
+        appState.elemStartX = parseInt(elem.style.left) || 0;
+        appState.elemStartY = parseInt(elem.style.top) || 0;
+        appState.elemStartWidth = elem.offsetWidth;
+        appState.elemStartHeight = elem.offsetHeight;
+
+        e.preventDefault();
+      });
+
+      elem.addEventListener('touchstart', (e) => {
+        selectElement(elem);
+        const touch = e.touches[0];
+        if (e.target.classList.contains('resize-handle')) {
+          appState.isResizing = true;
+        } else {
+          appState.isDragging = true;
+        }
+
+        appState.dragStartX = touch.clientX;
+        appState.dragStartY = touch.clientY;
+        appState.elemStartX = parseInt(elem.style.left) || 0;
+        appState.elemStartY = parseInt(elem.style.top) || 0;
+        appState.elemStartWidth = elem.offsetWidth;
+        appState.elemStartHeight = elem.offsetHeight;
+      }, { passive: true });
+    }
+
+    document.addEventListener('mousemove', (e) => {
+      if (!appState.selectedElement) return;
+
+      if (appState.isDragging) {
+        const dx = e.clientX - appState.dragStartX;
+        const dy = e.clientY - appState.dragStartY;
+        
+        const newX = Math.max(-50, Math.min(canvasMiddleZone.clientWidth - 50, appState.elemStartX + dx));
+        const newY = Math.max(-50, Math.min(canvasMiddleZone.clientHeight - 50, appState.elemStartY + dy));
+        
+        appState.selectedElement.style.left = `${newX}px`;
+        appState.selectedElement.style.top = `${newY}px`;
+      } else if (appState.isResizing) {
+        const dx = e.clientX - appState.dragStartX;
+        const newWidth = Math.max(50, appState.elemStartWidth + dx);
+        appState.selectedElement.style.width = `${newWidth}px`;
+      }
+    });
+
+    document.addEventListener('touchmove', (e) => {
+      if (!appState.selectedElement) return;
+      const touch = e.touches[0];
+
+      if (appState.isDragging) {
+        const dx = touch.clientX - appState.dragStartX;
+        const dy = touch.clientY - appState.dragStartY;
+        
+        const newX = Math.max(-50, Math.min(canvasMiddleZone.clientWidth - 50, appState.elemStartX + dx));
+        const newY = Math.max(-50, Math.min(canvasMiddleZone.clientHeight - 50, appState.elemStartY + dy));
+        
+        appState.selectedElement.style.left = `${newX}px`;
+        appState.selectedElement.style.top = `${newY}px`;
+      } else if (appState.isResizing) {
+        const dx = touch.clientX - appState.dragStartX;
+        const newWidth = Math.max(50, appState.elemStartWidth + dx);
+        appState.selectedElement.style.width = `${newWidth}px`;
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      appState.isDragging = false;
+      appState.isResizing = false;
+    });
+
+    document.addEventListener('touchend', () => {
+      appState.isDragging = false;
+      appState.isResizing = false;
+    });
+
+    function selectElement(elem) {
+      if (appState.selectedElement) {
+        appState.selectedElement.classList.remove('selected');
+      }
+      appState.selectedElement = elem;
+      elem.classList.add('selected');
+      elem.style.zIndex = ++zIndexCounter;
+    }
+
+    function deleteSelectedElement() {
+      if (appState.selectedElement) {
+        appState.selectedElement.remove();
+        appState.selectedElement = null;
+        
+        const elements = canvasMiddleZone.querySelectorAll('.canvas-element');
+        if (elements.length === 0) {
+          document.getElementById('canvas-guide-text').style.display = 'flex';
+        }
       }
     }
 
-    function handleFile(file) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        parseJWWBinary(e.target.result, file.name);
-      };
-      reader.readAsArrayBuffer(file);
-    }
+    canvasMiddleZone.addEventListener('mousedown', (e) => {
+      if (e.target === canvasMiddleZone || e.target === canvasBgDecoration) {
+        if (appState.selectedElement) {
+          appState.selectedElement.classList.remove('selected');
+          appState.selectedElement = null;
+        }
+      }
+    });
 
-    function logToConsole(message, type = 'info') {
-      const consoleOutput = document.getElementById('consoleOutput');
-      const div = document.createElement('div');
-      const time = new Date().toLocaleTimeString();
-      div.className = type === 'error' ? 'text-red-400 font-bold' : 'text-emerald-400';
-      div.textContent = `[${time}] ${message}`;
-      consoleOutput.appendChild(div);
-      consoleOutput.scrollTop = consoleOutput.scrollHeight;
-    }
+    // --- 初期化 ---
+    btnReset.addEventListener('click', () => {
+      const elements = canvasMiddleZone.querySelectorAll('.canvas-element');
+      elements.forEach(el => el.remove());
+      
+      inputTitle.value = "メゾン・ド・フルール 302号室";
+      inputRent.value = "89,000円";
+      inputSize.value = "1LDK (42.5㎡)";
+      inputSubAppeal.value = "★駅徒歩3分の好立地！南向き日当たり良好・インターネット無料！";
+      inputShikirei.value = "敷金 1ヶ月 / 礼金 なし";
+      inputTraffic.value = "東京メトロ千代田線「代々木公園」駅 徒歩3分";
+      inputTaiou.value = "媒介 (手数料100%分)";
+      inputAd.value = "AD 100%";
 
-    // -------------------------------------------------------------
-    // PDF ＆ 画像エクスポート
-    // -------------------------------------------------------------
-    async function exportMaisokuPDF() {
-      logToConsole("[SYSTEM] 高精度PDFのレンダリングを開始します...");
-      const { jsPDF } = window.jspdf;
-      const printTarget = document.getElementById('maisokuPrintTarget');
-      
-      const originalTransform = printTarget.style.transform;
-      printTarget.style.transform = "none";
-      
+      const syncMap = [
+        { input: inputTitle, canvas: canvasTitle },
+        { input: inputRent, canvas: canvasRent },
+        { input: inputSize, canvas: canvasSize },
+        { input: inputSubAppeal, canvas: canvasAppeal },
+        { input: inputShikirei, canvas: canvasShikirei },
+        { input: inputTraffic, canvas: canvasTraffic },
+        { input: inputTaiou, canvas: canvasTaiou },
+        { input: inputAd, canvas: canvasAd }
+      ];
+      syncMap.forEach(pair => pair.canvas.textContent = pair.input.value);
+
+      document.getElementById('canvas-guide-text').style.display = 'flex';
+      switchTarget('family');
+    });
+
+    // --- 高解像度エクスポート ---
+    btnExport.addEventListener('click', async () => {
+      if (appState.selectedElement) {
+        appState.selectedElement.classList.remove('selected');
+      }
+
+      const exportBtnText = btnExport.querySelector('span');
+      const originalText = exportBtnText.textContent;
+      exportBtnText.textContent = "高画質レンダリング中...";
+      btnExport.disabled = true;
+
+      const guideText = document.getElementById('canvas-guide-text');
+      const originalGuideDisplay = guideText.style.display;
+      guideText.style.display = 'none';
+
       try {
-        const canvas = await html2canvas(printTarget, {
-          scale: 2.5, 
+        const canvas = await html2canvas(myisokuCanvas, {
+          scale: 3, 
           useCORS: true,
           allowTaint: true,
+          logging: false,
           backgroundColor: '#ffffff',
-          logging: false
+          imageSmoothingEnabled: true
         });
 
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
-        const pdf = new jsPDF({
-          orientation: 'landscape',
-          unit: 'mm',
-          format: 'a4'
-        });
-
-        pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210);
-        const name = document.getElementById('formPropName').value.replace(/[\/\\?%*:|"<>\s]/g, '_');
-        pdf.save(`マイソク_${name}.pdf`);
-        logToConsole(`[SYSTEM] PDFエクスポートが完了しました: マイソク_${name}.pdf`);
-      } catch (error) {
-        logToConsole(`[ERROR] PDF生成エラー: ${error.message}`, 'error');
-      } finally {
-        updateZoom();
-      }
-    }
-
-    async function exportMaisokuImage() {
-      logToConsole("[SYSTEM] 高解像度Web用画像のレンダリングを開始します...");
-      const printTarget = document.getElementById('maisokuPrintTarget');
-      const originalTransform = printTarget.style.transform;
-      printTarget.style.transform = "none";
-
-      try {
-        const canvas = await html2canvas(printTarget, {
-          scale: 2.0,
-          useCORS: true,
-          backgroundColor: '#ffffff',
-          logging: false
-        });
-
-        const imgData = canvas.toDataURL('image/png');
+        const dataUrl = canvas.toDataURL('image/png', 1.0);
+        
         const link = document.createElement('a');
-        const name = document.getElementById('formPropName').value.replace(/[\/\\?%*:|"<>\s]/g, '_');
-        link.download = `マイソク_${name}.png`;
-        link.href = imgData;
+        link.download = `マイソク_横_${inputTitle.value.replace(/\s+/g, '_')}.png`;
+        link.href = dataUrl;
         link.click();
-        logToConsole(`[SYSTEM] 画像エクスポートが完了しました: マイソク_${name}.png`);
-      } catch (error) {
-        logToConsole(`[ERROR] 画像変換エラー: ${error.message}`, 'error');
+      } catch (err) {
+        console.error("エクスポートエラー:", err);
       } finally {
-        updateZoom();
+        exportBtnText.textContent = originalText;
+        btnExport.disabled = false;
+        guideText.style.display = originalGuideDisplay;
+        if (appState.selectedElement) {
+          appState.selectedElement.classList.add('selected');
+        }
       }
-    }
+    });
 
-    // -------------------------------------------------------------
-    // 画面ズーム調整
-    // -------------------------------------------------------------
-    function updateZoom() {
-      const container = document.getElementById('maisokuScaleWrapper');
-      const target = document.getElementById('maisokuPrintTarget');
-      
-      const containerWidth = container.clientWidth;
-      const zoomFactor = containerWidth / 1122 * state.zoom;
-      
-      target.style.transform = `scale(${zoomFactor})`;
-      document.getElementById('zoomPercent').textContent = `${Math.round(state.zoom * 100)}%`;
-    }
-
-    // -------------------------------------------------------------
-    // 起動時の初期化
-    // -------------------------------------------------------------
-    window.onload = function() {
-      // 初期状態をファミリー向け（family）としてロード
-      switchTargetGroup('family');
-      setupFileListeners();
-      
-      // フォームイベント
-      const formIds = [
-        'formCatch', 'formPropName', 'formRoom', 'formPrice', 'formStation',
-        'formDistance', 'formLayoutType', 'formArea', 'formBuilt', 'formTxType',
-        'formKanri', 'formShiki', 'formRei', 'formPoints',
-        'formAgencyName', 'formAgencyLic', 'formAgencyTel', 'formAgencyMail'
-      ];
-      formIds.forEach(id => {
-        document.getElementById(id).addEventListener('input', updateMaisokuPreview);
-      });
-
-      // 最適化クリーンアップトグル
-      const checkIds = ['chkCleanGrid', 'chkCleanDims', 'chkCleanHatch', 'chkDupMerge'];
-      checkIds.forEach(id => {
-        document.getElementById(id).addEventListener('change', () => {
-          logToConsole(`[SYSTEM] 最適化クリーンアップフィルタ再描画中...`);
-          renderCADToSVG();
-        });
-      });
-
-      // ズーム調整
-      document.getElementById('btnZoomIn').addEventListener('click', () => {
-        state.zoom = Math.min(1.5, state.zoom + 0.05);
-        updateZoom();
-      });
-      document.getElementById('btnZoomOut').addEventListener('click', () => {
-        state.zoom = Math.max(0.5, state.zoom - 0.05);
-        updateZoom();
-      });
-
-      // テーマスイッチ
-      const btnColor = document.getElementById('btnThemeColor');
-      const btnMono = document.getElementById('btnThemeMono');
-      const printTarget = document.getElementById('maisokuPrintTarget');
-
-      btnColor.addEventListener('click', () => {
-        printTarget.classList.remove('theme-monochrome');
-        btnColor.classList.add('bg-blue-600', 'text-white');
-        btnColor.classList.remove('text-slate-400');
-        btnMono.classList.remove('bg-blue-600', 'text-white');
-        btnMono.classList.add('text-slate-400');
-        logToConsole("[SYSTEM] カラー出力表示に切り替えました。");
-      });
-
-      btnMono.addEventListener('click', () => {
-        printTarget.classList.add('theme-monochrome');
-        btnMono.classList.add('bg-blue-600', 'text-white');
-        btnMono.classList.remove('text-slate-400');
-        btnColor.classList.remove('bg-blue-600', 'text-white');
-        btnColor.classList.add('text-slate-400');
-        logToConsole("[SYSTEM] FAX/店舗用の高コントラスト・モノクロ白黒表示に切り替えました。");
-      });
-
-      // スタンプ追加ボタン
-      document.querySelectorAll('.stamp-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const type = btn.getAttribute('data-type');
-          addNewStamp(type);
-        });
-      });
-
-      // スタンプクリア
-      document.getElementById('btnClearStamps').addEventListener('click', () => {
-        state.placedStamps = [];
-        renderCADToSVG();
-        logToConsole("[SYSTEM] 配置した全ての家具スタンプを消去しました。");
-      });
-
-      // キャッチコピーAI自動生成
-      document.getElementById('btnAiGenerate').addEventListener('click', triggerAICopy);
-
-      // ターゲット選択切替 (間取り図＆スペックマッピングと完全連動)
-      document.querySelectorAll('.target-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.target-btn').forEach(b => {
-            b.classList.remove('border-blue-600', 'bg-blue-50', 'text-blue-700', 'font-black');
-            b.classList.remove('border-2');
-            b.classList.add('border-slate-200', 'bg-white', 'text-slate-600', 'font-bold');
-          });
-          btn.classList.add('border-blue-600', 'bg-blue-50', 'text-blue-700', 'font-black', 'border-2');
-          const targetGroup = btn.getAttribute('data-target');
-          switchTargetGroup(targetGroup);
-        });
-      });
-
-      // 一括帯替えセレクトボックス
-      document.getElementById('selAgencyPreset').addEventListener('change', (e) => {
-        changeAgencyPreset(e.target.value);
-      });
-
-      // サンプルロード
-      document.getElementById('btnLoadSample').addEventListener('click', () => {
-        switchTargetGroup(state.activeTargetGroup);
-      });
-
-      document.getElementById('btnPdfExport').addEventListener('click', exportMaisokuPDF);
-      document.getElementById('btnImgExport').addEventListener('click', exportMaisokuImage);
-
-      document.getElementById('btnClearConsole').addEventListener('click', () => {
-        document.getElementById('consoleOutput').innerHTML = '';
-      });
-
-      // 設備タグトグル
-      document.querySelectorAll('.tag-toggle').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const icon = btn.getAttribute('data-icon');
-          if (state.activeTags.includes(icon)) {
-            state.activeTags = state.activeTags.filter(t => t !== icon);
-            btn.classList.remove('bg-blue-50', 'text-blue-700', 'border-blue-200');
-            btn.classList.add('bg-slate-100', 'text-slate-600', 'border-slate-200');
-          } else {
-            state.activeTags.push(icon);
-            btn.classList.add('bg-blue-50', 'text-blue-700', 'border-blue-200');
-            btn.classList.remove('bg-slate-100', 'text-slate-600', 'border-slate-200');
-          }
-          renderCADToSVG();
-          updateMaisokuPreview();
-        });
-      });
-
-      // 配置された家具の削除キー
-      window.addEventListener('keydown', (e) => {
-        if (e.key === 'Delete' || e.key === 'Backspace') {
-          if (state.selectedStampId) {
-            state.placedStamps = state.placedStamps.filter(s => s.id !== state.selectedStampId);
-            state.selectedStampId = null;
-            renderCADToSVG();
-            logToConsole("[SYSTEM] 選択中の家具スタンプを削除しました。");
-          }
-        }
-      });
-
-      // -------------------------------------------------------------
-      // アピールポイント複数選択ポップアップモーダルの制御
-      // -------------------------------------------------------------
-      const pointsModal = document.getElementById('pointsModal');
-      const btnOpenPointsModal = document.getElementById('btnOpenPointsModal');
-      const btnCloseModal = document.getElementById('btnCloseModal');
-      const btnApplyModalSelections = document.getElementById('btnApplyModalSelections');
-      const btnClearModalSelections = document.getElementById('btnClearModalSelections');
-
-      btnOpenPointsModal.addEventListener('click', () => {
-        // 現在のテキストエリアの状況をもとに、チェックボックスに反映する処理（簡易同期）
-        const currentText = document.getElementById('formPoints').value;
-        document.querySelectorAll('.modal-point-checkbox').forEach(cb => {
-          cb.checked = currentText.includes(cb.value);
-        });
-        pointsModal.classList.remove('hidden');
-      });
-
-      btnCloseModal.addEventListener('click', () => {
-        pointsModal.classList.add('hidden');
-      });
-
-      // 画面外クリックで閉じる
-      pointsModal.addEventListener('click', (e) => {
-        if (e.target === pointsModal) {
-          pointsModal.classList.add('hidden');
-        }
-      });
-
-      // 選択クリア
-      btnClearModalSelections.addEventListener('click', () => {
-        document.querySelectorAll('.modal-point-checkbox').forEach(cb => cb.checked = false);
-      });
-
-      // アピールポイントに適用
-      btnApplyModalSelections.addEventListener('click', () => {
-        const selectedPoints = [];
-        document.querySelectorAll('.modal-point-checkbox').forEach(cb => {
-          if (cb.checked) {
-            selectedPoints.push(`・${cb.value}`);
-          }
-        });
-        
-        if (selectedPoints.length > 0) {
-          document.getElementById('formPoints').value = selectedPoints.join('\n');
-        } else {
-          document.getElementById('formPoints').value = '';
-        }
-        
-        updateMaisokuPreview();
-        pointsModal.classList.add('hidden');
-        logToConsole(`[SYSTEM] ポップアップ選択から ${selectedPoints.length} 個のアピールポイントを適用しました。`);
-      });
-
-      updateMaisokuPreview();
-      updateZoom();
-      window.addEventListener('resize', updateZoom);
-    };
   </script>
 </body>
 </html>
