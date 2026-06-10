@@ -142,17 +142,17 @@
 
     <!-- アクションボタン群 -->
     <div class="flex items-center space-x-3">
-      <button onclick="changeTheme('family')" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition bg-emerald-950/40 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-900/40" title="アースカラーと角丸フォント">
-        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
-        ファミリー
+      <button onclick="changeTheme('premium')" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition bg-amber-950/40 text-amber-400 border border-amber-500/30 hover:bg-amber-900/40" title="ゴールド＆明朝のエレガンス">
+        <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
+        高級レジデンス
       </button>
       <button onclick="changeTheme('stylish')" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition bg-blue-950/40 text-blue-400 border border-blue-500/30 hover:bg-blue-900/40" title="ネイビー＆グレー of スタイリッシュモダン">
         <span class="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>
         スタイリッシュ
       </button>
-      <button onclick="changeTheme('premium')" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition bg-amber-950/40 text-amber-400 border border-amber-500/30 hover:bg-amber-900/40" title="ゴールド＆明朝のエレガンス">
-        <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
-        高級レジデンス
+      <button onclick="changeTheme('family')" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition bg-emerald-950/40 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-900/40" title="アースカラーと角丸フォント">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
+        ファミリー
       </button>
 
       <span class="h-6 w-px bg-slate-700 mx-2"></span>
@@ -597,34 +597,43 @@
           <!-- ==================== ヘッダー ==================== -->
           <div id="theme-header-bg" class="w-full h-[170px] bg-gradient-to-r from-emerald-800 to-teal-700 p-3.5 flex flex-col justify-between border-b-[6px] border-amber-400 relative z-10 transition-all duration-300">
             <!-- キャッチコピーブロック -->
-            <div class="flex items-center justify-between min-h-[30px] overflow-visible">
-              <div id="canvas-catch" class="text-[13px] font-black text-white truncate max-w-full leading-normal py-1 tracking-wider overflow-visible">
+            <div class="flex items-center justify-between min-h-[24px] overflow-visible">
+              <div id="canvas-catch" class="text-[13px] font-black text-white truncate max-w-full leading-[1.3] tracking-wider overflow-visible pt-1 pb-1.5">
                 ★駅チカ徒歩3分！陽当たり抜群 of 南向き角部屋フルリノベマンション★
               </div>
             </div>
 
             <!-- ヘッダーメイン -->
-            <div class="flex justify-between items-stretch py-1 h-[80px] w-full gap-x-2">
+            <div class="flex justify-between items-stretch h-[85px] w-full gap-x-2">
               <!-- 物件名ブロック -->
-              <div class="flex-grow min-w-0 pr-3 flex flex-col justify-start pt-1">
-                <h2 id="canvas-title" class="text-[26px] font-black text-white leading-normal font-rounded truncate py-1.5 overflow-visible">
+              <div class="flex-grow min-w-0 pr-2 flex flex-col justify-center overflow-visible">
+                <h2 id="canvas-title" class="text-[30px] font-black text-white leading-[1.15] font-rounded break-keep line-clamp-2 text-left w-full overflow-visible pb-0.5">
                   テクノハイツ代々木 402号室
                 </h2>
               </div>
 
-              <!-- 賃料ブロック -->
-              <div class="w-[220px] shrink-0 border-l border-white/25 pl-4 flex flex-col justify-start pt-1 min-w-0">
-                <div class="text-[9px] text-white/80 font-bold uppercase leading-normal">賃料</div>
-                <div class="text-white whitespace-nowrap flex items-baseline leading-normal py-1">
-                  <span id="canvas-price" class="text-[24px] font-black font-sans leading-normal">148,000</span>
-                  <span class="text-xs font-bold ml-1 leading-normal">円</span>
+              <!-- 間取りブロック -->
+              <div class="w-[110px] shrink-0 border-l border-white/25 pl-3 flex flex-col justify-center min-w-0 overflow-visible">
+                <div class="text-[10px] text-white/80 font-bold uppercase leading-none mb-1">間取り</div>
+                <div id="canvas-madori-text" class="text-[38px] font-black font-sans leading-none text-white drop-shadow-md overflow-visible tracking-tighter pb-0.5">1LDK</div>
+              </div>
+
+              <!-- 賃料・管理費ブロック -->
+              <div class="w-[260px] shrink-0 border-l border-white/25 pl-3 flex flex-col justify-center min-w-0 overflow-visible">
+                <div class="flex items-end gap-2 mb-1">
+                  <div class="text-[10px] text-white/80 font-bold uppercase leading-none">賃料</div>
+                  <div class="text-[10px] text-white/90 font-bold leading-none bg-black/20 px-1.5 py-0.5 rounded border border-white/10">管理費等: <span id="canvas-kanri">8,000円</span></div>
+                </div>
+                <div class="text-white whitespace-nowrap flex items-baseline overflow-visible">
+                  <span id="canvas-price" class="text-[42px] font-black font-sans leading-[1.1] tracking-tight pb-1.5 pt-0.5">148,000</span>
+                  <span class="text-[14px] font-bold ml-1.5 leading-none">円</span>
                 </div>
               </div>
 
               <!-- 交通アクセスブロック -->
-              <div class="w-[290px] shrink-0 border-l border-white/25 pl-4 flex flex-col justify-start pt-1 min-w-0">
-                <div class="text-[9px] text-white/80 font-bold uppercase leading-normal">交通アクセス</div>
-                <div id="canvas-access" class="text-[11px] font-extrabold text-white leading-normal whitespace-pre-line max-h-[54px] overflow-hidden py-1">
+              <div class="w-[220px] shrink-0 border-l border-white/25 pl-3 flex flex-col justify-center min-w-0 overflow-visible">
+                <div class="text-[10px] text-white/80 font-bold uppercase leading-none mb-1">交通アクセス</div>
+                <div id="canvas-access" class="text-[11px] font-extrabold text-white leading-[1.3] whitespace-pre-line max-h-full overflow-visible pb-0.5">
                   JR山手線「代々木」駅 徒歩3分
                   都営大江戸線「代々木」駅 徒歩2分
                 </div>
@@ -633,16 +642,14 @@
 
             <!-- ヘッダーサブ情報バー -->
             <div id="theme-sub-bar" class="w-full bg-emerald-950/60 rounded px-3 py-2 flex items-center justify-between text-[11px] text-white transition-all duration-300 mt-1">
-              <div class="flex gap-2.5 shrink-0 items-center">
-                <div><span class="sub-label text-emerald-300 font-bold mr-0.5">敷金:</span> <span id="canvas-shikikin" class="font-extrabold">1ヶ月</span></div>
-                <div><span class="sub-label text-emerald-300 font-bold mr-0.5">礼金:</span> <span id="canvas-reikin" class="font-extrabold">1ヶ月</span></div>
-                <div><span class="sub-label text-emerald-300 font-bold mr-0.5">管理費等:</span> <span id="canvas-kanri" class="font-extrabold">8,000円</span></div>
-                <div><span class="sub-label text-emerald-300 font-bold mr-0.5">間取り:</span> <span id="canvas-madori-text" class="font-extrabold">1LDK</span></div>
-                <div><span class="sub-label text-emerald-300 font-bold mr-0.5">面積:</span> <span id="canvas-menseki" class="font-extrabold">42.50㎡</span></div>
+              <div class="flex gap-3 shrink-0 items-center overflow-visible">
+                <div class="overflow-visible"><span class="sub-label text-emerald-300 font-bold mr-0.5">敷金:</span> <span id="canvas-shikikin" class="font-extrabold pb-0.5">1ヶ月</span></div>
+                <div class="overflow-visible"><span class="sub-label text-emerald-300 font-bold mr-0.5">礼金:</span> <span id="canvas-reikin" class="font-extrabold pb-0.5">1ヶ月</span></div>
+                <div class="overflow-visible"><span class="sub-label text-emerald-300 font-bold mr-0.5">面積:</span> <span id="canvas-menseki" class="font-extrabold pb-0.5">42.50㎡</span></div>
               </div>
-              <div class="text-[11px] font-mono opacity-95 truncate max-w-[45%] flex items-center gap-1.5 justify-end overflow-visible py-0.5">
+              <div class="text-[11px] font-mono opacity-95 truncate max-w-[50%] flex items-center gap-1.5 justify-end overflow-visible py-0.5">
                 <span id="theme-sub-bar-location-badge" class="bg-amber-400 text-emerald-950 px-2 py-1 rounded font-black shrink-0 text-[10px] leading-none flex items-center justify-center">所在地</span>
-                <span id="canvas-address" class="font-extrabold truncate text-[11px] leading-normal py-0.5 inline-block">東京都渋谷区代々木1丁目XX-XX</span>
+                <span id="canvas-address" class="font-extrabold truncate text-[11px] leading-normal pb-0.5 inline-block">東京都渋谷区代々木1丁目XX-XX</span>
               </div>
             </div>
           </div>
@@ -981,8 +988,9 @@
         subLabels.forEach(el => { el.className = "sub-label text-emerald-300 font-bold mr-0.5"; });
         if (locationBadge) locationBadge.className = "bg-amber-400 text-emerald-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
 
-        document.getElementById('canvas-title').style.fontFamily = "'M PLUS Rounded 1c', sans-serif";
-        document.getElementById('canvas-price').style.fontFamily = "'M PLUS Rounded 1c', sans-serif";
+        document.getElementById('canvas-title').style.fontFamily = "'Noto Sans JP', sans-serif";
+        document.getElementById('canvas-price').style.fontFamily = "'Noto Sans JP', sans-serif";
+        document.getElementById('canvas-madori-text').style.fontFamily = "'Noto Sans JP', sans-serif";
         
         watermark.innerHTML = `<i data-lucide="home" class="w-[300px] h-[300px] text-emerald-800"></i>`;
         
@@ -1005,6 +1013,7 @@
 
         document.getElementById('canvas-title').style.fontFamily = "'Noto Sans JP', sans-serif";
         document.getElementById('canvas-price').style.fontFamily = "'Noto Sans JP', sans-serif";
+        document.getElementById('canvas-madori-text').style.fontFamily = "'Noto Sans JP', sans-serif";
         
         watermark.innerHTML = `<i data-lucide="building" class="w-[300px] h-[300px] text-slate-800"></i>`;
 
@@ -1028,6 +1037,7 @@
 
         document.getElementById('canvas-title').style.fontFamily = "'Noto Serif JP', serif";
         document.getElementById('canvas-price').style.fontFamily = "'Noto Serif JP', serif";
+        document.getElementById('canvas-madori-text').style.fontFamily = "'Noto Serif JP', serif";
         
         watermark.innerHTML = `<i data-lucide="crown" class="w-[300px] h-[300px] text-amber-900"></i>`;
       }
