@@ -613,23 +613,23 @@
               </div>
 
               <!-- 間取りブロック -->
-              <div class="w-[110px] shrink-0 border-l border-white/25 pl-3 flex flex-col justify-center min-w-0 overflow-visible">
+              <div class="w-[130px] shrink-0 border-l border-white/25 pl-3 flex flex-col justify-center min-w-0 overflow-visible">
                 <div class="h-[20px] flex items-end mb-1">
                   <div class="text-[10px] text-white/80 font-bold uppercase leading-none mb-0.5">間取り</div>
                 </div>
                 <div class="text-white whitespace-nowrap flex items-baseline overflow-visible pb-1">
-                  <span id="canvas-madori-text" class="text-[38px] font-black font-sans leading-[1.2] text-white drop-shadow-md overflow-visible tracking-tighter pb-2 pt-0.5">1LDK</span>
+                  <span id="canvas-madori-text" class="text-[34px] font-black font-sans leading-[1.2] text-white drop-shadow-md overflow-visible tracking-tighter pb-2 pt-0.5">1LDK</span>
                 </div>
               </div>
 
               <!-- 賃料・管理費ブロック -->
-              <div class="w-[260px] shrink-0 border-l border-white/25 pl-3 flex flex-col justify-center min-w-0 overflow-visible">
+              <div class="w-[250px] shrink-0 border-l border-white/25 pl-3 flex flex-col justify-center min-w-0 overflow-visible">
                 <div class="h-[20px] flex items-end gap-2 mb-1">
                   <div class="text-[10px] text-white/80 font-bold uppercase leading-none mb-0.5">賃料</div>
                   <div class="text-[10px] text-white/90 font-bold leading-none bg-black/20 px-1.5 py-0.5 rounded border border-white/10">管理費等: <span id="canvas-kanri">8,000円</span></div>
                 </div>
                 <div class="text-white whitespace-nowrap flex items-baseline overflow-visible pb-1">
-                  <span id="canvas-price" class="text-[42px] font-black font-sans leading-[1.2] tracking-tight pb-2 pt-0.5">148,000</span>
+                  <span id="canvas-price" class="text-[40px] font-black font-sans leading-[1.2] tracking-tight pb-2 pt-0.5">148,000</span>
                   <span class="text-[14px] font-bold ml-1.5 leading-none">円</span>
                 </div>
               </div>
@@ -1477,10 +1477,10 @@
       }
 
       div.innerHTML = `
-        <div class="flex items-center justify-center w-full h-[40px] overflow-hidden select-none pointer-events-none">
+        <div class="flex items-center justify-center w-full h-[40px] overflow-visible select-none pointer-events-none">
           ${svgContent}
         </div>
-        <span class="text-[8.5px] font-black tracking-widest text-slate-900 text-center leading-none select-none w-full block truncate mt-1">${labelText}</span>
+        <span class="text-[8.5px] font-black tracking-widest text-slate-900 text-center leading-none select-none w-full block mt-0.5 whitespace-nowrap overflow-visible">${labelText}</span>
       `;
 
       setupCanvasItemInteractions(div);
@@ -1625,11 +1625,20 @@
           selectedCanvasItem.style.left = `${Math.max(0, Math.min(maxLeft, newLeft))}px`;
           selectedCanvasItem.style.top = `${Math.max(0, Math.min(maxTop, newTop))}px`;
         } else if (isResizingCanvasItem && selectedCanvasItem) {
-          const newW = activeCanvasItemPos.w + deltaX;
-          const newH = activeCanvasItemPos.h + deltaY;
+          // 縦横の比率(アスペクト比)を計算して維持する
+          const aspectRatio = activeCanvasItemPos.w / activeCanvasItemPos.h;
+          let newW, newH;
+          
+          if (activeCanvasItemPos.w >= activeCanvasItemPos.h) {
+            newW = Math.max(40, activeCanvasItemPos.w + deltaX);
+            newH = newW / aspectRatio;
+          } else {
+            newH = Math.max(40, activeCanvasItemPos.h + deltaY);
+            newW = newH * aspectRatio;
+          }
 
-          selectedCanvasItem.style.width = `${Math.max(40, newW)}px`;
-          selectedCanvasItem.style.height = `${Math.max(20, newH)}px`;
+          selectedCanvasItem.style.width = `${newW}px`;
+          selectedCanvasItem.style.height = `${newH}px`;
         }
       });
 
@@ -1863,7 +1872,17 @@
         ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
         const croppedBase64 = canvas.toDataURL('image/png');
         
-        addPresetAssetToCanvas(croppedBase64, 150, 150, 250, 250);
+        // 切り抜いた範囲の縦横比（アスペクト比）を維持したまま、キャンバス配置用のサイズを計算
+        let spawnW = 400;
+        let spawnH = 400 * (cropH / cropW);
+        
+        // 縦長すぎる画像の場合は高さを基準に再計算
+        if (spawnH > 400) {
+            spawnH = 400;
+            spawnW = 400 * (cropW / cropH);
+        }
+        
+        addPresetAssetToCanvas(croppedBase64, 150, 150, spawnW, spawnH);
         showToast("選択範囲を切りぬいて配置しました。");
       } catch (err) {
         console.error("Cropping Error: ", err);
