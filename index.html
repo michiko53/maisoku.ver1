@@ -758,6 +758,8 @@
     let isResizingCanvasItem = false;
     let activeCanvasItemPos = { x: 0, y: 0, w: 0, h: 0 };
     let pointerStartPos = { x: 0, y: 0 };
+    let activeResizeHandle = null;
+    let isCanvasGlobalEventRegistered = false;
 
     // カスケード出現カウンタ
     let cascadeOffsetCounter = 0;
@@ -812,6 +814,11 @@
       if (targetId === 'title') {
         setTimeout(adjustTitleFontSize, 10);
       }
+
+      // 交通アクセスが変更された場合はフォントサイズを自動調整
+      if (targetId === 'access') {
+        setTimeout(adjustAccessFontSize, 10);
+      }
     }
 
     // 物件名の自動フォントサイズ調整
@@ -834,6 +841,42 @@
 
       // 省略設定を元に戻す
       titleEl.classList.add('line-clamp-2');
+    }
+
+    // 交通アクセスの自動フォントサイズ調整
+    function adjustAccessFontSize() {
+      const accessEl = document.getElementById('canvas-access');
+      const inputAccess = document.getElementById('input-access');
+      const containerEl = accessEl ? accessEl.parentElement : null;
+      
+      if (!accessEl || !inputAccess || !containerEl) return;
+
+      const val = inputAccess.value.trim();
+
+      if (!val.includes('\n')) {
+        // 1行の場合は最大24pxをベースにはみ出さないよう調整
+        accessEl.style.fontSize = '24px';
+        
+        // 正確な文字幅を計測するため、折り返し禁止と幅をコンテンツに合わせる設定を一時付与
+        accessEl.style.width = 'max-content';
+        accessEl.style.whiteSpace = 'nowrap';
+        
+        let fontSize = 24;
+        // 親のパディング(pl-4 = 16px)を考慮した実質の最大許容幅
+        const maxWidth = containerEl.clientWidth - 16;
+
+        while (accessEl.scrollWidth > maxWidth && fontSize > 12) {
+          fontSize -= 1;
+          accessEl.style.fontSize = fontSize + 'px';
+        }
+        
+        // 計測用のスタイルを解除し、元の表示設定に戻す
+        accessEl.style.width = '';
+        accessEl.style.whiteSpace = '';
+      } else {
+        // 2行以上の場合はデフォルトの16px
+        accessEl.style.fontSize = '16px';
+      }
     }
 
     // 初期起動時同期
@@ -1090,6 +1133,7 @@
       
       // テーマ（フォント）が変わった際にもサイズを再計算
       setTimeout(adjustTitleFontSize, 10);
+      setTimeout(adjustAccessFontSize, 10);
     }
 
     // 画像描画境界取得
@@ -1587,11 +1631,20 @@
         e.stopPropagation();
       });
 
-      // リサイズハンドル
-      const resizeHandle = document.createElement('div');
-      resizeHandle.className = "resize-handle absolute bottom-0 right-0 w-4 h-4 bg-indigo-500 hover:bg-indigo-400 cursor-se-resize flex items-center justify-center border-l border-t border-white z-20 shadow-md";
-      resizeHandle.style.borderRadius = "4px 0 0 0";
-      el.appendChild(resizeHandle);
+      // 四隅のリサイズハンドル
+      const handleConfigs = [
+        { class: 'top-0 left-0 cursor-nwse-resize border-b border-r rounded-br', handle: 'top-left' },
+        { class: 'top-0 right-0 cursor-nesw-resize border-b border-l rounded-bl', handle: 'top-right' },
+        { class: 'bottom-0 left-0 cursor-nesw-resize border-t border-r rounded-tr', handle: 'bottom-left' },
+        { class: 'bottom-0 right-0 cursor-nwse-resize border-t border-l rounded-tl', handle: 'bottom-right' }
+      ];
+
+      handleConfigs.forEach(cfg => {
+        const h = document.createElement('div');
+        h.className = `resize-handle absolute w-4 h-4 bg-indigo-500 hover:bg-indigo-400 flex items-center justify-center border-white z-20 shadow-md ${cfg.class}`;
+        h.dataset.handle = cfg.handle;
+        el.appendChild(h);
+      });
 
       // 操作ボタン類
       const btnUp = document.createElement('button');
@@ -1629,14 +1682,16 @@
       };
 
       el.addEventListener('mousedown', function(e) {
-        if (e.target === resizeHandle) {
+        if (e.target.classList.contains('resize-handle')) {
           isResizingCanvasItem = true;
           isMovingCanvasItem = false;
+          activeResizeHandle = e.target.dataset.handle;
         } else if (e.target.tagName === 'BUTTON') {
           return;
         } else {
           isMovingCanvasItem = true;
           isResizingCanvasItem = false;
+          activeResizeHandle = null;
         }
         selectCanvasItem(el);
 
@@ -1652,43 +1707,115 @@
         e.stopPropagation();
       });
 
-      document.addEventListener('mousemove', function(e) {
-        if (!isMovingCanvasItem && !isResizingCanvasItem) return;
+      // マウスホイールによる直感的な拡大縮小
+      el.addEventListener('wheel', function(e) {
+        if (!el.classList.contains('canvas-item-active')) return;
+        e.preventDefault();
+        
+        const scaleFactor = e.deltaY > 0 ? 0.95 : 1.05; 
+        
+        const currentW = el.offsetWidth;
+        const currentH = el.offsetHeight;
+        let newW = currentW * scaleFactor;
+        let newH = currentH * scaleFactor;
+        
+        if (newW < 40 || newH < 40) return;
+        
+        const currentLeft = parseFloat(el.style.left) || 0;
+        const currentTop = parseFloat(el.style.top) || 0;
+        
+        const newLeft = currentLeft - (newW - currentW) / 2;
+        const newTop = currentTop - (newH - currentH) / 2;
+        
+        el.style.width = `${newW}px`;
+        el.style.height = `${newH}px`;
+        el.style.left = `${newLeft}px`;
+        el.style.top = `${newTop}px`;
+      }, { passive: false });
 
-        const deltaX = e.clientX - pointerStartPos.x;
-        const deltaY = e.clientY - pointerStartPos.y;
+      if (!isCanvasGlobalEventRegistered) {
+        isCanvasGlobalEventRegistered = true;
+        
+        document.addEventListener('mousemove', function(e) {
+          if (!isMovingCanvasItem && !isResizingCanvasItem) return;
 
-        if (isMovingCanvasItem && selectedCanvasItem) {
-          const newLeft = activeCanvasItemPos.x + deltaX;
-          const newTop = activeCanvasItemPos.y + deltaY;
-          
-          const maxLeft = workArea ? workArea.clientWidth - selectedCanvasItem.offsetWidth : 1000 - selectedCanvasItem.offsetWidth;
-          const maxTop = workArea ? workArea.clientHeight - selectedCanvasItem.offsetHeight : 462 - selectedCanvasItem.offsetHeight;
+          const deltaX = e.clientX - pointerStartPos.x;
+          const deltaY = e.clientY - pointerStartPos.y;
 
-          selectedCanvasItem.style.left = `${Math.max(0, Math.min(maxLeft, newLeft))}px`;
-          selectedCanvasItem.style.top = `${Math.max(0, Math.min(maxTop, newTop))}px`;
-        } else if (isResizingCanvasItem && selectedCanvasItem) {
-          // 縦横の比率(アスペクト比)を計算して維持する
-          const aspectRatio = activeCanvasItemPos.w / activeCanvasItemPos.h;
-          let newW, newH;
-          
-          if (activeCanvasItemPos.w >= activeCanvasItemPos.h) {
-            newW = Math.max(40, activeCanvasItemPos.w + deltaX);
-            newH = newW / aspectRatio;
-          } else {
-            newH = Math.max(40, activeCanvasItemPos.h + deltaY);
-            newW = newH * aspectRatio;
+          if (isMovingCanvasItem && selectedCanvasItem) {
+            const newLeft = activeCanvasItemPos.x + deltaX;
+            const newTop = activeCanvasItemPos.y + deltaY;
+            
+            const testWorkArea = document.getElementById('canvas-work-area');
+            const minX = -selectedCanvasItem.offsetWidth + 40;
+            const maxX = testWorkArea ? testWorkArea.clientWidth - 40 : 960;
+            const minY = -selectedCanvasItem.offsetHeight + 40;
+            const maxY = testWorkArea ? testWorkArea.clientHeight - 40 : 400;
+
+            selectedCanvasItem.style.left = `${Math.max(minX, Math.min(maxX, newLeft))}px`;
+            selectedCanvasItem.style.top = `${Math.max(minY, Math.min(maxY, newTop))}px`;
+          } else if (isResizingCanvasItem && selectedCanvasItem) {
+            const aspectRatio = activeCanvasItemPos.w / activeCanvasItemPos.h;
+            let newW = activeCanvasItemPos.w;
+            let newH = activeCanvasItemPos.h;
+            let newX = activeCanvasItemPos.x;
+            let newY = activeCanvasItemPos.y;
+            
+            if (activeResizeHandle === 'top-left') {
+              if (activeCanvasItemPos.w >= activeCanvasItemPos.h) {
+                newW = Math.max(40, activeCanvasItemPos.w - deltaX);
+                newH = newW / aspectRatio;
+              } else {
+                newH = Math.max(40, activeCanvasItemPos.h - deltaY);
+                newW = newH * aspectRatio;
+              }
+              newX = activeCanvasItemPos.x + (activeCanvasItemPos.w - newW);
+              newY = activeCanvasItemPos.y + (activeCanvasItemPos.h - newH);
+            } else if (activeResizeHandle === 'top-right') {
+              if (activeCanvasItemPos.w >= activeCanvasItemPos.h) {
+                newW = Math.max(40, activeCanvasItemPos.w + deltaX);
+                newH = newW / aspectRatio;
+              } else {
+                newH = Math.max(40, activeCanvasItemPos.h - deltaY);
+                newW = newH * aspectRatio;
+              }
+              newX = activeCanvasItemPos.x;
+              newY = activeCanvasItemPos.y + (activeCanvasItemPos.h - newH);
+            } else if (activeResizeHandle === 'bottom-left') {
+              if (activeCanvasItemPos.w >= activeCanvasItemPos.h) {
+                newW = Math.max(40, activeCanvasItemPos.w - deltaX);
+                newH = newW / aspectRatio;
+              } else {
+                newH = Math.max(40, activeCanvasItemPos.h + deltaY);
+                newW = newH * aspectRatio;
+              }
+              newX = activeCanvasItemPos.x + (activeCanvasItemPos.w - newW);
+              newY = activeCanvasItemPos.y;
+            } else {
+              if (activeCanvasItemPos.w >= activeCanvasItemPos.h) {
+                newW = Math.max(40, activeCanvasItemPos.w + deltaX);
+                newH = newW / aspectRatio;
+              } else {
+                newH = Math.max(40, activeCanvasItemPos.h + deltaY);
+                newW = newH * aspectRatio;
+              }
+              newX = activeCanvasItemPos.x;
+              newY = activeCanvasItemPos.y;
+            }
+
+            selectedCanvasItem.style.width = `${newW}px`;
+            selectedCanvasItem.style.height = `${newH}px`;
+            selectedCanvasItem.style.left = `${newX}px`;
+            selectedCanvasItem.style.top = `${newY}px`;
           }
+        });
 
-          selectedCanvasItem.style.width = `${newW}px`;
-          selectedCanvasItem.style.height = `${newH}px`;
-        }
-      });
-
-      document.addEventListener('mouseup', function() {
-        isMovingCanvasItem = false;
-        isResizingCanvasItem = false;
-      });
+        document.addEventListener('mouseup', function() {
+          isMovingCanvasItem = false;
+          isResizingCanvasItem = false;
+          activeResizeHandle = null;
+        });
+      }
 
       if (workArea) {
         workArea.appendChild(el);
@@ -1847,7 +1974,7 @@
               newX = potentialX;
               newW = cropBoxPos.w - deltaX;
             }
-            const potentialH = cropBoxPos.y + deltaY;
+            const potentialH = cropBoxPos.h + deltaY;
             if (cropBoxPos.y + potentialH <= bounds.bottom && potentialH >= minSize) {
               newH = potentialH;
             }
@@ -1856,7 +1983,7 @@
             if (cropBoxPos.x + potentialW <= bounds.right && potentialW >= minSize) {
               newW = potentialW;
             }
-            const potentialH = cropBoxPos.y + deltaY;
+            const potentialH = cropBoxPos.h + deltaY;
             if (cropBoxPos.y + potentialH <= bounds.bottom && potentialH >= minSize) {
               newH = potentialH;
             }
