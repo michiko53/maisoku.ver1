@@ -11,7 +11,7 @@
   <!-- Google Fonts for rich themes -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;900&family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@500;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@400;700&family=Klee+One:wght@600&family=M+PLUS+Rounded+1c:wght@400;700;900&family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@500;700;900&family=Yuji+Syuku&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
   
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
@@ -142,18 +142,55 @@
 
     <!-- アクションボタン群 -->
     <div class="flex items-center space-x-3">
-      <button onclick="changeTheme('premium')" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition bg-amber-950/40 text-amber-400 border border-amber-500/30 hover:bg-amber-900/40" title="ゴールド＆明朝のエレガンス">
-        <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
-        高級レジデンス
-      </button>
-      <button onclick="changeTheme('stylish')" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition bg-blue-950/40 text-blue-400 border border-blue-500/30 hover:bg-blue-900/40" title="ネイビー＆グレー of スタイリッシュモダン">
-        <span class="w-2.5 h-2.5 rounded-full bg-blue-500 inline-block"></span>
-        スタイリッシュ
-      </button>
-      <button onclick="changeTheme('family')" class="px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition bg-emerald-950/40 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-900/40" title="アースカラーと角丸フォント">
-        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>
-        ファミリー
-      </button>
+      <div class="flex items-center gap-2 bg-slate-900/50 rounded-lg p-1 border border-slate-700 shadow-inner">
+        <div class="flex items-center gap-1.5 px-2">
+          <i data-lucide="type" class="w-3.5 h-3.5 text-slate-400"></i>
+          <select onchange="changeFont(this.value)" class="bg-transparent text-xs font-semibold text-slate-300 focus:outline-none cursor-pointer outline-none appearance-none pr-2">
+            <option value="serif">明朝体 (高級感)</option>
+            <option value="sans">ゴシック体 (標準)</option>
+            <option value="rounded">丸ゴシック (親しみ)</option>
+            <option value="yumincho">游明朝 (シャープ)</option>
+            <option value="yugothic">游ゴシック (モダン)</option>
+            <option value="meiryo">メイリオ (視認性)</option>
+            <option value="klee">クレー (手書き風)</option>
+            <option value="zenkaku">禅角ゴシック (スッキリ)</option>
+            <option value="yuji">楷書体 (和風・伝統)</option>
+            <option value="kaisei">レトロ明朝 (モダン和風)</option>
+          </select>
+        </div>
+        <div class="w-px h-4 bg-slate-700"></div>
+        <div class="flex items-center gap-1.5 px-2">
+          <i data-lucide="palette" class="w-3.5 h-3.5 text-slate-400"></i>
+          <select onchange="changeColor(this.value)" class="bg-transparent text-xs font-semibold text-slate-300 focus:outline-none cursor-pointer outline-none appearance-none pr-2">
+            <optgroup label="グラデーション (高級感・豊かさ)">
+              <option value="amber">プレミアムアンバー (琥珀)</option>
+              <option value="blue">スタイリッシュブルー (青)</option>
+              <option value="emerald">ファミリーエメラルド (緑)</option>
+              <option value="rose">エレガントローズ (薔薇)</option>
+              <option value="slate">アーバンスレート (白黒)</option>
+              <option value="grad-gold">エグゼクティブゴールド (金)</option>
+              <option value="grad-navy">重厚ネイビー (濃紺)</option>
+              <option value="grad-burgundy">クラシックバーガンディ (深紅)</option>
+              <option value="grad-forest">リラックスフォレスト (深緑)</option>
+              <option value="grad-bronze">ヴィンテージブロンズ (銅)</option>
+            </optgroup>
+            <optgroup label="単色 (シンプル・視認性)">
+              <option value="solid-blue">トラストブルー (青)</option>
+              <option value="solid-emerald">エコグリーン (緑)</option>
+              <option value="solid-amber">ウォームブラウン (茶)</option>
+              <option value="solid-slate">モダングレー (灰)</option>
+              <option value="solid-black">ソリッドブラック (黒)</option>
+              <option value="solid-red">アテンションレッド (赤)</option>
+              <option value="solid-navy">フォーマルネイビー (濃紺)</option>
+              <option value="solid-teal">クリーンティール (青緑)</option>
+              <option value="solid-orange">アクティブオレンジ (橙)</option>
+              <option value="solid-indigo">スマートインディゴ (藍)</option>
+              <option value="solid-light-yellow">パステルイエロー (薄黄)</option>
+              <option value="solid-dusty-pink">ダスティピンク (暗め薄桃)</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
 
       <span class="h-6 w-px bg-slate-700 mx-2"></span>
 
@@ -199,8 +236,8 @@
             </div>
             <div class="grid grid-cols-2 gap-2">
               <div>
-                <label class="block text-xs text-slate-400 mb-1 font-semibold">賃料 (半角数字のみで自動カンマ)</label>
-                <input type="text" id="input-price" oninput="syncText('price', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-indigo-500 transition" value="148000">
+                <label class="block text-xs text-slate-400 mb-1 font-semibold">賃料 (数字で自動カンマ)</label>
+                <input type="text" id="input-price" oninput="syncText('price', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-indigo-500 transition" value="145000円～150000">
               </div>
               <div>
                 <label class="block text-xs text-slate-400 mb-1 font-semibold">管理費・共益費 (半角数字のみ)</label>
@@ -273,7 +310,7 @@
             </div>
             <div class="col-span-2">
               <label class="block text-xs text-slate-400 mb-1 font-semibold">掲載日 (作成日)</label>
-              <input type="text" id="input-pub-date" oninput="syncText('pub-date', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition" value="2026年6月6日">
+              <input type="text" id="input-pub-date" oninput="syncText('pub-date', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition" value="">
             </div>
           </div>
         </div>
@@ -398,152 +435,275 @@
           
           <div class="grid grid-cols-3 gap-3">
             <!-- 各アイコンボタン -->
-            <button onclick="addDesignerIconBox('B・T別')" class="p-2 bg-[#e0f2fe] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
-              <div class="flex items-center justify-center w-full h-[36px] overflow-hidden">
-                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M2 14c0 3 2 5 5 5h10c3 0 5-2 5-5v-2H2v2z" fill="#93c5fd" />
-                  <path d="M2 12h20" />
-                  <path d="M6 12V6a2 2 0 0 1 2-2h1" />
-                  <path d="M9 3v2" />
-                  <path d="M16 12v-2a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v2a3 3 0 0 1-3 3h-2" fill="#ffffff" />
+            <button onclick="addDesignerIconBox('B・T別')" class="p-1.5 bg-[#e0f2fe] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M2 13h14v2a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-2z" fill="#bae6fd" />
+                  <path d="M4 13V6a2 2 0 0 1 2-2h2" />
+                  <circle cx="10" cy="3" r="1.5" fill="#f8fafc" />
+                  <line x1="17" y1="2" x2="17" y2="22" stroke-dasharray="3 3" />
+                  <path d="M19 11v4h4v-2a2 2 0 0 0-2-2h-2z" fill="#e2e8f0" />
+                  <path d="M19 15c-1 0-2 1-2 2v2h4v-2c0-1-1-2-2-2z" fill="#f8fafc" />
                 </svg>
               </div>
               <span class="text-[9px] font-black text-slate-900 leading-none mb-0.5">B・T別</span>
             </button>
 
-            <button onclick="addDesignerIconBox('オートロック')" class="p-2 bg-[#ffedd5] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
-              <div class="flex items-center justify-center w-full h-[36px] overflow-hidden">
-                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="#475569" />
-                  <rect x="4" y="11" width="16" height="10" rx="3" fill="#f59e0b" />
-                  <circle cx="12" cy="15" r="1.5" fill="#1e293b" />
-                  <path d="M12 16.5v2.5" stroke="#1e293b" />
+            <button onclick="addDesignerIconBox('オートロック')" class="p-1.5 bg-[#ffedd5] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="5" y="11" width="14" height="10" rx="3" fill="#fcd34d" />
+                  <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+                  <circle cx="12" cy="16" r="1.5" fill="#1e293b" />
                 </svg>
               </div>
               <span class="text-[8.5px] font-black text-slate-900 leading-none mb-0.5">オートロック</span>
             </button>
 
-            <button onclick="addDesignerIconBox('独立洗面')" class="p-2 bg-[#d1fae5] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
-              <div class="flex items-center justify-center w-full h-[36px] overflow-hidden">
-                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="8" r="5" fill="#bae6fd" />
-                  <path d="M5 16h14v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-2z" fill="#ffffff" />
-                  <path d="M12 13v1.5" />
-                  <path d="M11 13h2" />
+            <button onclick="addDesignerIconBox('独立洗面')" class="p-1.5 bg-[#d1fae5] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="7" y="3" width="10" height="8" rx="2" fill="#e0f2fe" />
+                  <path d="M4 14h16v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3z" fill="#f8fafc" />
+                  <path d="M12 11v3" />
+                  <path d="M10 12h4" />
                 </svg>
               </div>
               <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">独立洗面</span>
             </button>
 
-            <button onclick="addDesignerIconBox('温水便座')" class="p-2 bg-[#fef3c7] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
-              <div class="flex items-center justify-center w-full h-[36px] overflow-hidden">
-                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="4" y="4" width="6" height="12" rx="1.5" fill="#f8fafc" />
-                  <path d="M10 10c0 4 2 6 6 6s6-2 6-6H10z" fill="#e2e8f0" />
-                  <path d="M10 10V8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2" fill="#ffffff" />
-                  <path d="M12 16v4h6v-4" />
+            <button onclick="addDesignerIconBox('温水便座')" class="p-1.5 bg-[#fef3c7] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="6" y="3" width="12" height="6" rx="2" fill="#f8fafc" />
+                  <path d="M8 9v6a4 4 0 0 0 8 0V9H8z" fill="#e2e8f0" />
+                  <path d="M12 15c-1 0-2-1-2-2s2-4 2-4 2 3 2 4-1 2-2 2z" fill="#60a5fa" stroke="none" />
+                  <circle cx="16" cy="6" r="1" fill="#94a3b8" />
                 </svg>
               </div>
               <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">温水便座</span>
             </button>
 
-            <button onclick="addDesignerIconBox('室内洗濯')" class="p-2 bg-[#e0e7ff] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
-              <div class="flex items-center justify-center w-full h-[36px] overflow-hidden">
-                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="4" y="4" width="16" height="17" rx="2.5" fill="#ffffff" />
-                  <line x1="4" y1="8" x2="20" y2="8" />
-                  <circle cx="7" cy="6" r="1" fill="#f59e0b" stroke="none" />
-                  <circle cx="10" cy="6" r="1" fill="#3b82f6" stroke="none" />
-                  <circle cx="12" cy="14" r="4.5" fill="#bae6fd" />
-                  <path d="M10 14a2 2 0 0 1 4 0" />
+            <button onclick="addDesignerIconBox('室内洗濯')" class="p-1.5 bg-[#e0e7ff] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="5" y="3" width="14" height="18" rx="3" fill="#f8fafc" />
+                  <line x1="5" y1="8" x2="19" y2="8" />
+                  <circle cx="12" cy="14" r="4" fill="#bae6fd" />
+                  <circle cx="8" cy="5.5" r="1" fill="#1e293b" />
+                  <circle cx="11" cy="5.5" r="1" fill="#1e293b" />
                 </svg>
               </div>
               <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">室内洗濯</span>
             </button>
 
-            <button onclick="addDesignerIconBox('システムK')" class="p-2 bg-[#fce7f3] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
-              <div class="flex items-center justify-center w-full h-[36px] overflow-hidden">
-                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M14 14l7 7" stroke="#475569" stroke-width="3" />
-                  <circle cx="10" cy="10" r="7" fill="#6366f1" />
-                  <path d="M8 9.5c.2-1 1.2-1.5 2-1s1.5 1 1 2-.5 1-1.5.5-1.7-.5-1.5-1.5z" fill="#ffffff" stroke="none" />
-                  <circle cx="10" cy="10" r="2" fill="#f97316" stroke="none" />
+            <button onclick="addDesignerIconBox('システムK')" class="p-1.5 bg-[#fce7f3] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 13h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6z" fill="#fbcfe8" />
+                  <line x1="3" y1="13" x2="21" y2="13" />
+                  <circle cx="8" cy="11" r="2" fill="#f97316" stroke="none" />
+                  <circle cx="16" cy="11" r="2" fill="#f97316" stroke="none" />
+                  <path d="M12 9V5c0-1 1-2 2-2s2 1 2 2v2" />
                 </svg>
               </div>
               <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">システムK</span>
             </button>
 
-            <button onclick="addDesignerIconBox('追い焚き')" class="p-2 bg-[#ffe4e6] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
-              <div class="flex items-center justify-center w-full h-[36px] overflow-hidden">
-                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="10" width="18" height="8" rx="2" fill="#93c5fd" />
-                  <path d="M2 10h20v2a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5v-2z" fill="#ffffff" />
-                  <path d="M7 6c.5-1 .5-2 0-3" />
-                  <path d="M12 6c.5-1 .5-2 0-3" />
-                  <path d="M17 6c.5-1 .5-2 0-3" />
+            <button onclick="addDesignerIconBox('追い焚き')" class="p-1.5 bg-[#ffe4e6] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 14h16v2a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-2z" fill="#93c5fd" />
+                  <path d="M12 9c-1-1-2-2-2-4s2-2 2-2 2 0 2 2-1 3-2 4z" fill="#f87171" stroke="none" />
+                  <path d="M7 8c0-2 1-3 2-4" />
+                  <path d="M17 8c0-2-1-3-2-4" />
                 </svg>
               </div>
               <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">追い焚き</span>
             </button>
 
-            <button onclick="addDesignerIconBox('浴室乾燥機')" class="p-2 bg-[#ccfbf1] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
-              <div class="flex items-center justify-center w-full h-[36px] overflow-hidden">
-                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 2a10 10 0 1 0 10 10" stroke="#3b82f6" fill="none" />
-                  <path d="M12 6a6 6 0 1 0 6 6" stroke="#60a5fa" fill="none" />
-                  <path d="M12 10a2 2 0 1 0 2 2" stroke="#93c5fd" fill="none" />
-                  <rect x="8" y="21" width="8" height="2" fill="#64748b" stroke="none" />
+            <button onclick="addDesignerIconBox('浴室乾燥機')" class="p-1.5 bg-[#ccfbf1] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="3" width="16" height="6" rx="1" fill="#e2e8f0" />
+                  <line x1="6" y1="6" x2="18" y2="6" stroke-dasharray="2 2" />
+                  <path d="M12 11l-3 3v6h6v-6l-3-3z" fill="#fef08a" />
+                  <path d="M12 11a1 1 0 0 0-1-1 1 1 0 0 1 1-1 1 1 0 0 1 1 1 1 1 0 0 0-1 1z" />
+                  <path d="M7 14s2 2 5 2 5-2 5-2" stroke="#94a3b8" />
                 </svg>
               </div>
               <span class="text-[8.5px] font-black text-slate-900 text-center leading-none mb-0.5">浴室乾燥</span>
             </button>
 
-            <button onclick="addDesignerIconBox('ネット無料')" class="p-2 bg-[#ecfccb] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
-              <div class="flex items-center justify-center w-full h-[36px] overflow-hidden">
-                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M5 12a10 10 0 0 1 14 0" fill="none" />
-                  <path d="M8.5 15.5a5 5 0 0 1 7 0" fill="none" />
-                  <circle cx="12" cy="19" r="1.5" fill="#0f172a" />
+            <button onclick="addDesignerIconBox('ネット無料')" class="p-1.5 bg-[#ecfccb] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 8.5a10 10 0 0 1 14 0" />
+                  <path d="M8.5 12.5a5 5 0 0 1 7 0" />
+                  <circle cx="12" cy="16.5" r="1.5" fill="#3b82f6" stroke="none" />
+                  <rect x="6" y="19" width="12" height="3" rx="1" fill="#1e293b" />
                 </svg>
               </div>
               <span class="text-[8.5px] font-black text-slate-900 text-center leading-none mb-0.5">ネット無料</span>
             </button>
 
-            <button onclick="addDesignerIconBox('ペット可')" class="p-2 bg-[#fef9c3] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
-              <div class="flex items-center justify-center w-full h-[36px] overflow-hidden">
-                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 11c-2.5 0-4.5 1.5-4.5 4s1.5 4 4.5 4 4.5-1.5 4.5-4-2-4-4.5-4z" fill="#f43f5e" />
-                  <circle cx="7" cy="9" r="2.2" fill="#f43f5e" />
-                  <circle cx="10.5" cy="6.5" r="2.2" fill="#f43f5e" />
-                  <circle cx="14.5" cy="6.5" r="2.2" fill="#f43f5e" />
-                  <circle cx="18" cy="9" r="2.2" fill="#f43f5e" />
+            <button onclick="addDesignerIconBox('ペット可')" class="p-1.5 bg-[#fef9c3] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 12c-2.5 0-5 2-5 5.5S9 22 12 22s5-1 5-4.5-2.5-5.5-5-5.5z" fill="#f43f5e" />
+                  <circle cx="7" cy="9" r="2.5" fill="#f43f5e" />
+                  <circle cx="10.5" cy="5.5" r="2.5" fill="#f43f5e" />
+                  <circle cx="14.5" cy="5.5" r="2.5" fill="#f43f5e" />
+                  <circle cx="18" cy="9" r="2.5" fill="#f43f5e" />
                 </svg>
               </div>
               <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">ペット可</span>
             </button>
 
-            <button onclick="addDesignerIconBox('宅配ボックス')" class="p-2 bg-[#cffafe] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
-              <div class="flex items-center justify-center w-full h-[36px] overflow-hidden">
-                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 2l9 4-9 4-9-4 9-4z" fill="#f59e0b" />
-                  <path d="M3 6v10l9 5v-11L3 6z" fill="#d97706" />
-                  <path d="M21 6v10l-9 5v-11l9-4z" fill="#b45309" />
-                  <path d="M12 6.5v11" stroke="#ffffff" stroke-width="2.5" />
-                  <path d="M7.5 8.5l9 4" stroke="#ffffff" stroke-width="2.5" />
+            <button onclick="addDesignerIconBox('宅配ボックス')" class="p-1.5 bg-[#cffafe] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="10" height="18" rx="1" fill="#e2e8f0" />
+                  <line x1="3" y1="9" x2="13" y2="9" />
+                  <line x1="3" y1="15" x2="13" y2="15" />
+                  <path d="M15 13l6 3v5l-6-3v-5z" fill="#d97706" stroke="#b45309" />
+                  <path d="M15 13l3-1.5 3 1.5-3 1.5-3-1.5z" fill="#f59e0b" stroke="#b45309" />
                 </svg>
               </div>
               <span class="text-[8.5px] font-black text-slate-900 text-center leading-none mb-0.5">宅配BOX</span>
             </button>
 
-            <button onclick="addDesignerIconBox('WIC')" class="p-2 bg-[#ede9fe] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200 shadow-[2px_2px_0px_0px_rgba(15,23,42,1)]">
-              <div class="flex items-center justify-center w-full h-[36px] overflow-hidden">
-                <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 7a2 2 0 1 1 2-2" />
-                  <path d="M6 11l6-4 6 4v8H6v-8z" fill="#c084fc" />
-                  <path d="M10 7l2 3 2-3" />
+            <button onclick="addDesignerIconBox('WIC')" class="p-1.5 bg-[#ede9fe] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="16" rx="2" fill="#ede9fe" />
+                  <path d="M3 8h18" />
+                  <path d="M8 8l-2 4h4l-2-4z" fill="#a855f7" />
+                  <path d="M16 8l-2 4h4l-2-4z" fill="#a855f7" />
+                  <path d="M8 8c0-1 .5-2 1-2s1 1 1 2" />
+                  <path d="M16 8c0-1 .5-2 1-2s1 1 1 2" />
                 </svg>
               </div>
               <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">WIC</span>
+            </button>
+
+            <button onclick="addDesignerIconBox('エレベーター')" class="p-1.5 bg-[#e2e8f0] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="2" width="16" height="20" rx="1" fill="#cbd5e1" />
+                  <line x1="12" y1="2" x2="12" y2="22" />
+                  <path d="M9 10l-2-2-2 2" stroke="#475569" />
+                  <line x1="7" y1="8" x2="7" y2="16" stroke="#475569" />
+                  <path d="M15 14l2 2 2-2" stroke="#475569" />
+                  <line x1="17" y1="8" x2="17" y2="16" stroke="#475569" />
+                </svg>
+              </div>
+              <span class="text-[8.5px] font-black text-slate-900 text-center leading-none mb-0.5">エレベーター</span>
+            </button>
+
+            <button onclick="addDesignerIconBox('防犯カメラ')" class="p-1.5 bg-[#fef08a] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="5" y="8" width="14" height="8" rx="2" fill="#cbd5e1" />
+                  <path d="M19 10l3-2v8l-3-2" fill="#cbd5e1" />
+                  <circle cx="9" cy="12" r="2" fill="#1e293b" />
+                  <circle cx="9" cy="12" r="0.5" fill="#ef4444" stroke="none" />
+                </svg>
+              </div>
+              <span class="text-[8.5px] font-black text-slate-900 text-center leading-none mb-0.5">防犯カメラ</span>
+            </button>
+
+            <button onclick="addDesignerIconBox('駐輪場')" class="p-1.5 bg-[#dcfce7] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="6" cy="16" r="4" fill="#a7f3d0" />
+                  <circle cx="18" cy="16" r="4" fill="#a7f3d0" />
+                  <path d="M6 16l3-6h6l3 6" />
+                  <path d="M12 16v-6" />
+                  <path d="M8 10h8" />
+                </svg>
+              </div>
+              <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">駐輪場</span>
+            </button>
+
+            <button onclick="addDesignerIconBox('駐車場')" class="p-1.5 bg-[#fed7aa] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 15h14a2 2 0 0 0 2-2v-2l-3-4H6l-3 4v2a2 2 0 0 0 2 2z" fill="#fdba74" />
+                  <circle cx="7" cy="16" r="3" fill="#1e293b" />
+                  <circle cx="17" cy="16" r="3" fill="#1e293b" />
+                  <path d="M6 11h12" />
+                </svg>
+              </div>
+              <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">駐車場</span>
+            </button>
+
+            <button onclick="addDesignerIconBox('エアコン')" class="p-1.5 bg-[#e0f2fe] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="8" rx="2" fill="#f8fafc" />
+                  <line x1="6" y1="8" x2="18" y2="8" />
+                  <line x1="8" y1="16" x2="10" y2="20" stroke="#60a5fa" />
+                  <line x1="12" y1="16" x2="12" y2="20" stroke="#60a5fa" />
+                  <line x1="16" y1="16" x2="14" y2="20" stroke="#60a5fa" />
+                </svg>
+              </div>
+              <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">エアコン</span>
+            </button>
+
+            <button onclick="addDesignerIconBox('TVモニターホン')" class="p-1.5 bg-[#f3e8ff] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="3" width="16" height="18" rx="2" fill="#e9d5ff" />
+                  <rect x="6" y="6" width="12" height="8" rx="1" fill="#f8fafc" />
+                  <circle cx="12" cy="10" r="2" fill="#a855f7" stroke="none" />
+                  <circle cx="9" cy="17" r="1.5" fill="#a855f7" />
+                  <circle cx="15" cy="17" r="1.5" fill="#a855f7" />
+                </svg>
+              </div>
+              <span class="text-[7.5px] font-black text-slate-900 text-center leading-none mb-0.5">TVモニターホン</span>
+            </button>
+
+            <button onclick="addDesignerIconBox('カウンターK')" class="p-1.5 bg-[#fce7f3] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 18v-8h16" fill="none" />
+                  <path d="M4 18h4v-4h12V10H4z" fill="#fbcfe8" />
+                  <path d="M12 18v-4" />
+                  <path d="M10 14h4" />
+                  <path d="M18 18v-4" />
+                  <path d="M16 14h4" />
+                </svg>
+              </div>
+              <span class="text-[8.5px] font-black text-slate-900 text-center leading-none mb-0.5">カウンターK</span>
+            </button>
+
+            <button onclick="addDesignerIconBox('新築')" class="p-1.5 bg-[#ffedd5] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 3l8 6v12H4V9l8-6z" fill="#fed7aa" />
+                  <path d="M10 21V14h4v7" fill="#f8fafc" />
+                  <path d="M5 5l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" />
+                  <path d="M19 5l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" />
+                  <path d="M19 12l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" />
+                </svg>
+              </div>
+              <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">新築</span>
+            </button>
+
+            <button onclick="addDesignerIconBox('RC')" class="p-1.5 bg-[#e5e7eb] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
+                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="5" y="4" width="14" height="18" rx="1" fill="#e2e8f0" />
+                  <rect x="8" y="7" width="3" height="3" fill="#64748b" stroke="none" />
+                  <rect x="13" y="7" width="3" height="3" fill="#64748b" stroke="none" />
+                  <rect x="8" y="12" width="3" height="3" fill="#64748b" stroke="none" />
+                  <rect x="13" y="12" width="3" height="3" fill="#64748b" stroke="none" />
+                  <rect x="8" y="17" width="3" height="3" fill="#64748b" stroke="none" />
+                  <rect x="13" y="17" width="3" height="3" fill="#64748b" stroke="none" />
+                </svg>
+              </div>
+              <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">RC</span>
             </button>
           </div>
         </div>
@@ -567,6 +727,18 @@
             </button>
             <button onclick="addAppealText('即入居可能！', 'bg-blue-600 text-white')" class="px-2.5 py-1.5 bg-blue-950 text-blue-400 hover:bg-blue-900/50 rounded-lg text-xs font-semibold border border-blue-500/30 transition">
               即入居可能！
+            </button>
+            <button onclick="addAppealText('角部屋', 'bg-purple-600 text-white')" class="px-2.5 py-1.5 bg-purple-950 text-purple-400 hover:bg-purple-900/50 rounded-lg text-xs font-semibold border border-purple-500/30 transition">
+              角部屋
+            </button>
+            <button onclick="addAppealText('2人入居可', 'bg-teal-600 text-white')" class="px-2.5 py-1.5 bg-teal-950 text-teal-400 hover:bg-teal-900/50 rounded-lg text-xs font-semibold border border-teal-500/30 transition">
+              2人入居可
+            </button>
+            <button onclick="addAppealText('店舗事務所可', 'bg-indigo-600 text-white')" class="px-2.5 py-1.5 bg-indigo-950 text-indigo-400 hover:bg-indigo-900/50 rounded-lg text-xs font-semibold border border-indigo-500/30 transition">
+              店舗事務所可
+            </button>
+            <button onclick="addAppealText('最上階', 'bg-pink-600 text-white')" class="px-2.5 py-1.5 bg-pink-950 text-pink-400 hover:bg-pink-900/50 rounded-lg text-xs font-semibold border border-pink-500/30 transition">
+              最上階
             </button>
           </div>
         </div>
@@ -595,52 +767,53 @@
         <div id="mysoku-canvas" class="mysoku-canvas-container relative select-none rounded border border-slate-800 shrink-0" onclick="deselectAllItems(event)">
           
           <!-- ==================== ヘッダー ==================== -->
-          <div id="theme-header-bg" class="w-full h-[170px] bg-gradient-to-r from-emerald-800 to-teal-700 p-3.5 flex flex-col justify-between relative z-10 transition-all duration-300">
+          <div id="theme-header-bg" class="w-full h-[170px] bg-gradient-to-r from-emerald-800 to-teal-700 px-3.5 pt-2 pb-3 flex flex-col justify-between relative z-10 transition-all duration-300">
             <!-- 追加: 最前面に表示される専用の下線要素 -->
             <div id="theme-header-border" class="absolute bottom-0 left-0 right-0 h-[6px] bg-amber-400 z-50 pointer-events-none transition-colors duration-300"></div>
 
             <!-- キャッチコピーブロック -->
-            <div class="flex items-center justify-between min-h-[24px] overflow-visible">
-              <div id="canvas-catch" class="text-[13px] font-black text-white truncate max-w-full leading-[1.3] tracking-wider overflow-visible pt-1 pb-1.5">
+            <div class="flex items-center justify-between h-[32px] overflow-visible">
+              <div id="canvas-catch" class="text-[18px] font-black text-white truncate max-w-full leading-normal tracking-wider overflow-visible pb-1 pt-0.5">
                 ★駅チカ徒歩3分！陽当たり抜群 of 南向き角部屋フルリノベマンション★
               </div>
             </div>
 
             <!-- ヘッダーメイン -->
-            <div class="flex justify-between items-stretch h-[85px] w-full gap-x-2">
+            <div class="flex justify-between items-stretch h-[85px] w-full gap-x-2 relative z-20">
               <!-- 物件名ブロック -->
-              <div class="flex-grow min-w-0 pr-2 flex flex-col justify-center overflow-visible">
-                <h2 id="canvas-title" class="text-[30px] font-black text-white leading-[1.15] font-rounded break-keep line-clamp-2 text-left w-full overflow-visible pb-0.5">
+              <div class="flex-1 min-w-0 pr-3 flex flex-col justify-center overflow-visible">
+                <!-- 修正: break-words を whitespace-nowrap に変更 -->
+                <h2 id="canvas-title" class="text-[36px] font-black text-white leading-[1.2] font-rounded whitespace-nowrap text-left w-full overflow-visible">
                   テクノハイツ代々木 402号室
                 </h2>
               </div>
 
               <!-- 間取りブロック -->
-              <div class="w-[130px] shrink-0 border-l border-white/25 pl-3 flex flex-col justify-center min-w-0 overflow-visible">
+              <div class="w-[110px] shrink-0 border-l border-white/25 pl-3 flex flex-col justify-center min-w-0 overflow-visible">
                 <div class="h-[20px] flex items-end mb-1">
                   <div class="text-[10px] text-white/80 font-bold uppercase leading-none mb-0.5">間取り</div>
                 </div>
-                <div class="text-white whitespace-nowrap flex items-baseline overflow-visible pb-1">
-                  <span id="canvas-madori-text" class="text-[34px] font-black font-sans leading-[1.2] text-white drop-shadow-md overflow-visible tracking-tighter pb-2 pt-0.5">1LDK</span>
+                <div class="text-white whitespace-nowrap flex items-baseline overflow-visible">
+                  <span id="canvas-madori-text" class="text-[36px] font-black font-sans leading-[1.1] text-white drop-shadow-md tracking-tight">1LDK</span>
                 </div>
               </div>
 
               <!-- 賃料・管理費ブロック -->
-              <div class="w-[250px] shrink-0 border-l border-white/25 pl-3 flex flex-col justify-center min-w-0 overflow-visible">
+              <div class="w-[310px] shrink-0 border-l border-white/25 pl-3 flex flex-col justify-center min-w-0 overflow-visible">
                 <div class="h-[20px] flex items-end gap-2 mb-1">
                   <div class="text-[10px] text-white/80 font-bold uppercase leading-none mb-0.5">賃料</div>
                   <div class="text-[10px] text-white/90 font-bold leading-none bg-black/20 px-1.5 py-0.5 rounded border border-white/10">管理費等: <span id="canvas-kanri">8,000円</span></div>
                 </div>
-                <div class="text-white whitespace-nowrap flex items-baseline overflow-visible pb-1">
-                  <span id="canvas-price" class="text-[40px] font-black font-sans leading-[1.2] tracking-tight pb-2 pt-0.5">148,000</span>
+                <div class="text-white whitespace-nowrap flex items-baseline w-full overflow-visible">
+                  <span id="canvas-price" class="text-[36px] font-black font-sans leading-[1.1] tracking-tight">145,000円～150,000</span>
                   <span class="text-[14px] font-bold ml-1.5 leading-none">円</span>
                 </div>
               </div>
 
               <!-- 交通アクセスブロック -->
-              <div class="w-[340px] shrink-0 border-l border-white/25 pl-4 flex flex-col justify-center min-w-0 overflow-visible">
+              <div class="w-[280px] shrink-0 border-l border-white/25 pl-4 flex flex-col justify-center min-w-0 overflow-visible">
                 <div class="text-[12px] text-white/80 font-bold uppercase leading-none mb-1">交通アクセス</div>
-                <div id="canvas-access" class="text-[16px] font-extrabold text-white leading-[1.25] whitespace-pre-line max-h-full overflow-visible pb-0.5 tracking-tight">
+                <div id="canvas-access" class="text-[16px] font-extrabold text-white leading-[1.3] whitespace-pre-line overflow-visible tracking-tight">
                   JR山手線「代々木」駅 徒歩3分
                   都営大江戸線「代々木」駅 徒歩2分
                 </div>
@@ -648,11 +821,11 @@
             </div>
 
             <!-- ヘッダーサブ情報バー -->
-            <div id="theme-sub-bar" class="w-full bg-emerald-950/60 rounded px-3 py-2 flex items-center justify-between text-[11px] text-white transition-all duration-300 mt-1">
-              <div class="flex gap-3 shrink-0 items-center overflow-visible">
-                <div class="overflow-visible"><span class="sub-label text-emerald-300 font-bold mr-0.5">敷金:</span> <span id="canvas-shikikin" class="font-extrabold pb-0.5">1ヶ月</span></div>
-                <div class="overflow-visible"><span class="sub-label text-emerald-300 font-bold mr-0.5">礼金:</span> <span id="canvas-reikin" class="font-extrabold pb-0.5">1ヶ月</span></div>
-                <div class="overflow-visible"><span class="sub-label text-emerald-300 font-bold mr-0.5">面積:</span> <span id="canvas-menseki" class="font-extrabold pb-0.5">42.50㎡</span></div>
+            <div id="theme-sub-bar" class="w-full bg-emerald-950/60 rounded px-3 py-1.5 flex items-center justify-between text-[11px] text-white transition-all duration-300 mt-0.5">
+              <div class="flex gap-4 shrink-0 items-baseline overflow-visible text-[14px] pt-0.5">
+                <div class="overflow-visible flex items-baseline"><span class="sub-label text-emerald-300 font-bold mr-0.5">敷金:</span> <span id="canvas-shikikin" class="font-black text-[18px] ml-1 leading-none">1ヶ月</span></div>
+                <div class="overflow-visible flex items-baseline"><span class="sub-label text-emerald-300 font-bold mr-0.5">礼金:</span> <span id="canvas-reikin" class="font-black text-[18px] ml-1 leading-none">1ヶ月</span></div>
+                <div class="overflow-visible flex items-baseline"><span class="sub-label text-emerald-300 font-bold mr-0.5">面積:</span> <span id="canvas-menseki" class="font-black text-[18px] ml-1 leading-none">42.50㎡</span></div>
               </div>
               <div class="text-[11px] font-mono opacity-95 truncate max-w-[50%] flex items-center gap-1.5 justify-end overflow-visible py-0.5">
                 <span id="theme-sub-bar-location-badge" class="bg-amber-400 text-emerald-950 px-2 py-1 rounded font-black shrink-0 text-[10px] leading-none flex items-center justify-center">所在地</span>
@@ -716,7 +889,7 @@
                 <div id="canvas-footer-note" class="text-[7.5px] text-white/80 leading-normal line-clamp-1 truncate max-w-full pb-0.5">
                   図面と現況が異なる場合は現況を優先します。
                 </div>
-                <div id="canvas-pub-date" class="text-[7px] text-white/60 font-mono whitespace-nowrap leading-normal mt-1 pb-0.5">
+                <div id="canvas-pub-date" class="text-[10px] font-bold text-white font-mono whitespace-nowrap leading-normal mt-1 pb-0.5">
                   掲載日：2026年6月6日
                 </div>
               </div>
@@ -764,6 +937,10 @@
     // カスケード出現カウンタ
     let cascadeOffsetCounter = 0;
 
+    // 追加：最後に操作したアイコンとスタンプのサイズ記憶用変数
+    let lastIconSize = { w: 75, h: 75 };
+    let lastAppealSize = { w: 180, h: 45 };
+
     // ==========================================
     // 2. コア・共通ユーティリティ関数
     // ==========================================
@@ -771,11 +948,9 @@
     // 金額フォーマット
     function formatToYen(value) {
       if (!value) return "0";
-      const rawNum = value.toString().replace(/[^\d]/g, '');
-      if (rawNum !== '' && !isNaN(rawNum)) {
-        return parseInt(rawNum, 10).toLocaleString();
-      }
-      return value;
+      return value.toString().replace(/\d+/g, function(match) {
+        return parseInt(match, 10).toLocaleString();
+      });
     }
 
     // 面積フォーマット (平米 ⇄ 坪数自動算出)
@@ -804,6 +979,9 @@
           displayEl.innerHTML = formatArea(val);
         } else if (targetId === 'pub-date') {
           displayEl.innerHTML = '掲載日：' + val;
+        } else if (targetId === 'title') {
+          // 追加・修正: 物件名の場合はスペース（半角・全角）を確実に改行タグに変換する
+          displayEl.innerHTML = val.replace(/[ 　]+/g, '<br>').replace(/\n/g, '<br>');
         } else {
           displayEl.innerHTML = val.replace(/\n/g, '<br>');
         }
@@ -819,6 +997,11 @@
       if (targetId === 'access') {
         setTimeout(adjustAccessFontSize, 10);
       }
+      
+      // 賃料が変更された場合はフォントサイズを自動調整
+      if (targetId === 'price') {
+        setTimeout(adjustPriceFontSize, 10);
+      }
     }
 
     // 物件名の自動フォントサイズ調整
@@ -828,19 +1011,33 @@
       if (!titleEl || !containerEl) return;
 
       // 一旦ベースサイズにリセット
-      titleEl.style.fontSize = '30px';
-      // 高さを正確に測るため省略設定を一時解除
-      titleEl.classList.remove('line-clamp-2'); 
+      titleEl.style.fontSize = '36px';
 
-      let fontSize = 30;
-      // 親コンテナの横幅を超えるか、または2行の高さ(約75px)を超える場合は1pxずつ縮小
-      while ((titleEl.scrollWidth > containerEl.clientWidth || titleEl.scrollHeight > 75) && fontSize > 12) {
+      let fontSize = 36;
+      // コンテナの横幅を超えるか、縦幅（メインヘッダーの高さ85px）を超える場合は1pxずつ縮小
+      while ((titleEl.scrollWidth > containerEl.clientWidth || titleEl.scrollHeight > 85) && fontSize > 10) {
         fontSize -= 1;
         titleEl.style.fontSize = fontSize + 'px';
       }
+    }
 
-      // 省略設定を元に戻す
-      titleEl.classList.add('line-clamp-2');
+    // 賃料の自動フォントサイズ調整
+    function adjustPriceFontSize() {
+      const priceEl = document.getElementById('canvas-price');
+      const containerEl = priceEl ? priceEl.parentElement.parentElement : null;
+      if (!priceEl || !containerEl) return;
+
+      // 一旦ベースサイズにリセット
+      priceEl.style.fontSize = '36px';
+      
+      let fontSize = 36;
+      // 親コンテナの横幅からマージンと「円」の文字幅を引いた最大許容幅
+      const maxWidth = containerEl.clientWidth - 32;
+
+      while (priceEl.scrollWidth > maxWidth && fontSize > 14) {
+        fontSize -= 1;
+        priceEl.style.fontSize = fontSize + 'px';
+      }
     }
 
     // 交通アクセスの自動フォントサイズ調整
@@ -881,6 +1078,13 @@
 
     // 初期起動時同期
     function initInputs() {
+      // 掲載日に本日の日付を自動設定
+      const pubDateInput = document.getElementById('input-pub-date');
+      if (pubDateInput) {
+        const today = new Date();
+        pubDateInput.value = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`;
+      }
+
       const inputs = [
         'catch', 'title', 'price', 'kanri', 'shikikin', 'reikin', 'madori-text', 'menseki', 'address', 'access', 'ad', 'taiyou', 'footer-note', 'pub-date'
       ];
@@ -1005,6 +1209,19 @@
       });
       
       selectedCanvasItem = null;
+
+      // 追加：記憶していたアイコンとスタンプのサイズを初期値にリセット
+      lastIconSize = { w: 75, h: 75 };
+      lastAppealSize = { w: 180, h: 45 };
+
+      // 追加：掲載日（作成日）を本日の日付にリセット
+      const pubDateInput = document.getElementById('input-pub-date');
+      if (pubDateInput) {
+        const today = new Date();
+        pubDateInput.value = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`;
+        syncText('pub-date', pubDateInput.value);
+      }
+
       checkEmptyCanvas();
       showToast('キャンバスをクリアしました。');
     }
@@ -1021,10 +1238,31 @@
       }
     }
 
-    // テーマ変更
-    function changeTheme(theme) {
-      currentTheme = theme;
+    // フォント変更
+    function changeFont(fontType) {
+      let fontFamilyStr = "";
+      if (fontType === 'serif') fontFamilyStr = "'Noto Serif JP', serif";
+      else if (fontType === 'sans') fontFamilyStr = "'Noto Sans JP', sans-serif";
+      else if (fontType === 'rounded') fontFamilyStr = "'M PLUS Rounded 1c', sans-serif";
+      else if (fontType === 'yumincho') fontFamilyStr = "'Yu Mincho', 'YuMincho', serif";
+      else if (fontType === 'yugothic') fontFamilyStr = "'Yu Gothic', 'YuGothic', sans-serif";
+      else if (fontType === 'meiryo') fontFamilyStr = "'Meiryo', sans-serif";
+      else if (fontType === 'klee') fontFamilyStr = "'Klee One', cursive, sans-serif";
+      else if (fontType === 'zenkaku') fontFamilyStr = "'Zen Kaku Gothic New', sans-serif";
+      else if (fontType === 'yuji') fontFamilyStr = "'Yuji Syuku', serif";
+      else if (fontType === 'kaisei') fontFamilyStr = "'Kaisei Decol', serif";
+
+      document.getElementById('canvas-title').style.fontFamily = fontFamilyStr;
+      document.getElementById('canvas-price').style.fontFamily = fontFamilyStr;
+      document.getElementById('canvas-madori-text').style.fontFamily = fontFamilyStr;
       
+      setTimeout(adjustTitleFontSize, 10);
+      setTimeout(adjustAccessFontSize, 10);
+      setTimeout(adjustPriceFontSize, 10);
+    }
+
+    // カラー変更
+    function changeColor(color) {
       const headerBg = document.getElementById('theme-header-bg');
       const headerBorder = document.getElementById('theme-header-border');
       const footerBg = document.getElementById('theme-footer-bg');
@@ -1046,68 +1284,17 @@
 
       if (!headerBg || !footerBg || !subBar || !watermark) return;
 
-      headerBg.className = "w-full h-[170px] p-3.5 flex flex-col justify-between relative z-10 transition-all duration-300";
+      headerBg.className = "w-full h-[170px] px-3.5 pt-2 pb-3 flex flex-col justify-between relative z-10 transition-all duration-300";
       if (headerBorder) headerBorder.className = "absolute bottom-0 left-0 right-0 h-[6px] z-50 pointer-events-none transition-colors duration-300";
       footerBg.className = "absolute bottom-0 left-0 right-0 h-[95px] p-2.5 grid grid-cols-12 gap-2 text-white z-10 transition-all duration-300 font-sans";
-      subBar.className = "w-full rounded px-3 py-2 flex items-center justify-between text-[11px] text-white transition-all duration-300 mt-1";
+      subBar.className = "w-full rounded px-3 py-1.5 flex items-center justify-between text-[11px] text-white transition-all duration-300 mt-0.5 bg-stone-950/40";
       watermark.innerHTML = '';
 
-      if (theme === 'family') {
-        headerBg.classList.add('bg-gradient-to-r', 'from-emerald-800', 'to-teal-700');
-        if (headerBorder) headerBorder.classList.add('bg-amber-400');
-        subBar.classList.add('bg-emerald-950/60');
-        footerBg.classList.add('bg-gradient-to-r', 'from-emerald-800', 'to-teal-700', 'border-t-[5px]', 'border-amber-400');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-white/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-emerald-950/60 rounded-lg flex items-center justify-center shrink-0 shadow";
-        if (labelText) labelText.className = "text-[9px] font-bold text-amber-300 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-emerald-950/80 border border-emerald-800/80 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-emerald-400 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-black/40 border border-white/10 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-emerald-300 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-amber-400 text-emerald-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
-
-        document.getElementById('canvas-title').style.fontFamily = "'Noto Sans JP', sans-serif";
-        document.getElementById('canvas-price').style.fontFamily = "'Noto Sans JP', sans-serif";
-        document.getElementById('canvas-madori-text').style.fontFamily = "'Noto Sans JP', sans-serif";
-        
-        watermark.innerHTML = `<i data-lucide="home" class="w-[300px] h-[300px] text-emerald-800"></i>`;
-        
-      } else if (theme === 'stylish') {
-        headerBg.classList.add('bg-gradient-to-r', 'from-blue-950', 'to-indigo-900');
-        if (headerBorder) headerBorder.classList.add('bg-blue-500');
-        subBar.classList.add('bg-blue-950/80');
-        footerBg.classList.add('bg-gradient-to-r', 'from-blue-950', 'to-indigo-900', 'border-t-[5px]', 'border-blue-500');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-white/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-blue-900/80 rounded-lg flex items-center justify-center shrink-0 shadow";
-        if (labelText) labelText.className = "text-[9px] font-bold text-blue-300 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-indigo-900/90 border border-indigo-800 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-blue-300 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-blue-900/60 border border-white/10 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-blue-300 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-blue-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
-
-        document.getElementById('canvas-title').style.fontFamily = "'Noto Sans JP', sans-serif";
-        document.getElementById('canvas-price').style.fontFamily = "'Noto Sans JP', sans-serif";
-        document.getElementById('canvas-madori-text').style.fontFamily = "'Noto Sans JP', sans-serif";
-        
-        watermark.innerHTML = `<i data-lucide="building" class="w-[300px] h-[300px] text-blue-900"></i>`;
-
-      } else if (theme === 'premium') {
+      // --- グラデーション 10種類 ---
+      if (color === 'amber') {
         headerBg.classList.add('bg-gradient-to-r', 'from-amber-950', 'via-stone-900', 'to-amber-950');
         if (headerBorder) headerBorder.classList.add('bg-amber-500');
-        subBar.className = "w-full rounded px-3 py-2 flex items-center justify-between text-[11px] text-white transition-all duration-300 mt-1 bg-stone-950/40";
-        footerBg.className = "absolute bottom-0 left-0 right-0 h-[95px] p-2.5 grid grid-cols-12 gap-2 text-white z-10 transition-all duration-300 bg-gradient-to-r from-amber-950 via-stone-900 to-amber-950 border-t-[5px] border-amber-500";
-        watermark.innerHTML = '';
+        footerBg.classList.add('bg-gradient-to-r', 'from-amber-950', 'via-stone-900', 'to-amber-950', 'border-t-[5px]', 'border-amber-500');
         
         if (footerLeft) footerLeft.className = "col-span-9 border-r border-amber-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
         if (logoBg) logoBg.className = "p-2.5 bg-stone-950/90 rounded-lg flex items-center justify-center shrink-0 shadow border border-amber-500/20";
@@ -1121,19 +1308,413 @@
 
         subLabels.forEach(el => { el.className = "sub-label text-amber-300 font-bold mr-0.5"; });
         if (locationBadge) locationBadge.className = "bg-amber-500 text-stone-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
-
-        document.getElementById('canvas-title').style.fontFamily = "'Noto Serif JP', serif";
-        document.getElementById('canvas-price').style.fontFamily = "'Noto Serif JP', serif";
-        document.getElementById('canvas-madori-text').style.fontFamily = "'Noto Serif JP', serif";
         
         watermark.innerHTML = `<i data-lucide="crown" class="w-[300px] h-[300px] text-amber-900"></i>`;
+      } else if (color === 'blue') {
+        headerBg.classList.add('bg-gradient-to-r', 'from-blue-950', 'via-slate-900', 'to-blue-950');
+        if (headerBorder) headerBorder.classList.add('bg-blue-500');
+        footerBg.classList.add('bg-gradient-to-r', 'from-blue-950', 'via-slate-900', 'to-blue-950', 'border-t-[5px]', 'border-blue-500');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-blue-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-stone-950/90 rounded-lg flex items-center justify-center shrink-0 shadow border border-blue-500/20";
+        if (labelText) labelText.className = "text-[9px] font-bold text-blue-400 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-blue-400 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-blue-400 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-blue-400 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-stone-950/80 border border-blue-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-blue-400 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-stone-900/60 border border-blue-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-blue-300 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-blue-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="crown" class="w-[300px] h-[300px] text-blue-900"></i>`;
+      } else if (color === 'emerald') {
+        headerBg.classList.add('bg-gradient-to-r', 'from-emerald-950', 'via-stone-900', 'to-emerald-950');
+        if (headerBorder) headerBorder.classList.add('bg-emerald-500');
+        footerBg.classList.add('bg-gradient-to-r', 'from-emerald-950', 'via-stone-900', 'to-emerald-950', 'border-t-[5px]', 'border-emerald-500');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-emerald-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-stone-950/90 rounded-lg flex items-center justify-center shrink-0 shadow border border-emerald-500/20";
+        if (labelText) labelText.className = "text-[9px] font-bold text-emerald-400 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-emerald-400 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-emerald-400 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-emerald-400 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-stone-950/80 border border-emerald-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-emerald-400 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-stone-900/60 border border-emerald-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-emerald-300 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-emerald-500 text-stone-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="crown" class="w-[300px] h-[300px] text-emerald-900"></i>`;
+      } else if (color === 'rose') {
+        headerBg.classList.add('bg-gradient-to-r', 'from-rose-950', 'via-stone-900', 'to-rose-950');
+        if (headerBorder) headerBorder.classList.add('bg-rose-500');
+        footerBg.classList.add('bg-gradient-to-r', 'from-rose-950', 'via-stone-900', 'to-rose-950', 'border-t-[5px]', 'border-rose-500');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-rose-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-stone-950/90 rounded-lg flex items-center justify-center shrink-0 shadow border border-rose-500/20";
+        if (labelText) labelText.className = "text-[9px] font-bold text-rose-400 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-rose-400 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-rose-400 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-rose-400 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-stone-950/80 border border-rose-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-rose-400 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-stone-900/60 border border-rose-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-rose-300 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-rose-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="crown" class="w-[300px] h-[300px] text-rose-900"></i>`;
+      } else if (color === 'slate') {
+        headerBg.classList.add('bg-gradient-to-r', 'from-slate-900', 'via-zinc-900', 'to-slate-900');
+        if (headerBorder) headerBorder.classList.add('bg-slate-500');
+        footerBg.classList.add('bg-gradient-to-r', 'from-slate-900', 'via-zinc-900', 'to-slate-900', 'border-t-[5px]', 'border-slate-500');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-slate-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-stone-950/90 rounded-lg flex items-center justify-center shrink-0 shadow border border-slate-500/20";
+        if (labelText) labelText.className = "text-[9px] font-bold text-slate-400 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-slate-400 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-slate-400 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-slate-400 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-stone-950/80 border border-slate-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-slate-400 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-stone-900/60 border border-slate-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-slate-300 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-slate-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="crown" class="w-[300px] h-[300px] text-slate-800"></i>`;
+      } else if (color === 'grad-gold') {
+        headerBg.classList.add('bg-gradient-to-r', 'from-yellow-950', 'via-amber-800', 'to-yellow-950');
+        if (headerBorder) headerBorder.classList.add('bg-yellow-500');
+        footerBg.classList.add('bg-gradient-to-r', 'from-yellow-950', 'via-amber-800', 'to-yellow-950', 'border-t-[5px]', 'border-yellow-500');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-yellow-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-yellow-950/80 rounded-lg flex items-center justify-center shrink-0 shadow border border-yellow-500/20";
+        if (labelText) labelText.className = "text-[9px] font-bold text-yellow-400 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-yellow-400 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-yellow-400 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-yellow-400 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-yellow-950/80 border border-yellow-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-yellow-400 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-yellow-900/60 border border-yellow-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-yellow-300 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-yellow-500 text-yellow-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="crown" class="w-[300px] h-[300px] text-yellow-900"></i>`;
+      } else if (color === 'grad-navy') {
+        headerBg.classList.add('bg-gradient-to-r', 'from-slate-950', 'via-blue-950', 'to-slate-950');
+        if (headerBorder) headerBorder.classList.add('bg-blue-600');
+        footerBg.classList.add('bg-gradient-to-r', 'from-slate-950', 'via-blue-950', 'to-slate-950', 'border-t-[5px]', 'border-blue-600');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-blue-600/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-slate-900/80 rounded-lg flex items-center justify-center shrink-0 shadow border border-blue-600/20";
+        if (labelText) labelText.className = "text-[9px] font-bold text-blue-300 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-slate-900/80 border border-blue-600/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-blue-300 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-slate-800/60 border border-blue-600/10 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-blue-200 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-blue-600 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="building-2" class="w-[300px] h-[300px] text-blue-950"></i>`;
+      } else if (color === 'grad-burgundy') {
+        headerBg.classList.add('bg-gradient-to-r', 'from-rose-950', 'via-red-900', 'to-rose-950');
+        if (headerBorder) headerBorder.classList.add('bg-rose-500');
+        footerBg.classList.add('bg-gradient-to-r', 'from-rose-950', 'via-red-900', 'to-rose-950', 'border-t-[5px]', 'border-rose-500');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-rose-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-rose-950/80 rounded-lg flex items-center justify-center shrink-0 shadow border border-rose-500/20";
+        if (labelText) labelText.className = "text-[9px] font-bold text-rose-300 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-rose-300 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-rose-300 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-rose-300 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-rose-950/80 border border-rose-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-rose-300 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-rose-900/60 border border-rose-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-rose-200 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-rose-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="gem" class="w-[300px] h-[300px] text-rose-950"></i>`;
+      } else if (color === 'grad-forest') {
+        headerBg.classList.add('bg-gradient-to-r', 'from-emerald-950', 'via-green-900', 'to-emerald-950');
+        if (headerBorder) headerBorder.classList.add('bg-emerald-500');
+        footerBg.classList.add('bg-gradient-to-r', 'from-emerald-950', 'via-green-900', 'to-emerald-950', 'border-t-[5px]', 'border-emerald-500');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-emerald-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-emerald-950/80 rounded-lg flex items-center justify-center shrink-0 shadow border border-emerald-500/20";
+        if (labelText) labelText.className = "text-[9px] font-bold text-emerald-300 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-emerald-300 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-emerald-300 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-emerald-300 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-emerald-950/80 border border-emerald-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-emerald-300 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-emerald-900/60 border border-emerald-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-emerald-200 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-emerald-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="tree-pine" class="w-[300px] h-[300px] text-emerald-950"></i>`;
+      } else if (color === 'grad-bronze') {
+        headerBg.classList.add('bg-gradient-to-r', 'from-orange-950', 'via-stone-800', 'to-orange-950');
+        if (headerBorder) headerBorder.classList.add('bg-orange-500');
+        footerBg.classList.add('bg-gradient-to-r', 'from-orange-950', 'via-stone-800', 'to-orange-950', 'border-t-[5px]', 'border-orange-500');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-orange-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-orange-950/80 rounded-lg flex items-center justify-center shrink-0 shadow border border-orange-500/20";
+        if (labelText) labelText.className = "text-[9px] font-bold text-orange-300 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-orange-300 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-orange-300 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-orange-300 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-orange-950/80 border border-orange-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-orange-300 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-orange-900/60 border border-orange-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-orange-200 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-orange-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="landmark" class="w-[300px] h-[300px] text-orange-950"></i>`;
+      } 
+      
+      // --- 単色 10種類 ---
+      else if (color === 'solid-blue') {
+        headerBg.classList.add('bg-blue-900');
+        if (headerBorder) headerBorder.classList.add('bg-blue-400');
+        footerBg.classList.add('bg-blue-900', 'border-t-[5px]', 'border-blue-400');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-blue-400/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-blue-950/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-blue-400/20";
+        if (labelText) labelText.className = "text-[9px] font-bold text-blue-300 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-blue-950/40 border border-blue-400/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-blue-300 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-blue-900/40 border border-blue-400/10 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-blue-200 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-blue-400 text-blue-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="building" class="w-[300px] h-[300px] text-blue-800"></i>`;
+      } else if (color === 'solid-emerald') {
+        headerBg.classList.add('bg-emerald-900');
+        if (headerBorder) headerBorder.classList.add('bg-emerald-400');
+        footerBg.classList.add('bg-emerald-900', 'border-t-[5px]', 'border-emerald-400');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-emerald-400/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-emerald-950/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-emerald-400/20";
+        if (labelText) labelText.className = "text-[9px] font-bold text-emerald-300 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-emerald-300 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-emerald-300 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-emerald-300 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-emerald-950/40 border border-emerald-400/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-emerald-300 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-emerald-900/40 border border-emerald-400/10 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-emerald-200 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-emerald-400 text-emerald-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="home" class="w-[300px] h-[300px] text-emerald-800"></i>`;
+      } else if (color === 'solid-amber') {
+        headerBg.classList.add('bg-amber-900');
+        if (headerBorder) headerBorder.classList.add('bg-amber-400');
+        footerBg.classList.add('bg-amber-900', 'border-t-[5px]', 'border-amber-400');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-amber-400/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-amber-950/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-amber-400/20";
+        if (labelText) labelText.className = "text-[9px] font-bold text-amber-300 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-amber-950/40 border border-amber-400/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-amber-300 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-amber-900/40 border border-amber-400/10 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-amber-200 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-amber-400 text-amber-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="crown" class="w-[300px] h-[300px] text-amber-800"></i>`;
+      } else if (color === 'solid-slate') {
+        headerBg.classList.add('bg-slate-800');
+        if (headerBorder) headerBorder.classList.add('bg-slate-400');
+        footerBg.classList.add('bg-slate-800', 'border-t-[5px]', 'border-slate-400');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-slate-400/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-slate-900/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-slate-400/20";
+        if (labelText) labelText.className = "text-[9px] font-bold text-slate-300 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-slate-300 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-slate-300 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-slate-300 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-slate-900/40 border border-slate-400/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-slate-300 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-slate-800/40 border border-slate-400/10 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-slate-200 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-slate-400 text-slate-900 px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="building" class="w-[300px] h-[300px] text-slate-700"></i>`;
+      } else if (color === 'solid-black') {
+        headerBg.classList.add('bg-zinc-950');
+        if (headerBorder) headerBorder.classList.add('bg-zinc-500');
+        footerBg.classList.add('bg-zinc-950', 'border-t-[5px]', 'border-zinc-500');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-zinc-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-black/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-zinc-500/20";
+        if (labelText) labelText.className = "text-[9px] font-bold text-zinc-300 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-zinc-300 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-zinc-300 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-zinc-300 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-black/40 border border-zinc-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-zinc-300 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-zinc-900/40 border border-zinc-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-zinc-200 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-zinc-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="crown" class="w-[300px] h-[300px] text-zinc-800"></i>`;
+      } else if (color === 'solid-red') {
+        headerBg.classList.add('bg-red-900');
+        if (headerBorder) headerBorder.classList.add('bg-red-500');
+        footerBg.classList.add('bg-red-900', 'border-t-[5px]', 'border-red-500');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-red-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-red-950/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-red-500/20";
+        if (labelText) labelText.className = "text-[9px] font-bold text-red-300 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-red-300 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-red-300 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-red-300 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-red-950/40 border border-red-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-red-300 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-red-900/40 border border-red-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-red-200 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-red-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="megaphone" class="w-[300px] h-[300px] text-red-800"></i>`;
+      } else if (color === 'solid-navy') {
+        headerBg.classList.add('bg-blue-950');
+        if (headerBorder) headerBorder.classList.add('bg-blue-500');
+        footerBg.classList.add('bg-blue-950', 'border-t-[5px]', 'border-blue-500');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-blue-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-slate-950/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-blue-500/20";
+        if (labelText) labelText.className = "text-[9px] font-bold text-blue-300 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-slate-950/40 border border-blue-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-blue-300 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-slate-900/40 border border-blue-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-blue-200 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-blue-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="shield-check" class="w-[300px] h-[300px] text-blue-900"></i>`;
+      } else if (color === 'solid-teal') {
+        headerBg.classList.add('bg-teal-900');
+        if (headerBorder) headerBorder.classList.add('bg-teal-500');
+        footerBg.classList.add('bg-teal-900', 'border-t-[5px]', 'border-teal-500');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-teal-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-teal-950/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-teal-500/20";
+        if (labelText) labelText.className = "text-[9px] font-bold text-teal-300 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-teal-300 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-teal-300 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-teal-300 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-teal-950/40 border border-teal-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-teal-300 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-teal-900/40 border border-teal-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-teal-200 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-teal-500 text-teal-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="sparkles" class="w-[300px] h-[300px] text-teal-800"></i>`;
+      } else if (color === 'solid-orange') {
+        headerBg.classList.add('bg-orange-800');
+        if (headerBorder) headerBorder.classList.add('bg-orange-500');
+        footerBg.classList.add('bg-orange-800', 'border-t-[5px]', 'border-orange-500');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-orange-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-orange-950/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-orange-500/20";
+        if (labelText) labelText.className = "text-[9px] font-bold text-orange-300 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-orange-300 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-orange-300 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-orange-300 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-orange-950/40 border border-orange-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-orange-300 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-orange-900/40 border border-orange-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-orange-200 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-orange-500 text-orange-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="sun" class="w-[300px] h-[300px] text-orange-700"></i>`;
+      } else if (color === 'solid-indigo') {
+        headerBg.classList.add('bg-indigo-900');
+        if (headerBorder) headerBorder.classList.add('bg-indigo-400');
+        footerBg.classList.add('bg-indigo-900', 'border-t-[5px]', 'border-indigo-400');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-indigo-400/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-indigo-950/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-indigo-400/20";
+        if (labelText) labelText.className = "text-[9px] font-bold text-indigo-300 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-indigo-300 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-indigo-300 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-indigo-300 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-indigo-950/40 border border-indigo-400/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-indigo-300 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-indigo-900/40 border border-indigo-400/10 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-indigo-200 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-indigo-400 text-indigo-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="compass" class="w-[300px] h-[300px] text-indigo-800"></i>`;
+      } else if (color === 'solid-light-yellow') {
+        headerBg.classList.add('bg-yellow-600');
+        if (headerBorder) headerBorder.classList.add('bg-yellow-300');
+        footerBg.classList.add('bg-yellow-600', 'border-t-[5px]', 'border-yellow-300');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-yellow-300/30 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-yellow-700/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-yellow-300/30";
+        if (labelText) labelText.className = "text-[9px] font-bold text-yellow-200 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-yellow-200 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-yellow-200 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-yellow-200 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-yellow-700/40 border border-yellow-300/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-yellow-200 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-yellow-700/30 border border-yellow-300/20 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-yellow-200 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-yellow-300 text-yellow-900 px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="sun" class="w-[300px] h-[300px] text-yellow-500"></i>`;
+      } else if (color === 'solid-dusty-pink') {
+        headerBg.classList.add('bg-rose-800');
+        if (headerBorder) headerBorder.classList.add('bg-rose-300');
+        footerBg.classList.add('bg-rose-800', 'border-t-[5px]', 'border-rose-300');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-rose-300/30 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
+        if (logoBg) logoBg.className = "p-2.5 bg-rose-900/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-rose-300/30";
+        if (labelText) labelText.className = "text-[9px] font-bold text-rose-200 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-rose-200 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-rose-200 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-rose-200 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-rose-900/40 border border-rose-300/30 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-rose-200 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-rose-900/30 border border-rose-300/20 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-rose-200 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-rose-300 text-rose-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="heart" class="w-[300px] h-[300px] text-rose-900"></i>`;
       }
       
       lucide.createIcons();
-      
-      // テーマ（フォント）が変わった際にもサイズを再計算
-      setTimeout(adjustTitleFontSize, 10);
-      setTimeout(adjustAccessFontSize, 10);
     }
 
     // 画像描画境界取得
@@ -1437,138 +2018,264 @@
       else if (type === 'ペット可') bgClass = "bg-[#fef9c3]";
       else if (type === '宅配ボックス') bgClass = "bg-[#cffafe]";
       else if (type === 'WIC') bgClass = "bg-[#ede9fe]";
+      else if (type === 'エレベーター') bgClass = "bg-[#e2e8f0]";
+      else if (type === '防犯カメラ') bgClass = "bg-[#fef08a]";
+      else if (type === '駐輪場') bgClass = "bg-[#dcfce7]";
+      else if (type === '駐車場') bgClass = "bg-[#fed7aa]";
+      else if (type === 'エアコン') bgClass = "bg-[#e0f2fe]";
+      else if (type === 'TVモニターホン') bgClass = "bg-[#f3e8ff]";
+      else if (type === 'カウンターK') bgClass = "bg-[#fce7f3]";
+      else if (type === '新築') bgClass = "bg-[#ffedd5]";
+      else if (type === 'RC') bgClass = "bg-[#e5e7eb]";
 
-      div.className = `absolute ${bgClass} border-[2.5px] border-slate-900 rounded-2xl flex flex-col items-center justify-between p-2 shadow-[3px_3px_0px_0px_rgba(15,23,42,1)] cursor-move overflow-visible transition duration-150 hover:scale-105`;
+      // 変更点1：親要素を透明なラッパーに変更し、スケール用クラスとデータ属性を追加
+      div.className = `absolute cursor-move overflow-visible group`;
+      div.dataset.itemType = 'icon';
       
       const pos = getNextSpawnPos(120, 180);
       div.style.left = `${pos.x}px`;
       div.style.top = `${pos.y}px`;
-      div.style.width = "75px";
-      div.style.height = "75px";
+      // 記憶されたサイズを適用
+      div.style.width = `${lastIconSize.w}px`;
+      div.style.height = `${lastIconSize.h}px`;
 
       let svgContent = '';
       let labelText = type;
 
       if (type === 'B・T別') {
         svgContent = `
-          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 14c0 3 2 5 5 5h10c3 0 5-2 5-5v-2H2v2z" fill="#93c5fd" />
-            <path d="M2 12h20" />
-            <path d="M6 12V6a2 2 0 0 1 2-2h1" />
-            <path d="M9 3v2" />
-            <path d="M16 12v-2a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v2a3 3 0 0 1-3 3h-2" fill="#ffffff" />
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 13h14v2a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-2z" fill="#bae6fd" />
+            <path d="M4 13V6a2 2 0 0 1 2-2h2" />
+            <circle cx="10" cy="3" r="1.5" fill="#f8fafc" />
+            <line x1="17" y1="2" x2="17" y2="22" stroke-dasharray="3 3" />
+            <path d="M19 11v4h4v-2a2 2 0 0 0-2-2h-2z" fill="#e2e8f0" />
+            <path d="M19 15c-1 0-2 1-2 2v2h4v-2c0-1-1-2-2-2z" fill="#f8fafc" />
           </svg>
         `;
       } else if (type === 'オートロック') {
         svgContent = `
-          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M7 11V7a5 5 0 0 1 10 0v4" fill="none" stroke="#475569" />
-            <rect x="4" y="11" width="16" height="10" rx="3" fill="#f59e0b" />
-            <circle cx="12" cy="15" r="1.5" fill="#1e293b" />
-            <path d="M12 16.5v2.5" stroke="#1e293b" />
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="11" width="14" height="10" rx="3" fill="#fcd34d" />
+            <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+            <circle cx="12" cy="16" r="1.5" fill="#1e293b" />
           </svg>
         `;
       } else if (type === '独立洗面') {
         svgContent = `
-          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="8" r="5" fill="#bae6fd" />
-            <path d="M5 16h14v2a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-2z" fill="#ffffff" />
-            <path d="M12 13v1.5" />
-            <path d="M11 13h2" />
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="7" y="3" width="10" height="8" rx="2" fill="#e0f2fe" />
+            <path d="M4 14h16v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3z" fill="#f8fafc" />
+            <path d="M12 11v3" />
+            <path d="M10 12h4" />
           </svg>
         `;
       } else if (type === '温水便座') {
         svgContent = `
-          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="4" y="4" width="6" height="12" rx="1.5" fill="#f8fafc" />
-            <path d="M10 10c0 4 2 6 6 6s6-2 6-6H10z" fill="#e2e8f0" />
-            <path d="M10 10V8a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2" fill="#ffffff" />
-            <path d="M12 16v4h6v-4" />
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="6" y="3" width="12" height="6" rx="2" fill="#f8fafc" />
+            <path d="M8 9v6a4 4 0 0 0 8 0V9H8z" fill="#e2e8f0" />
+            <path d="M12 15c-1 0-2-1-2-2s2-4 2-4 2 3 2 4-1 2-2 2z" fill="#60a5fa" stroke="none" />
+            <circle cx="16" cy="6" r="1" fill="#94a3b8" />
           </svg>
         `;
       } else if (type === '室内洗濯') {
         svgContent = `
-          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="4" y="4" width="16" height="17" rx="2.5" fill="#ffffff" />
-            <line x1="4" y1="8" x2="20" y2="8" />
-            <circle cx="7" cy="6" r="1" fill="#f59e0b" stroke="none" />
-            <circle cx="10" cy="6" r="1" fill="#3b82f6" stroke="none" />
-            <circle cx="12" cy="14" r="4.5" fill="#bae6fd" />
-            <path d="M10 14a2 2 0 0 1 4 0" />
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="3" width="14" height="18" rx="3" fill="#f8fafc" />
+            <line x1="5" y1="8" x2="19" y2="8" />
+            <circle cx="12" cy="14" r="4" fill="#bae6fd" />
+            <circle cx="8" cy="5.5" r="1" fill="#1e293b" />
+            <circle cx="11" cy="5.5" r="1" fill="#1e293b" />
           </svg>
         `;
       } else if (type === 'システムK') {
         svgContent = `
-          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 14l7 7" stroke="#475569" stroke-width="3" />
-            <circle cx="10" cy="10" r="7" fill="#6366f1" />
-            <path d="M8 9.5c.2-1 1.2-1.5 2-1s1.5 1 1 2-.5 1-1.5.5-1.7-.5-1.5-1.5z" fill="#ffffff" stroke="none" />
-            <circle cx="10" cy="10" r="2" fill="#f97316" stroke="none" />
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 13h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6z" fill="#fbcfe8" />
+            <line x1="3" y1="13" x2="21" y2="13" />
+            <circle cx="8" cy="11" r="2" fill="#f97316" stroke="none" />
+            <circle cx="16" cy="11" r="2" fill="#f97316" stroke="none" />
+            <path d="M12 9V5c0-1 1-2 2-2s2 1 2 2v2" />
           </svg>
         `;
       } else if (type === '追い焚き') {
         svgContent = `
-          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="10" width="18" height="8" rx="2" fill="#93c5fd" />
-            <path d="M2 10h20v2a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5v-2z" fill="#ffffff" />
-            <path d="M7 6c.5-1 .5-2 0-3" />
-            <path d="M12 6c.5-1 .5-2 0-3" />
-            <path d="M17 6c.5-1 .5-2 0-3" />
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 14h16v2a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-2z" fill="#93c5fd" />
+            <path d="M12 9c-1-1-2-2-2-4s2-2 2-2 2 0 2 2-1 3-2 4z" fill="#f87171" stroke="none" />
+            <path d="M7 8c0-2 1-3 2-4" />
+            <path d="M17 8c0-2-1-3-2-4" />
           </svg>
         `;
       } else if (type === '浴室乾燥機') {
         svgContent = `
-          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2a10 10 0 1 0 10 10" stroke="#3b82f6" fill="none" />
-            <path d="M12 6a6 6 0 1 0 6 6" stroke="#60a5fa" fill="none" />
-            <path d="M12 10a2 2 0 1 0 2 2" stroke="#93c5fd" fill="none" />
-            <rect x="8" y="21" width="8" height="2" fill="#64748b" stroke="none" />
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="3" width="16" height="6" rx="1" fill="#e2e8f0" />
+            <line x1="6" y1="6" x2="18" y2="6" stroke-dasharray="2 2" />
+            <path d="M12 11l-3 3v6h6v-6l-3-3z" fill="#fef08a" />
+            <path d="M12 11a1 1 0 0 0-1-1 1 1 0 0 1 1-1 1 1 0 0 1 1 1 1 1 0 0 0-1 1z" />
+            <path d="M7 14s2 2 5 2 5-2 5-2" stroke="#94a3b8" />
           </svg>
         `;
       } else if (type === 'ネット無料') {
         svgContent = `
-          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 12a10 10 0 0 1 14 0" fill="none" />
-            <path d="M8.5 15.5a5 5 0 0 1 7 0" fill="none" />
-            <circle cx="12" cy="19" r="1.5" fill="#0f172a" />
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 8.5a10 10 0 0 1 14 0" />
+            <path d="M8.5 12.5a5 5 0 0 1 7 0" />
+            <circle cx="12" cy="16.5" r="1.5" fill="#3b82f6" stroke="none" />
+            <rect x="6" y="19" width="12" height="3" rx="1" fill="#1e293b" />
           </svg>
         `;
       } else if (type === 'ペット可') {
         svgContent = `
-          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 11c-2.5 0-4.5 1.5-4.5 4s1.5 4 4.5 4 4.5-1.5 4.5-4-2-4-4.5-4z" fill="#f43f5e" />
-            <circle cx="7" cy="9" r="2.2" fill="#f43f5e" />
-            <circle cx="10.5" cy="6.5" r="2.2" fill="#f43f5e" />
-            <circle cx="14.5" cy="6.5" r="2.2" fill="#f43f5e" />
-            <circle cx="18" cy="9" r="2.2" fill="#f43f5e" />
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 12c-2.5 0-5 2-5 5.5S9 22 12 22s5-1 5-4.5-2.5-5.5-5-5.5z" fill="#f43f5e" />
+            <circle cx="7" cy="9" r="2.5" fill="#f43f5e" />
+            <circle cx="10.5" cy="5.5" r="2.5" fill="#f43f5e" />
+            <circle cx="14.5" cy="5.5" r="2.5" fill="#f43f5e" />
+            <circle cx="18" cy="9" r="2.5" fill="#f43f5e" />
           </svg>
         `;
       } else if (type === '宅配ボックス') {
         svgContent = `
-          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2l9 4-9 4-9-4 9-4z" fill="#f59e0b" />
-            <path d="M3 6v10l9 5v-11L3 6z" fill="#d97706" />
-            <path d="M21 6v10l-9 5v-11l9-4z" fill="#b45309" />
-            <path d="M12 6.5v11" stroke="#ffffff" stroke-width="2.5" />
-            <path d="M7.5 8.5l9 4" stroke="#ffffff" stroke-width="2.5" />
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="10" height="18" rx="1" fill="#e2e8f0" />
+            <line x1="3" y1="9" x2="13" y2="9" />
+            <line x1="3" y1="15" x2="13" y2="15" />
+            <path d="M15 13l6 3v5l-6-3v-5z" fill="#d97706" stroke="#b45309" />
+            <path d="M15 13l3-1.5 3 1.5-3 1.5-3-1.5z" fill="#f59e0b" stroke="#b45309" />
           </svg>
         `;
       } else if (type === 'WIC') {
         svgContent = `
-          <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 7a2 2 0 1 1 2-2" />
-            <path d="M6 11l6-4 6 4v8H6v-8z" fill="#c084fc" />
-            <path d="M10 7l2 3 2-3" />
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="16" rx="2" fill="#ede9fe" />
+            <path d="M3 8h18" />
+            <path d="M8 8l-2 4h4l-2-4z" fill="#a855f7" />
+            <path d="M16 8l-2 4h4l-2-4z" fill="#a855f7" />
+            <path d="M8 8c0-1 .5-2 1-2s1 1 1 2" />
+            <path d="M16 8c0-1 .5-2 1-2s1 1 1 2" />
+          </svg>
+        `;
+      } else if (type === 'エレベーター') {
+        svgContent = `
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="2" width="16" height="20" rx="1" fill="#cbd5e1" />
+            <line x1="12" y1="2" x2="12" y2="22" />
+            <path d="M9 10l-2-2-2 2" stroke="#475569" />
+            <line x1="7" y1="8" x2="7" y2="16" stroke="#475569" />
+            <path d="M15 14l2 2 2-2" stroke="#475569" />
+            <line x1="17" y1="8" x2="17" y2="16" stroke="#475569" />
+          </svg>
+        `;
+      } else if (type === '防犯カメラ') {
+        svgContent = `
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="8" width="14" height="8" rx="2" fill="#cbd5e1" />
+            <path d="M19 10l3-2v8l-3-2" fill="#cbd5e1" />
+            <circle cx="9" cy="12" r="2" fill="#1e293b" />
+            <circle cx="9" cy="12" r="0.5" fill="#ef4444" stroke="none" />
+          </svg>
+        `;
+      } else if (type === '駐輪場') {
+        svgContent = `
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="6" cy="16" r="4" fill="#a7f3d0" />
+            <circle cx="18" cy="16" r="4" fill="#a7f3d0" />
+            <path d="M6 16l3-6h6l3 6" />
+            <path d="M12 16v-6" />
+            <path d="M8 10h8" />
+          </svg>
+        `;
+      } else if (type === '駐車場') {
+        svgContent = `
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 15h14a2 2 0 0 0 2-2v-2l-3-4H6l-3 4v2a2 2 0 0 0 2 2z" fill="#fdba74" />
+            <circle cx="7" cy="16" r="3" fill="#1e293b" />
+            <circle cx="17" cy="16" r="3" fill="#1e293b" />
+            <path d="M6 11h12" />
+          </svg>
+        `;
+      } else if (type === 'エアコン') {
+        svgContent = `
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="8" rx="2" fill="#f8fafc" />
+            <line x1="6" y1="8" x2="18" y2="8" />
+            <line x1="8" y1="16" x2="10" y2="20" stroke="#60a5fa" />
+            <line x1="12" y1="16" x2="12" y2="20" stroke="#60a5fa" />
+            <line x1="16" y1="16" x2="14" y2="20" stroke="#60a5fa" />
+          </svg>
+        `;
+      } else if (type === 'TVモニターホン') {
+        svgContent = `
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="3" width="16" height="18" rx="2" fill="#e9d5ff" />
+            <rect x="6" y="6" width="12" height="8" rx="1" fill="#f8fafc" />
+            <circle cx="12" cy="10" r="2" fill="#a855f7" stroke="none" />
+            <circle cx="9" cy="17" r="1.5" fill="#a855f7" />
+            <circle cx="15" cy="17" r="1.5" fill="#a855f7" />
+          </svg>
+        `;
+      } else if (type === 'カウンターK') {
+        svgContent = `
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 18v-8h16" fill="none" />
+            <path d="M4 18h4v-4h12V10H4z" fill="#fbcfe8" />
+            <path d="M12 18v-4" />
+            <path d="M10 14h4" />
+            <path d="M18 18v-4" />
+            <path d="M16 14h4" />
+          </svg>
+        `;
+      } else if (type === '新築') {
+        svgContent = `
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3l8 6v12H4V9l8-6z" fill="#fed7aa" />
+            <path d="M10 21V14h4v7" fill="#f8fafc" />
+            <path d="M5 5l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" />
+            <path d="M19 5l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" />
+            <path d="M19 12l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" />
+          </svg>
+        `;
+      } else if (type === 'RC') {
+        svgContent = `
+          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="4" width="14" height="18" rx="1" fill="#e2e8f0" />
+            <rect x="8" y="7" width="3" height="3" fill="#64748b" stroke="none" />
+            <rect x="13" y="7" width="3" height="3" fill="#64748b" stroke="none" />
+            <rect x="8" y="12" width="3" height="3" fill="#64748b" stroke="none" />
+            <rect x="13" y="12" width="3" height="3" fill="#64748b" stroke="none" />
+            <rect x="8" y="17" width="3" height="3" fill="#64748b" stroke="none" />
+            <rect x="13" y="17" width="3" height="3" fill="#64748b" stroke="none" />
           </svg>
         `;
       }
 
+      // 初期の描画スケールも記憶したサイズに基づいて計算
+      const initialScale = lastIconSize.w / 75;
+      
       div.innerHTML = `
-        <div class="flex items-center justify-center w-full h-[40px] overflow-visible select-none pointer-events-none">
-          ${svgContent}
+        <div class="icon-scale-wrapper w-[75px] h-[75px] origin-top-left pointer-events-none" style="transform: scale(${initialScale});">
+          <div class="w-full h-full flex flex-col items-center justify-between p-1.5 ${bgClass} border-[2.5px] border-slate-900 rounded-2xl transition duration-150 group-hover:scale-105">
+            <div class="flex items-center justify-center w-full h-[46px] overflow-visible select-none pointer-events-none">
+              ${svgContent}
+            </div>
+            <span class="text-[8.5px] font-black tracking-widest text-slate-900 text-center leading-none select-none w-full block mt-0.5 whitespace-nowrap overflow-visible">${labelText}</span>
+          </div>
         </div>
-        <span class="text-[8.5px] font-black tracking-widest text-slate-900 text-center leading-none select-none w-full block mt-0.5 whitespace-nowrap overflow-visible">${labelText}</span>
       `;
+
+      // 変更点3：親要素のリサイズを監視し、中身全体を自動で拡大縮小させる処理を追加
+      const scaleWrapper = div.querySelector('.icon-scale-wrapper');
+      const ro = new ResizeObserver(entries => {
+        for (let entry of entries) {
+          const currentW = entry.contentRect.width;
+          const scale = currentW / 75; // 初期サイズ(75px)に対する現在の倍率
+          scaleWrapper.style.transform = `scale(${scale})`;
+        }
+      });
+      ro.observe(div);
 
       setupCanvasItemInteractions(div);
       showToast(`「${type}」アイコンを配置しました。`);
@@ -1731,6 +2438,13 @@
         el.style.height = `${newH}px`;
         el.style.left = `${newLeft}px`;
         el.style.top = `${newTop}px`;
+
+        // ホイール操作時にサイズを記憶
+        if (el.dataset.itemType === 'icon') {
+          lastIconSize = { w: newW, h: newH };
+        } else if (el.dataset.itemType === 'appeal') {
+          lastAppealSize = { w: newW, h: newH };
+        }
       }, { passive: false });
 
       if (!isCanvasGlobalEventRegistered) {
@@ -1807,9 +2521,17 @@
             selectedCanvasItem.style.height = `${newH}px`;
             selectedCanvasItem.style.left = `${newX}px`;
             selectedCanvasItem.style.top = `${newY}px`;
+
+            // 追加: リサイズ中に計算されたサイズを即座に記憶する（これで確実に引き継がれます）
+            if (selectedCanvasItem.dataset.itemType === 'icon') {
+              lastIconSize = { w: newW, h: newH };
+            } else if (selectedCanvasItem.dataset.itemType === 'appeal') {
+              lastAppealSize = { w: newW, h: newH };
+            }
           }
         });
 
+        // フラグのリセット
         document.addEventListener('mouseup', function() {
           isMovingCanvasItem = false;
           isResizingCanvasItem = false;
@@ -2077,12 +2799,15 @@
 
       const div = document.createElement('div');
       div.className = `absolute py-2 px-4 ${bgClass} rounded shadow-lg cursor-move flex items-center justify-center text-center font-black font-rounded text-sm tracking-widest min-w-[150px] overflow-visible`;
+      div.dataset.itemType = 'appeal'; // 追加：種類の識別用
       
       const pos = getNextSpawnPos(150, 200);
       div.style.left = `${pos.x}px`;
       div.style.top = `${pos.y}px`;
-      div.style.width = "180px";
-      div.style.height = "45px";
+      
+      // 記憶されたサイズを適用
+      div.style.width = `${lastAppealSize.w}px`;
+      div.style.height = `${lastAppealSize.h}px`;
       div.style.zIndex = 100;
       
       div.innerHTML = `<span>${text}</span>`;
@@ -2106,7 +2831,8 @@
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
       initInputs();
-      changeTheme('premium');
+      changeColor('amber');
+      changeFont('serif');
 
       // キーボードでの要素削除サポート
       document.addEventListener('keydown', function(e) {
