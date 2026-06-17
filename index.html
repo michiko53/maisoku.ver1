@@ -122,6 +122,16 @@
         margin: 0;
       }
     }
+
+    /* 白系統・ライトグレー系統カラー選択時の文字・枠線反転用スタイル */
+    #theme-header-bg.theme-light .text-white, #theme-footer-bg.theme-light .text-white { color: #1e293b !important; }
+    #theme-header-bg.theme-light .text-white\/80, #theme-footer-bg.theme-light .text-white\/80 { color: rgba(30, 41, 59, 0.8) !important; }
+    #theme-header-bg.theme-light .text-white\/90, #theme-footer-bg.theme-light .text-white\/90 { color: rgba(30, 41, 59, 0.9) !important; }
+    #theme-header-bg.theme-light .text-white\/70, #theme-footer-bg.theme-light .text-white\/70 { color: rgba(30, 41, 59, 0.7) !important; }
+    #theme-header-bg.theme-light .text-white\/60, #theme-footer-bg.theme-light .text-white\/60 { color: rgba(30, 41, 59, 0.6) !important; }
+    #theme-header-bg.theme-light .border-white\/25, #theme-footer-bg.theme-light .border-white\/20, #theme-footer-bg.theme-light .border-white\/10 { border-color: rgba(30, 41, 59, 0.25) !important; }
+    #theme-header-bg.theme-light .bg-black\/20, #theme-footer-bg.theme-light .bg-black\/40 { background-color: rgba(0, 0, 0, 0.05) !important; }
+    #theme-sub-bar.theme-light { color: #1e293b !important; background-color: rgba(0, 0, 0, 0.05) !important; }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex flex-col overflow-x-hidden">
@@ -173,6 +183,10 @@
               <option value="grad-burgundy">クラシックバーガンディ (深紅)</option>
               <option value="grad-forest">リラックスフォレスト (深緑)</option>
               <option value="grad-bronze">ヴィンテージブロンズ (銅)</option>
+              <option value="grad-silver">プラチナシルバー (白×灰)</option>
+              <option value="grad-iceblue">アイスブルー (白×水色)</option>
+              <option value="grad-mint">ミントグリーン (白×薄緑)</option>
+              <option value="grad-champagne">シャンパン (白×象牙)</option>
             </optgroup>
             <optgroup label="単色 (シンプル・視認性)">
               <option value="solid-blue">トラストブルー (青)</option>
@@ -866,8 +880,8 @@
                   </div>
                   <div class="flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-white/95 font-mono leading-none pt-0.5">
                     <span class="flex items-end gap-1.5"><i id="footer-phone-icon" data-lucide="phone" class="w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]"></i> <strong class="text-white align-bottom leading-none">03-6808-3031</strong></span>
-                    <span class="flex items-end gap-1.5"><i id="footer-mail-icon" data-lucide="mail" class="w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]"></i> <span class="align-bottom leading-none">chintai@techno-home.jp</span></span>
-                    <span class="flex items-end gap-1.5"><i id="footer-map-icon" data-lucide="map-pin" class="w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]"></i> <span class="align-bottom leading-none">〒134-0084 東京都江戸川区東葛西6-4-17 ELLEPLAN1階</span></span>
+                    <span class="flex items-end gap-1.5"><i id="footer-mail-icon" data-lucide="mail" class="w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]"></i> <span class="text-white align-bottom leading-none">chintai@techno-home.jp</span></span>
+                    <span class="flex items-end gap-1.5"><i id="footer-map-icon" data-lucide="map-pin" class="w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]"></i> <span class="text-white align-bottom leading-none">〒134-0084 東京都江戸川区東葛西6-4-17 ELLEPLAN1階</span></span>
                   </div>
                 </div>
               </div>
@@ -1481,7 +1495,83 @@
         if (locationBadge) locationBadge.className = "bg-orange-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
         
         watermark.innerHTML = `<i data-lucide="landmark" class="w-[300px] h-[300px] text-orange-950"></i>`;
-      } 
+      } else if (color === 'grad-silver') {
+        headerBg.classList.add('bg-gradient-to-r', 'from-white', 'via-slate-100', 'to-slate-200');
+        if (headerBorder) headerBorder.classList.add('bg-slate-400');
+        footerBg.classList.add('bg-gradient-to-r', 'from-white', 'via-slate-100', 'to-slate-200', 'border-t-[5px]', 'border-slate-400');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-slate-300 pr-3 flex items-center gap-3 relative overflow-hidden text-slate-800";
+        if (logoBg) logoBg.className = "p-2.5 bg-slate-100 rounded-lg flex items-center justify-center shrink-0 shadow border border-slate-300";
+        if (labelText) labelText.className = "text-[9px] font-bold text-slate-500 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-slate-600 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-slate-600 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-slate-600 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-slate-100 border border-slate-300 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-slate-500 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-slate-50 border border-slate-200 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-slate-500 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-slate-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="layers" class="w-[300px] h-[300px] text-slate-200"></i>`;
+      } else if (color === 'grad-iceblue') {
+        headerBg.classList.add('bg-sky-50');
+        if (headerBorder) headerBorder.classList.add('bg-sky-400');
+        footerBg.classList.add('bg-sky-50', 'border-t-[5px]', 'border-sky-400');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-sky-200 pr-3 flex items-center gap-3 relative overflow-hidden text-slate-800";
+        if (logoBg) logoBg.className = "p-2.5 bg-white rounded-lg flex items-center justify-center shrink-0 shadow border border-sky-200";
+        if (labelText) labelText.className = "text-[9px] font-bold text-sky-600 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-sky-600 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-sky-600 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-sky-600 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-white border border-sky-200 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-sky-600 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-sky-100 border border-sky-200 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-sky-600 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-sky-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="droplets" class="w-[300px] h-[300px] text-sky-100"></i>`;
+      } else if (color === 'grad-mint') {
+        headerBg.classList.add('bg-emerald-50');
+        if (headerBorder) headerBorder.classList.add('bg-emerald-400');
+        footerBg.classList.add('bg-emerald-50', 'border-t-[5px]', 'border-emerald-400');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-emerald-200 pr-3 flex items-center gap-3 relative overflow-hidden text-slate-800";
+        if (logoBg) logoBg.className = "p-2.5 bg-white rounded-lg flex items-center justify-center shrink-0 shadow border border-emerald-200";
+        if (labelText) labelText.className = "text-[9px] font-bold text-emerald-600 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-emerald-600 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-emerald-600 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-emerald-600 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-white border border-emerald-200 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-emerald-600 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-emerald-100 border border-emerald-200 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-emerald-600 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-emerald-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="leaf" class="w-[300px] h-[300px] text-emerald-100"></i>`;
+      } else if (color === 'grad-champagne') {
+        headerBg.classList.add('bg-amber-50');
+        if (headerBorder) headerBorder.classList.add('bg-amber-400');
+        footerBg.classList.add('bg-amber-50', 'border-t-[5px]', 'border-amber-400');
+        
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-amber-200 pr-3 flex items-center gap-3 relative overflow-hidden text-slate-800";
+        if (logoBg) logoBg.className = "p-2.5 bg-white rounded-lg flex items-center justify-center shrink-0 shadow border border-amber-200";
+        if (labelText) labelText.className = "text-[9px] font-bold text-amber-600 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-amber-600 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-amber-600 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-amber-600 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-white border border-amber-200 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-amber-600 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-amber-100 border border-amber-200 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-amber-600 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-amber-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="sparkles" class="w-[300px] h-[300px] text-amber-100"></i>`;
+      }
       
       // --- 単色 10種類 ---
       else if (color === 'solid-blue') {
@@ -1712,6 +1802,17 @@
         if (locationBadge) locationBadge.className = "bg-rose-300 text-rose-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
         
         watermark.innerHTML = `<i data-lucide="heart" class="w-[300px] h-[300px] text-rose-900"></i>`;
+      }
+      
+      // 白・ライトグレー時の文字色反転制御
+      if (color === 'grad-silver' || color === 'grad-iceblue' || color === 'grad-mint' || color === 'grad-champagne') {
+        headerBg.classList.add('theme-light');
+        footerBg.classList.add('theme-light');
+        subBar.classList.add('theme-light');
+      } else {
+        headerBg.classList.remove('theme-light');
+        footerBg.classList.remove('theme-light');
+        subBar.classList.remove('theme-light');
       }
       
       lucide.createIcons();
