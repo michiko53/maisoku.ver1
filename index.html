@@ -187,6 +187,7 @@
               <option value="grad-iceblue">アイスブルー (白×水色)</option>
               <option value="grad-mint">ミントグリーン (白×薄緑)</option>
               <option value="grad-champagne">シャンパン (白×象牙)</option>
+              <option value="grad-tricolor">スマートトリコロール (白×紺×灰×赤)</option>
             </optgroup>
             <optgroup label="単色 (シンプル・視認性)">
               <option value="solid-blue">トラストブルー (青)</option>
@@ -445,7 +446,16 @@
             <i data-lucide="layout-grid" class="w-4 h-4 text-emerald-400"></i>
             デザイナーズスタンプ型アイコン
           </h3>
-          <p class="text-xs text-slate-400 mb-4 leading-relaxed">今流行りのリノベマイソク風、丸みのある極太黒縁取りのハイデザインスタンプです。</p>
+          <p class="text-xs text-slate-400 mb-2 leading-relaxed">今流行りのリノベマイソク風、丸みのある極太黒縁取りのハイデザインスタンプです。</p>
+
+          <!-- 追加：グリッド作成メニュー -->
+          <div class="flex items-center gap-1.5 mb-4 bg-slate-900/60 p-2 rounded-lg border border-slate-700">
+            <span class="text-[10px] text-slate-400 font-bold whitespace-nowrap"><i data-lucide="grid" class="w-3 h-3 inline pb-0.5"></i> 整列枠を追加:</span>
+            <button onclick="addIconGrid(2)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 transition shadow-sm font-semibold">2列</button>
+            <button onclick="addIconGrid(3)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 transition shadow-sm font-semibold">3列</button>
+            <button onclick="addIconGrid(4)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 transition shadow-sm font-semibold">4列</button>
+            <span class="text-[8.5px] text-slate-500 ml-auto leading-tight">※追加した枠を選択し<br>下からアイコンを挿入</span>
+          </div>
           
           <div class="grid grid-cols-3 gap-3">
             <!-- 各アイコンボタン -->
@@ -786,7 +796,7 @@
             <div id="theme-header-border" class="absolute bottom-0 left-0 right-0 h-[6px] bg-amber-400 z-50 pointer-events-none transition-colors duration-300"></div>
 
             <!-- キャッチコピーブロック -->
-            <div class="flex items-center justify-between h-[32px] overflow-visible">
+            <div id="header-catch-block" class="flex items-center justify-between min-h-[32px] overflow-visible transition-colors duration-300">
               <div id="canvas-catch" class="text-[18px] font-black text-white truncate max-w-full leading-normal tracking-wider overflow-visible pb-1 pt-0.5">
                 ★駅チカ徒歩3分！陽当たり抜群 of 南向き角部屋フルリノベマンション★
               </div>
@@ -795,7 +805,7 @@
             <!-- ヘッダーメイン -->
             <div class="flex justify-between items-stretch h-[85px] w-full gap-x-2 relative z-20">
               <!-- 物件名ブロック -->
-              <div class="flex-1 min-w-0 pr-3 flex flex-col justify-center overflow-visible">
+              <div id="header-title-block" class="flex-1 min-w-0 pr-3 flex flex-col justify-center overflow-visible transition-colors duration-300">
                 <!-- 修正: break-words を whitespace-nowrap に変更 -->
                 <h2 id="canvas-title" class="text-[36px] font-black text-white leading-[1.2] font-rounded whitespace-nowrap text-left w-full overflow-visible">
                   テクノハイツ代々木 402号室
@@ -1296,6 +1306,11 @@
       const subLabels = document.querySelectorAll('.sub-label');
       const locationBadge = document.getElementById('theme-sub-bar-location-badge');
 
+      const headerTitleBlock = document.getElementById('header-title-block');
+      const canvasTitle = document.getElementById('canvas-title');
+      const headerCatchBlock = document.getElementById('header-catch-block');
+      const canvasCatch = document.getElementById('canvas-catch');
+
       if (!headerBg || !footerBg || !subBar || !watermark) return;
 
       headerBg.className = "w-full h-[170px] px-3.5 pt-2 pb-3 flex flex-col justify-between relative z-10 transition-all duration-300";
@@ -1303,6 +1318,19 @@
       footerBg.className = "absolute bottom-0 left-0 right-0 h-[95px] p-2.5 grid grid-cols-12 gap-2 text-white z-10 transition-all duration-300 font-sans";
       subBar.className = "w-full rounded px-3 py-1.5 flex items-center justify-between text-[11px] text-white transition-all duration-300 mt-0.5 bg-stone-950/40";
       watermark.innerHTML = '';
+      
+      if (headerTitleBlock) {
+        headerTitleBlock.className = "flex-1 min-w-0 pr-3 flex flex-col justify-center overflow-visible transition-colors duration-300";
+      }
+      if (canvasTitle) {
+        canvasTitle.style.removeProperty('color');
+      }
+      if (headerCatchBlock) {
+        headerCatchBlock.className = "flex items-center justify-between min-h-[32px] overflow-visible transition-colors duration-300";
+      }
+      if (canvasCatch) {
+        canvasCatch.style.removeProperty('color');
+      }
 
       // --- グラデーション 10種類 ---
       if (color === 'amber') {
@@ -1571,6 +1599,46 @@
         if (locationBadge) locationBadge.className = "bg-amber-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
         
         watermark.innerHTML = `<i data-lucide="sparkles" class="w-[300px] h-[300px] text-amber-100"></i>`;
+      } else if (color === 'grad-tricolor') {
+        headerBg.classList.add('bg-white');
+        if (headerBorder) headerBorder.classList.add('bg-red-600');
+        footerBg.classList.add('bg-white', 'border-t-[5px]', 'border-red-600');
+        
+        // キャッチコピー背景をネイビーブルー
+        if (headerCatchBlock) {
+          headerCatchBlock.classList.add('bg-blue-900', '-mx-3.5', 'px-3.5', '-mt-2', 'pt-2');
+        }
+        if (canvasCatch) {
+          canvasCatch.style.setProperty('color', '#ffffff', 'important');
+        }
+
+        // ヘッダー物件名のみネイビーブルー
+        if (headerTitleBlock) {
+          headerTitleBlock.classList.add('bg-blue-900', '-ml-3.5', 'pl-3.5');
+        }
+        if (canvasTitle) {
+          canvasTitle.style.setProperty('color', '#ffffff', 'important');
+        }
+
+        // 帯の背景をネイビーブルー
+        subBar.classList.remove('bg-stone-950/40');
+        subBar.classList.add('bg-blue-900');
+
+        // フッターは白背景にグレー文字
+        if (footerLeft) footerLeft.className = "col-span-9 border-r border-slate-300 pr-3 flex items-center gap-3 relative overflow-hidden text-slate-800";
+        if (logoBg) logoBg.className = "p-2.5 bg-slate-100 rounded-lg flex items-center justify-center shrink-0 shadow border border-slate-300";
+        if (labelText) labelText.className = "text-[9px] font-bold text-slate-500 leading-none";
+        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-slate-600 shrink-0 self-end mb-[-1.5px]";
+        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-slate-600 shrink-0 self-end mb-[-1.5px]";
+        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-slate-600 shrink-0 self-end mb-[-1.5px]";
+        if (adBg) adBg.className = "bg-white border border-slate-300 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (adLabel) adLabel.className = "text-[8px] text-slate-500 font-bold scale-90 leading-none mb-0.5";
+        if (taiyouBg) taiyouBg.className = "bg-slate-50 border border-slate-200 rounded py-1.5 leading-none flex flex-col justify-center";
+
+        subLabels.forEach(el => { el.className = "sub-label text-blue-200 font-bold mr-0.5"; });
+        if (locationBadge) locationBadge.className = "bg-slate-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
+        
+        watermark.innerHTML = `<i data-lucide="flag" class="w-[300px] h-[300px] text-slate-100"></i>`;
       }
       
       // --- 単色 10種類 ---
@@ -1809,6 +1877,10 @@
         headerBg.classList.add('theme-light');
         footerBg.classList.add('theme-light');
         subBar.classList.add('theme-light');
+      } else if (color === 'grad-tricolor') {
+        headerBg.classList.add('theme-light');
+        footerBg.classList.add('theme-light');
+        subBar.classList.remove('theme-light');
       } else {
         headerBg.classList.remove('theme-light');
         footerBg.classList.remove('theme-light');
@@ -1874,6 +1946,42 @@
     // ==========================================
     // 3. アセット作成・配置コントロール
     // ==========================================
+
+    // アイコン整列枠配置
+    function addIconGrid(cols) {
+      const guide = document.getElementById('canvas-guide');
+      if (guide) guide.style.opacity = '0';
+
+      const div = document.createElement('div');
+      div.className = `absolute cursor-move overflow-visible group flex flex-col justify-start bg-indigo-50/10 border-2 border-dashed border-indigo-400/60 transition-colors icon-grid-container`;
+      div.dataset.itemType = 'icon-grid';
+
+      const pos = getNextSpawnPos(100, 250);
+      div.style.left = `${pos.x}px`;
+      div.style.top = `${pos.y}px`;
+      div.style.width = `${cols * 80 + (cols - 1) * 8 + 16}px`; 
+      div.style.height = 'auto'; 
+      div.style.minHeight = '90px'; // 追加: 枠がペチャンコに潰れないように最小高さを設定
+
+      // 修正: .grid-inner から h-full を削除し、中身に応じて高さが広がるようにする
+      div.innerHTML = `
+        <div class="grid-inner w-full p-2 grid gap-2 content-start" style="grid-template-columns: repeat(${cols}, minmax(0, 1fr));">
+        </div>
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none empty-grid-msg opacity-50">
+           <span class="text-[10px] font-bold text-indigo-400 text-center leading-tight">ここにアイコンが<br>並びます</span>
+        </div>
+      `;
+
+      setupCanvasItemInteractions(div);
+      showToast(`${cols}列の整列枠を配置しました。そのままアイコンを追加してください。`);
+      
+      // 追加直後に自動的に選択状態にして、すぐアイコンを入れられるようにする
+      setTimeout(() => {
+        selectCanvasItem(div);
+        // 新規追加した枠が見えるようにLucideアイコンを再レンダリング
+        lucide.createIcons();
+      }, 50);
+    }
 
     // 画像アセット自由配置
     function addPresetAssetToCanvas(src, customX = 80, customY = 60, customW = 280, customH = 210) {
@@ -2104,6 +2212,27 @@
       const guide = document.getElementById('canvas-guide');
       if (guide) guide.style.opacity = '0';
 
+      let targetContainer = null;
+      let targetGrid = null;
+      let isGridMode = false;
+
+      // 1. 選択中の要素が「アイコン整列枠」だった場合
+      if (selectedCanvasItem && selectedCanvasItem.dataset.itemType === 'icon-grid') {
+        targetGrid = selectedCanvasItem;
+      } 
+      // 2. 何も選択されていない場合でも、キャンバス上に「アイコン整列枠」があれば自動で拾って吸着させる
+      else if (!selectedCanvasItem) {
+        const grids = document.querySelectorAll('.icon-grid-container');
+        if (grids.length > 0) {
+          targetGrid = grids[grids.length - 1]; // 複数あれば最後に操作・追加した枠
+        }
+      }
+
+      if (targetGrid) {
+        targetContainer = targetGrid.querySelector('.grid-inner');
+        isGridMode = true;
+      }
+
       const div = document.createElement('div');
       
       let bgClass = "bg-[#fdfdfc]";
@@ -2128,17 +2257,6 @@
       else if (type === 'カウンターK') bgClass = "bg-[#fce7f3]";
       else if (type === '新築') bgClass = "bg-[#ffedd5]";
       else if (type === 'RC') bgClass = "bg-[#e5e7eb]";
-
-      // 変更点1：親要素を透明なラッパーに変更し、スケール用クラスとデータ属性を追加
-      div.className = `absolute cursor-move overflow-visible group`;
-      div.dataset.itemType = 'icon';
-      
-      const pos = getNextSpawnPos(120, 180);
-      div.style.left = `${pos.x}px`;
-      div.style.top = `${pos.y}px`;
-      // 記憶されたサイズを適用
-      div.style.width = `${lastIconSize.w}px`;
-      div.style.height = `${lastIconSize.h}px`;
 
       let svgContent = '';
       let labelText = type;
@@ -2353,11 +2471,37 @@
         `;
       }
 
-      // 初期の描画スケールも記憶したサイズに基づいて計算
-      const initialScale = lastIconSize.w / 75;
+      if (isGridMode) {
+        // グリッド枠内の場合は、絶対配置を解除し、幅100%（セルの幅に合わせる）にする
+        div.className = `relative w-full aspect-square group`;
+        div.dataset.itemType = 'icon-in-grid';
+        
+        // 修正: アイコンの座標ズレを防ぐため、念のためインラインスタイルをリセット
+        div.style.left = '';
+        div.style.top = '';
+        div.style.width = '';
+        div.style.height = '';
+      } else {
+        // 通常の自由配置の場合は、今まで通りの絶対配置
+        div.className = `absolute cursor-move overflow-visible group`;
+        div.dataset.itemType = 'icon';
+        const pos = getNextSpawnPos(120, 180);
+        div.style.left = `${pos.x}px`;
+        div.style.top = `${pos.y}px`;
+        // 記憶されたサイズを適用
+        div.style.width = `${lastIconSize.w}px`;
+        div.style.height = `${lastIconSize.h}px`;
+      }
+
+      // 初期の描画スケール計算
+      const initialScale = isGridMode ? 1 : (lastIconSize.w / 75);
       
+      // グリッドモード時のみ、個別に削除できる「×」ボタンを追加（削除して空になったらガイドを再表示する）
+      const deleteBtnHtml = isGridMode ? `<button onclick="const p = this.parentElement; const g = p.closest('.icon-grid-container'); p.remove(); if(g && g.querySelector('.grid-inner').children.length === 0){ g.querySelector('.empty-grid-msg').style.display = 'flex'; } event.stopPropagation();" class="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center shadow font-bold text-[8px] opacity-0 group-hover:opacity-100 transition z-50 pointer-events-auto">×</button>` : '';
+
+      // 修正: absolute top-0 left-0 を追加し、親の枠や高さを圧迫せずにピッタリと追従するように変更
       div.innerHTML = `
-        <div class="icon-scale-wrapper w-[75px] h-[75px] origin-top-left pointer-events-none" style="transform: scale(${initialScale});">
+        <div class="icon-scale-wrapper absolute top-0 left-0 w-[75px] h-[75px] origin-top-left pointer-events-none" style="transform: scale(${initialScale});">
           <div class="w-full h-full flex flex-col items-center justify-between p-1.5 ${bgClass} border-[2.5px] border-slate-900 rounded-2xl transition duration-150 group-hover:scale-105">
             <div class="flex items-center justify-center w-full h-[46px] overflow-visible select-none pointer-events-none">
               ${svgContent}
@@ -2365,21 +2509,40 @@
             <span class="text-[8.5px] font-black tracking-widest text-slate-900 text-center leading-none select-none w-full block mt-0.5 whitespace-nowrap overflow-visible">${labelText}</span>
           </div>
         </div>
+        ${deleteBtnHtml}
       `;
 
-      // 変更点3：親要素のリサイズを監視し、中身全体を自動で拡大縮小させる処理を追加
+      // 親要素のリサイズを監視し、中身全体を自動で拡大縮小させる処理
       const scaleWrapper = div.querySelector('.icon-scale-wrapper');
       const ro = new ResizeObserver(entries => {
         for (let entry of entries) {
           const currentW = entry.contentRect.width;
-          const scale = currentW / 75; // 初期サイズ(75px)に対する現在の倍率
-          scaleWrapper.style.transform = `scale(${scale})`;
+          if (currentW > 0) {
+            const scale = currentW / 75; // 初期サイズ(75px)に対する現在の倍率
+            scaleWrapper.style.transform = `scale(${scale})`;
+          }
         }
       });
       ro.observe(div);
 
-      setupCanvasItemInteractions(div);
-      showToast(`「${type}」アイコンを配置しました。`);
+      if (isGridMode) {
+        targetContainer.appendChild(div);
+        targetGrid.style.height = 'auto'; // 親の枠が中身に合わせて伸びるようにheightをリセット
+        
+        // ガイドメッセージを非表示にする
+        const msg = targetGrid.querySelector('.empty-grid-msg');
+        if (msg) msg.style.display = 'none';
+
+        // 枠が未選択状態だったら、操作しやすくするため自動的に選択状態に戻す
+        if (selectedCanvasItem !== targetGrid) {
+           selectCanvasItem(targetGrid);
+        }
+
+        showToast(`枠内に「${type}」を追加しました。`);
+      } else {
+        setupCanvasItemInteractions(div);
+        showToast(`「${type}」アイコンを自由に配置しました。`);
+      }
     }
 
     // PDFドロップ連携
@@ -2536,7 +2699,12 @@
         const newTop = currentTop - (newH - currentH) / 2;
         
         el.style.width = `${newW}px`;
-        el.style.height = `${newH}px`;
+        // 修正: アイコン整列枠の場合は高さを自動調整(auto)に保ち、中身のはみ出しを防ぐ
+        if (el.dataset.itemType === 'icon-grid') {
+          el.style.height = 'auto';
+        } else {
+          el.style.height = `${newH}px`;
+        }
         el.style.left = `${newLeft}px`;
         el.style.top = `${newTop}px`;
 
@@ -2619,7 +2787,12 @@
             }
 
             selectedCanvasItem.style.width = `${newW}px`;
-            selectedCanvasItem.style.height = `${newH}px`;
+            // 修正: アイコン整列枠の場合はリサイズ時も高さを自動調整(auto)に保つ
+            if (selectedCanvasItem.dataset.itemType === 'icon-grid') {
+              selectedCanvasItem.style.height = 'auto';
+            } else {
+              selectedCanvasItem.style.height = `${newH}px`;
+            }
             selectedCanvasItem.style.left = `${newX}px`;
             selectedCanvasItem.style.top = `${newY}px`;
 
@@ -2972,6 +3145,12 @@
       canvasEl.style.transform = 'none';
       wrapper.style.height = 'auto';
 
+      // 追加: アイコン整列枠を印刷に映らないよう透明化
+      const grids = document.querySelectorAll('.icon-grid-container');
+      grids.forEach(g => {
+        g.classList.add('!border-transparent', '!bg-transparent');
+      });
+
       setTimeout(() => {
         html2canvas(canvasEl, {
           scale: 3.5, 
@@ -2982,6 +3161,10 @@
         }).then(canvas => {
           canvasEl.style.transform = originalTransform;
           wrapper.style.height = originalHeight;
+          
+          grids.forEach(g => {
+            g.classList.remove('!border-transparent', '!bg-transparent');
+          });
 
           try {
             const imgData = canvas.toDataURL('image/jpeg', 1.0);
@@ -3006,6 +3189,9 @@
           console.error(err);
           canvasEl.style.transform = originalTransform;
           wrapper.style.height = originalHeight;
+          grids.forEach(g => {
+            g.classList.remove('!border-transparent', '!bg-transparent');
+          });
           showToast("PDFの生成に失敗しました。");
         });
       }, 100);
