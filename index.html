@@ -796,7 +796,7 @@
             <div id="theme-header-border" class="absolute bottom-0 left-0 right-0 h-[6px] bg-amber-400 z-50 pointer-events-none transition-colors duration-300"></div>
 
             <!-- キャッチコピーブロック -->
-            <div id="header-catch-block" class="flex items-center justify-between min-h-[32px] overflow-visible transition-colors duration-300">
+            <div id="header-catch-block" class="flex items-center justify-between min-h-[32px] overflow-visible transition-colors duration-300 relative z-30">
               <div id="canvas-catch" class="text-[18px] font-black text-white truncate max-w-full leading-normal tracking-wider overflow-visible pb-1 pt-0.5">
                 ★駅チカ徒歩3分！陽当たり抜群 of 南向き角部屋フルリノベマンション★
               </div>
@@ -805,7 +805,7 @@
             <!-- ヘッダーメイン -->
             <div class="flex justify-between items-stretch h-[85px] w-full gap-x-2 relative z-20">
               <!-- 物件名ブロック -->
-              <div id="header-title-block" class="flex-1 min-w-0 pr-3 flex flex-col justify-center overflow-visible transition-colors duration-300">
+              <div id="header-title-block" class="flex-1 min-w-0 pr-3 flex flex-col justify-center overflow-visible transition-colors duration-300 relative z-40">
                 <!-- 修正: break-words を whitespace-nowrap に変更 -->
                 <h2 id="canvas-title" class="text-[36px] font-black text-white leading-[1.2] font-rounded whitespace-nowrap text-left w-full overflow-visible">
                   テクノハイツ代々木 402号室
@@ -1037,12 +1037,26 @@
       // 一旦ベースサイズにリセット
       titleEl.style.fontSize = '36px';
 
+      // 正確な幅と高さを計算するため一時的にスタイル変更
+      const origWidth = titleEl.style.width;
+      titleEl.style.width = 'max-content';
+
       let fontSize = 36;
-      // コンテナの横幅を超えるか、縦幅（メインヘッダーの高さ85px）を超える場合は1pxずつ縮小
-      while ((titleEl.scrollWidth > containerEl.clientWidth || titleEl.scrollHeight > 85) && fontSize > 10) {
+      // 親コンテナの実質幅（pr-3=12pxを考慮）
+      const maxWidth = containerEl.clientWidth - 12;
+      
+      // 修正: 固定値ではなく「親コンテナの現在の実際の高さ」から安全マージンを引いて上限を計算
+      // これにより、他の要素に押しつぶされて枠が縮んでいても確実に枠内に収まります
+      const maxHeight = containerEl.clientHeight > 0 ? containerEl.clientHeight - 8 : 70;
+
+      // 横幅を超えるか、縦幅（高さ）が上限を超える場合は1pxずつ縮小
+      while ((titleEl.scrollWidth > maxWidth || titleEl.scrollHeight > maxHeight) && fontSize > 10) {
         fontSize -= 1;
         titleEl.style.fontSize = fontSize + 'px';
       }
+
+      // スタイルを元に戻す
+      titleEl.style.width = origWidth;
     }
 
     // 賃料の自動フォントサイズ調整
@@ -1320,16 +1334,17 @@
       watermark.innerHTML = '';
       
       if (headerTitleBlock) {
-        headerTitleBlock.className = "flex-1 min-w-0 pr-3 flex flex-col justify-center overflow-visible transition-colors duration-300";
+        headerTitleBlock.className = "flex-1 min-w-0 pr-3 flex flex-col justify-center overflow-visible transition-colors duration-300 relative z-40";
       }
       if (canvasTitle) {
         canvasTitle.style.removeProperty('color');
       }
       if (headerCatchBlock) {
-        headerCatchBlock.className = "flex items-center justify-between min-h-[32px] overflow-visible transition-colors duration-300";
+        headerCatchBlock.className = "flex items-center justify-between min-h-[32px] overflow-visible transition-colors duration-300 relative z-30";
       }
       if (canvasCatch) {
         canvasCatch.style.removeProperty('color');
+        canvasCatch.style.removeProperty('padding-bottom');
       }
 
       // --- グラデーション 10種類 ---
@@ -1604,12 +1619,15 @@
         if (headerBorder) headerBorder.classList.add('bg-red-600');
         footerBg.classList.add('bg-white', 'border-t-[5px]', 'border-red-600');
         
-        // キャッチコピー背景をネイビーブルー
+        // キャッチコピー背景を赤に変更し、配置を上部に寄せる（文字見切れ防止のため下部余白も確保）
         if (headerCatchBlock) {
-          headerCatchBlock.classList.add('bg-blue-900', '-mx-3.5', 'px-3.5', '-mt-2', 'pt-2');
+          headerCatchBlock.classList.add('bg-red-600', '-mx-3.5', 'px-3.5', '-mt-2', 'pt-1.5', 'pb-2');
+          headerCatchBlock.classList.remove('items-center');
+          headerCatchBlock.classList.add('items-start');
         }
         if (canvasCatch) {
           canvasCatch.style.setProperty('color', '#ffffff', 'important');
+          canvasCatch.style.setProperty('padding-bottom', '8px', 'important');
         }
 
         // ヘッダー物件名のみネイビーブルー
@@ -1620,9 +1638,9 @@
           canvasTitle.style.setProperty('color', '#ffffff', 'important');
         }
 
-        // 帯の背景をネイビーブルー
+        // 帯の背景をホワイトグレーに変更
         subBar.classList.remove('bg-stone-950/40');
-        subBar.classList.add('bg-blue-900');
+        subBar.classList.add('bg-slate-200');
 
         // フッターは白背景にグレー文字
         if (footerLeft) footerLeft.className = "col-span-9 border-r border-slate-300 pr-3 flex items-center gap-3 relative overflow-hidden text-slate-800";
@@ -1635,7 +1653,7 @@
         if (adLabel) adLabel.className = "text-[8px] text-slate-500 font-bold scale-90 leading-none mb-0.5";
         if (taiyouBg) taiyouBg.className = "bg-slate-50 border border-slate-200 rounded py-1.5 leading-none flex flex-col justify-center";
 
-        subLabels.forEach(el => { el.className = "sub-label text-blue-200 font-bold mr-0.5"; });
+        subLabels.forEach(el => { el.className = "sub-label text-slate-500 font-bold mr-0.5"; });
         if (locationBadge) locationBadge.className = "bg-slate-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
         
         watermark.innerHTML = `<i data-lucide="flag" class="w-[300px] h-[300px] text-slate-100"></i>`;
@@ -1873,14 +1891,10 @@
       }
       
       // 白・ライトグレー時の文字色反転制御
-      if (color === 'grad-silver' || color === 'grad-iceblue' || color === 'grad-mint' || color === 'grad-champagne') {
+      if (color === 'grad-silver' || color === 'grad-iceblue' || color === 'grad-mint' || color === 'grad-champagne' || color === 'grad-tricolor') {
         headerBg.classList.add('theme-light');
         footerBg.classList.add('theme-light');
         subBar.classList.add('theme-light');
-      } else if (color === 'grad-tricolor') {
-        headerBg.classList.add('theme-light');
-        footerBg.classList.add('theme-light');
-        subBar.classList.remove('theme-light');
       } else {
         headerBg.classList.remove('theme-light');
         footerBg.classList.remove('theme-light');
