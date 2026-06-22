@@ -1928,7 +1928,7 @@
         subBar.classList.remove('theme-light');
       }
 
-      // --- 追加: 透過PNGロゴの動的色替え処理 ---
+      // --- 修正: 透過PNGロゴの動的色替え処理（CSSフィルターを併用して確実に反転させる） ---
       const customLogo = document.getElementById('footer-custom-logo');
       if (customLogo) {
         const originalSrc = customLogo.getAttribute('data-original-src') || 'logo.png';
@@ -1939,29 +1939,47 @@
         // 白・ライトグレー系（明るいテーマ）かどうかを判定
         const isLightTheme = (color === 'grad-silver' || color === 'grad-iceblue' || color === 'grad-mint' || color === 'grad-champagne' || color === 'grad-tricolor');
 
-        // 明るいテーマの時は「黒（濃いグレー）」、暗いテーマの時は「白」で確実に塗りつぶす
+        // 明るいテーマの時は「黒（濃いグレー）」、暗いテーマの時は「白」で塗りつぶす
         const targetColor = isLightTheme ? '#1e293b' : '#ffffff';
 
+        // 1. 保険として、CSSフィルターで強制的に色を反転させる (システム制限でCanvasが使えなかった時用)
+        if (isLightTheme) {
+          customLogo.style.filter = 'brightness(0)'; // 真っ黒にする
+        } else {
+          customLogo.style.filter = 'brightness(0) invert(1)'; // 真っ白にする
+        }
+
         const img = new Image();
-        img.crossOrigin = 'anonymous'; // GitHub等でのCORSエラー回避
+        // セキュリティエラー（CORS制限）を防ぐため、外部URLの場合のみ設定を付与
+        if (originalSrc.startsWith('http') && !originalSrc.includes(window.location.host)) {
+          img.crossOrigin = 'anonymous';
+        }
+        
         img.onload = function() {
           const canvas = document.createElement('canvas');
           canvas.width = img.width;
           canvas.height = img.height;
+          if(canvas.width === 0) return;
+          
           const ctx = canvas.getContext('2d');
           
-          // 1. まず元のロゴ画像を描画
+          // 元画像を描画
           ctx.drawImage(img, 0, 0);
           
-          // 2. 透明でない部分（文字やアイコンのシルエット）の上から、指定した色で塗りつぶす
+          // 透明でない部分を塗りつぶす
           ctx.globalCompositeOperation = 'source-in';
           ctx.fillStyle = targetColor;
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           
           try {
-            customLogo.src = canvas.toDataURL('image/png');
+            // 画像の変換に成功した場合
+            const dataUrl = canvas.toDataURL('image/png');
+            customLogo.src = dataUrl;
+            // 変換成功時は、色が二重に反転しないようCSSフィルターを解除する
+            customLogo.style.filter = 'none';
           } catch (e) {
-            console.error("ロゴの色替えに失敗しました:", e);
+            console.warn("セキュリティ制限によりCanvasでの色替えがブロックされました。CSSフィルターで代用します。", e);
+            // 失敗時は元の画像を読み込み、CSSフィルターによって白黒反転させる
             customLogo.src = originalSrc;
           }
         };
