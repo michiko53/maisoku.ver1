@@ -312,10 +312,6 @@
           </h3>
           <div class="grid grid-cols-2 gap-3">
             <div>
-              <label class="block text-xs text-slate-400 mb-1 font-semibold">AD（広告料割合）</label>
-              <input type="text" id="input-ad" oninput="syncText('ad', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition" value="AD 100%">
-            </div>
-            <div>
               <label class="block text-xs text-slate-400 mb-1 font-semibold">取引態様</label>
               <input type="text" id="input-taiyou" oninput="syncText('taiyou', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition" value="媒介 (客付100%)">
             </div>
@@ -324,7 +320,7 @@
               <textarea id="input-footer-note" oninput="syncText('footer-note', this.value)" rows="2" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition resize-none">図面と現況が異なる場合は現況を優先します。</textarea>
             </div>
             <div class="col-span-2">
-              <label class="block text-xs text-slate-400 mb-1 font-semibold">掲載日 (作成日)</label>
+              <label class="block text-xs text-slate-400 mb-1 font-semibold">広告有効期限</label>
               <input type="text" id="input-pub-date" oninput="syncText('pub-date', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition" value="">
             </div>
           </div>
@@ -878,32 +874,40 @@
             
             <!-- 左9/12: お問合せ情報 -->
             <div id="footer-left" class="col-span-9 border-r border-white/20 pr-3 flex items-center gap-3 relative overflow-hidden">
-              <div id="footer-obi-html" class="flex items-center gap-3 w-full">
-                <div id="footer-logo-bg" class="p-2.5 bg-emerald-950/60 rounded-lg flex items-center justify-center shrink-0 shadow">
-                  <i id="footer-logo-icon" data-lucide="home" class="w-7 h-7 text-white"></i>
-                </div>
-                <div class="space-y-1 min-w-0">
-                  <div id="footer-label-text" class="text-[9px] font-bold text-amber-300 leading-none">お問合せ管理元</div>
-                  <div class="flex items-baseline gap-x-3 flex-wrap leading-none">
-                    <span class="text-base font-black font-rounded text-white whitespace-nowrap justify-start">株式会社テクノホーム</span>
-                    <span class="text-[9px] font-normal text-white/70 font-sans leading-none whitespace-nowrap bg-black/20 px-1.5 py-0.5 rounded">国土交通大臣（3）第8627号</span>
+              <div id="footer-obi-html" class="flex items-center justify-between gap-3 w-full">
+                
+                <!-- 会社情報ブロック（左側） -->
+                <div class="flex items-center gap-3 min-w-0">
+                  <div id="footer-logo-bg" class="p-2.5 bg-emerald-950/60 rounded-lg flex items-center justify-center shrink-0 shadow">
+                    <i id="footer-logo-icon" data-lucide="home" class="w-7 h-7 text-white"></i>
                   </div>
-                  <div class="flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-white/95 font-mono leading-none pt-0.5">
-                    <span class="flex items-end gap-1.5"><i id="footer-phone-icon" data-lucide="phone" class="w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]"></i> <strong class="text-white align-bottom leading-none">03-6808-3031</strong></span>
-                    <span class="flex items-end gap-1.5"><i id="footer-mail-icon" data-lucide="mail" class="w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]"></i> <span class="text-white align-bottom leading-none">chintai@techno-home.jp</span></span>
-                    <span class="flex items-end gap-1.5"><i id="footer-map-icon" data-lucide="map-pin" class="w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]"></i> <span class="text-white align-bottom leading-none">〒134-0084 東京都江戸川区東葛西6-4-17 ELLEPLAN1階</span></span>
+                  <div class="space-y-1 min-w-0">
+                    <div id="footer-label-text" class="text-[9px] font-bold text-amber-300 leading-none">お問合せ管理元</div>
+                    <div class="flex items-baseline gap-x-3 flex-wrap leading-none">
+                      <span class="text-base font-black font-rounded text-white whitespace-nowrap justify-start">株式会社テクノホーム</span>
+                      <span class="text-[9px] font-normal text-white/70 font-sans leading-none whitespace-nowrap bg-black/20 px-1.5 py-0.5 rounded">国土交通大臣（3）第8627号</span>
+                    </div>
+                    <div class="flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-white/95 font-mono leading-none pt-0.5">
+                      <span class="flex items-end gap-1.5"><i id="footer-phone-icon" data-lucide="phone" class="w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]"></i> <strong class="text-white align-bottom leading-none">03-6808-3031</strong></span>
+                      <span class="flex items-end gap-1.5"><i id="footer-mail-icon" data-lucide="mail" class="w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]"></i> <span class="text-white align-bottom leading-none">chintai@techno-home.jp</span></span>
+                      <span class="flex items-end gap-1.5"><i id="footer-map-icon" data-lucide="map-pin" class="w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]"></i> <span class="text-white align-bottom leading-none">〒134-0084 東京都江戸川区東葛西6-4-17 ELLEPLAN1階</span></span>
+                    </div>
                   </div>
                 </div>
+
+                <!-- 修正: PDF出力に対応するため、画像(logo.png)を読み込むタグに変更 -->
+                <div class="w-[210px] shrink-0 pointer-events-auto translate-x-2">
+                  <!-- GitHubにアップロードした logo.png をここで読み込みます -->
+                  <img src="logo.png" alt="テクノホームロゴ" class="w-full h-auto rounded-[4px]" style="box-shadow: 0 2px 8px 0 rgba(0,0,0,0.2);">
+                </div>
+
               </div>
             </div>
 
             <!-- 右3/12: AD割合・掲載日等 -->
             <div id="footer-right" class="col-span-3 flex flex-col justify-between pl-2">
               <div class="grid grid-cols-2 gap-1.5 text-center">
-                <div id="footer-ad-bg" class="bg-emerald-950/80 border border-emerald-800/80 rounded py-1.5 leading-none flex flex-col justify-center">
-                  <div id="footer-ad-label" class="text-[8px] text-emerald-400 font-bold scale-90 leading-none mb-0.5">広告料</div>
-                  <div id="canvas-ad" class="text-[10px] text-white font-black leading-none mt-1">AD 100%</div>
-                </div>
+                <div></div>
                 <div id="footer-taiyou-bg" class="bg-black/40 border border-white/10 rounded py-1.5 leading-none flex flex-col justify-center">
                   <div class="text-[8px] text-white/70 font-bold scale-90 leading-none mb-0.5">取引態様</div>
                   <div id="canvas-taiyou" class="text-[9.5px] text-white font-bold leading-none mt-1 break-all px-0.5">媒介</div>
@@ -914,7 +918,7 @@
                   図面と現況が異なる場合は現況を優先します。
                 </div>
                 <div id="canvas-pub-date" class="text-[10px] font-bold text-white font-mono whitespace-nowrap leading-normal mt-1 pb-0.5">
-                  掲載日：2026年6月6日
+                  広告有効期限：
                 </div>
               </div>
             </div>
@@ -1002,7 +1006,7 @@
         } else if (targetId === 'menseki') {
           displayEl.innerHTML = formatArea(val);
         } else if (targetId === 'pub-date') {
-          displayEl.innerHTML = '掲載日：' + val;
+          displayEl.innerHTML = '広告有効期限：' + val;
         } else if (targetId === 'title') {
           // 追加・修正: 物件名の場合はスペース（半角・全角）を確実に改行タグに変換する
           displayEl.innerHTML = val.replace(/[ 　]+/g, '<br>').replace(/\n/g, '<br>');
@@ -1116,15 +1120,16 @@
 
     // 初期起動時同期
     function initInputs() {
-      // 掲載日に本日の日付を自動設定
+      // 広告有効期限に作成日（本日）から14日後の日付を自動設定
       const pubDateInput = document.getElementById('input-pub-date');
       if (pubDateInput) {
-        const today = new Date();
-        pubDateInput.value = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`;
+        const targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() + 14);
+        pubDateInput.value = `${targetDate.getFullYear()}年${targetDate.getMonth() + 1}月${targetDate.getDate()}日`;
       }
 
       const inputs = [
-        'catch', 'title', 'price', 'kanri', 'shikikin', 'reikin', 'madori-text', 'menseki', 'address', 'access', 'ad', 'taiyou', 'footer-note', 'pub-date'
+        'catch', 'title', 'price', 'kanri', 'shikikin', 'reikin', 'madori-text', 'menseki', 'address', 'access', 'taiyou', 'footer-note', 'pub-date'
       ];
       inputs.forEach(id => {
         const inputEl = document.getElementById(`input-${id}`);
@@ -1252,11 +1257,12 @@
       lastIconSize = { w: 75, h: 75 };
       lastAppealSize = { w: 180, h: 45 };
 
-      // 追加：掲載日（作成日）を本日の日付にリセット
+      // 追加：広告有効期限を本日の14日後の日付にリセット
       const pubDateInput = document.getElementById('input-pub-date');
       if (pubDateInput) {
-        const today = new Date();
-        pubDateInput.value = `${today.getFullYear()}年${today.getMonth() + 1}月${today.getDate()}日`;
+        const targetDate = new Date();
+        targetDate.setDate(targetDate.getDate() + 14);
+        pubDateInput.value = `${targetDate.getFullYear()}年${targetDate.getMonth() + 1}月${targetDate.getDate()}日`;
         syncText('pub-date', pubDateInput.value);
       }
 
@@ -1290,9 +1296,31 @@
       else if (fontType === 'yuji') fontFamilyStr = "'Yuji Syuku', serif";
       else if (fontType === 'kaisei') fontFamilyStr = "'Kaisei Decol', serif";
 
-      document.getElementById('canvas-title').style.fontFamily = fontFamilyStr;
-      document.getElementById('canvas-price').style.fontFamily = fontFamilyStr;
-      document.getElementById('canvas-madori-text').style.fontFamily = fontFamilyStr;
+      const targetIds = [
+        'canvas-title', 
+        'canvas-price', 
+        'canvas-madori-text', 
+        'canvas-catch', 
+        'theme-sub-bar', 
+        'theme-footer-bg'
+      ];
+
+      targetIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+          el.style.setProperty('font-family', fontFamilyStr, 'important');
+          // 敷金・礼金・面積の帯とフッター内のすべての文字に選択したフォントを強制適用
+          if (id === 'theme-sub-bar' || id === 'theme-footer-bg') {
+            const children = el.querySelectorAll('*');
+            children.forEach(child => {
+              // アイコンの描画要素には影響させない
+              if (!['svg', 'path', 'line', 'circle', 'rect'].includes(child.tagName.toLowerCase())) {
+                child.style.setProperty('font-family', 'inherit', 'important');
+              }
+            });
+          }
+        }
+      });
       
       setTimeout(adjustTitleFontSize, 10);
       setTimeout(adjustAccessFontSize, 10);
