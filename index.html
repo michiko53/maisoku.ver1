@@ -895,10 +895,9 @@
                   </div>
                 </div>
 
-                <!-- 修正: PDF出力に対応するため、画像(logo.png)を読み込むタグに変更 -->
-                <div class="w-[210px] shrink-0 pointer-events-auto translate-x-2">
-                  <!-- GitHubにアップロードした logo.png をここで読み込みます -->
-                  <img src="logo.png" alt="テクノホームロゴ" class="w-full h-auto rounded-[4px]" style="box-shadow: 0 2px 8px 0 rgba(0,0,0,0.2);">
+                <!-- 修正: ロゴ画像がフッターの高さに綺麗に収まるように調整 -->
+                <div class="w-[210px] shrink-0 pointer-events-auto translate-x-2 flex items-center justify-end h-[50px]">
+                  <img src="logo.png" alt="テクノホームロゴ" class="max-w-full h-full object-contain drop-shadow-sm rounded-[4px]">
                 </div>
 
               </div>
@@ -1928,7 +1927,57 @@
         footerBg.classList.remove('theme-light');
         subBar.classList.remove('theme-light');
       }
-      
+
+      // --- 追加: 透過PNGロゴの動的色替え処理 ---
+      const customLogo = document.getElementById('footer-custom-logo');
+      if (customLogo) {
+        const originalSrc = customLogo.getAttribute('data-original-src') || 'logo.png';
+        if (!customLogo.hasAttribute('data-original-src')) {
+          customLogo.setAttribute('data-original-src', originalSrc);
+        }
+
+        // 各テーマごとの「同系色かつ目立つ色（主にアクセントカラー）」のカラーコード定義
+        const logoColorMap = {
+          'amber': '#fcd34d', 'blue': '#93c5fd', 'emerald': '#6ee7b7', 'rose': '#fda4af', 'slate': '#cbd5e1',
+          'grad-gold': '#facc15', 'grad-navy': '#93c5fd', 'grad-burgundy': '#fda4af', 'grad-forest': '#6ee7b7', 'grad-bronze': '#fdba74',
+          'grad-silver': '#64748b', 'grad-iceblue': '#0284c7', 'grad-mint': '#059669', 'grad-champagne': '#d97706', 'grad-tricolor': '#64748b',
+          'solid-blue': '#93c5fd', 'solid-emerald': '#6ee7b7', 'solid-amber': '#fcd34d', 'solid-slate': '#cbd5e1', 'solid-black': '#d4d4d8',
+          'solid-red': '#fca5a5', 'solid-navy': '#93c5fd', 'solid-teal': '#5eead4', 'solid-orange': '#fdba74', 'solid-indigo': '#a5b4fc',
+          'solid-light-yellow': '#fef08a', 'solid-dusty-pink': '#fecdd3'
+        };
+
+        const targetColor = logoColorMap[color] || '#ffffff';
+
+        const img = new Image();
+        img.crossOrigin = 'anonymous'; // GitHub等でのCORSエラー回避
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          
+          // 1. まず元のロゴ画像を描画
+          ctx.drawImage(img, 0, 0);
+          
+          // 2. 透明でない部分（文字やアイコンのシルエット）の上から、指定した色で塗りつぶす
+          ctx.globalCompositeOperation = 'source-in';
+          ctx.fillStyle = targetColor;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          
+          try {
+            customLogo.src = canvas.toDataURL('image/png');
+          } catch (e) {
+            console.error("ロゴの色替えに失敗しました:", e);
+            customLogo.src = originalSrc;
+          }
+        };
+        img.onerror = function() {
+          customLogo.src = originalSrc; // 読み込み失敗時はそのまま
+        };
+        img.src = originalSrc;
+      }
+      // --- 追加ここまで ---
+
       lucide.createIcons();
     }
 
