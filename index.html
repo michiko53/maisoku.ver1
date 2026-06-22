@@ -1936,17 +1936,19 @@
           customLogo.setAttribute('data-original-src', originalSrc);
         }
 
-        // 各テーマごとの「同系色かつ目立つ色（主にアクセントカラー）」のカラーコード定義
-        const logoColorMap = {
-          'amber': '#fcd34d', 'blue': '#93c5fd', 'emerald': '#6ee7b7', 'rose': '#fda4af', 'slate': '#cbd5e1',
-          'grad-gold': '#facc15', 'grad-navy': '#93c5fd', 'grad-burgundy': '#fda4af', 'grad-forest': '#6ee7b7', 'grad-bronze': '#fdba74',
-          'grad-silver': '#64748b', 'grad-iceblue': '#0284c7', 'grad-mint': '#059669', 'grad-champagne': '#d97706', 'grad-tricolor': '#64748b',
-          'solid-blue': '#93c5fd', 'solid-emerald': '#6ee7b7', 'solid-amber': '#fcd34d', 'solid-slate': '#cbd5e1', 'solid-black': '#d4d4d8',
-          'solid-red': '#fca5a5', 'solid-navy': '#93c5fd', 'solid-teal': '#5eead4', 'solid-orange': '#fdba74', 'solid-indigo': '#a5b4fc',
-          'solid-light-yellow': '#fef08a', 'solid-dusty-pink': '#fecdd3'
+        // 白・ライトグレー系（明るいテーマ）かどうかを判定
+        const isLightTheme = (color === 'grad-silver' || color === 'grad-iceblue' || color === 'grad-mint' || color === 'grad-champagne' || color === 'grad-tricolor');
+
+        // 明るいテーマの時だけ専用の濃い色を使い、暗いテーマ（白系以外）の時は見えなくならないよう全て「白（#ffffff）」にする
+        const lightThemeColors = {
+          'grad-silver': '#475569',   // 濃いスレートグレー
+          'grad-iceblue': '#0284c7',  // 濃いスカイブルー
+          'grad-mint': '#059669',     // 濃いエメラルド
+          'grad-champagne': '#d97706',// 濃いアンバー
+          'grad-tricolor': '#334155'  // 濃いネイビーグレー
         };
 
-        const targetColor = logoColorMap[color] || '#ffffff';
+        const targetColor = isLightTheme ? lightThemeColors[color] : '#ffffff';
 
         const img = new Image();
         img.crossOrigin = 'anonymous'; // GitHub等でのCORSエラー回避
