@@ -1928,7 +1928,7 @@
         subBar.classList.remove('theme-light');
       }
 
-      // --- 修正: 透過PNGロゴの動的色替え処理（CSSフィルターを併用して確実に反転させる） ---
+      // --- 修正: 透過PNGロゴの動的色替え処理 ---
       const customLogo = document.getElementById('footer-custom-logo');
       if (customLogo) {
         const originalSrc = customLogo.getAttribute('data-original-src') || 'logo.png';
@@ -1936,22 +1936,23 @@
           customLogo.setAttribute('data-original-src', originalSrc);
         }
 
-        // 白・ライトグレー系（明るいテーマ）かどうかを判定
+        // 指定された5つのテーマカラー（白系）かどうかを判定
         const isLightTheme = (color === 'grad-silver' || color === 'grad-iceblue' || color === 'grad-mint' || color === 'grad-champagne' || color === 'grad-tricolor');
 
-        // 明るいテーマの時は「黒（濃いグレー）」、暗いテーマの時は「白」で塗りつぶす
-        const targetColor = isLightTheme ? '#1e293b' : '#ffffff';
+        // ★ご要望の通り、5色の時は「黒（#000000）」、それ以外の時は「白（#ffffff）」にする
+        const targetColor = isLightTheme ? '#000000' : '#ffffff';
 
-        // 1. 保険として、CSSフィルターで強制的に色を反転させる (システム制限でCanvasが使えなかった時用)
+        // プレビュー用にCSSフィルターを適用 (システム制限でCanvasが使えなかった時の保険)
         if (isLightTheme) {
-          customLogo.style.filter = 'brightness(0)'; // 真っ黒にする
+          customLogo.style.filter = 'brightness(0)'; // 黒くする
         } else {
-          customLogo.style.filter = 'brightness(0) invert(1)'; // 真っ白にする
+          customLogo.style.filter = 'brightness(0) invert(1)'; // 白くする
         }
 
         const img = new Image();
-        // セキュリティエラー（CORS制限）を防ぐため、外部URLの場合のみ設定を付与
-        if (originalSrc.startsWith('http') && !originalSrc.includes(window.location.host)) {
+        
+        // 外部URLの場合のみCORS対策を行う（「logo.png」のように同じ場所にあるファイルの場合はエラーを防ぐため付与しない）
+        if (originalSrc.startsWith('http')) {
           img.crossOrigin = 'anonymous';
         }
         
@@ -1972,21 +1973,22 @@
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           
           try {
-            // 画像の変換に成功した場合
+            // PDFに出力できるよう、Canvasで作成した画像をセットする
             const dataUrl = canvas.toDataURL('image/png');
             customLogo.src = dataUrl;
-            // 変換成功時は、色が二重に反転しないようCSSフィルターを解除する
+            // 変換に成功した場合は二重反転を防ぐためCSSフィルターを解除
             customLogo.style.filter = 'none';
           } catch (e) {
-            console.warn("セキュリティ制限によりCanvasでの色替えがブロックされました。CSSフィルターで代用します。", e);
-            // 失敗時は元の画像を読み込み、CSSフィルターによって白黒反転させる
+            console.warn("Canvasでの色替えがブロックされました:", e);
             customLogo.src = originalSrc;
           }
         };
         img.onerror = function() {
-          customLogo.src = originalSrc; // 読み込み失敗時はそのまま
+          customLogo.src = originalSrc;
         };
-        img.src = originalSrc;
+        
+        // 外部URLの場合のみキャッシュ回避パラメータをつける
+        img.src = originalSrc.startsWith('http') ? originalSrc + '?v=' + new Date().getTime() : originalSrc;
       }
       // --- 追加ここまで ---
 
