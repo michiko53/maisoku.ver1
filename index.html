@@ -5,125 +5,41 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>マイソク作成 - 不動産マイソク作成・帯替えツール</title>
   
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- Google Fonts for rich themes -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Kaisei+Decol:wght@400;700&family=Klee+One:wght@600&family=M+PLUS+Rounded+1c:wght@400;700;900&family=Noto+Sans+JP:wght@400;500;700;900&family=Noto+Serif+JP:wght@500;700;900&family=Yuji+Syuku&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap" rel="stylesheet">
-  
-  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  
-  <!-- html2canvas & jspdf (CDN) for High Quality Export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <!-- PDF.js (Mozilla) for Direct PDF Drag & Drop Decoding -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
   <script>
     tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Noto Sans JP', 'sans-serif'],
-            rounded: ['M PLUS Rounded 1c', 'sans-serif'],
-            serif: ['Noto Serif JP', 'serif'],
-          }
-        }
-      }
+      theme: { extend: { fontFamily: { sans: ['Noto Sans JP', 'sans-serif'], rounded: ['M PLUS Rounded 1c', 'sans-serif'], serif: ['Noto Serif JP', 'serif'] } } }
     }
   </script>
 
   <style>
-    /* A4 横 規格 (297mm x 210mm) の比率を再現するキャンバスベース設定 */
-    .mysoku-canvas-container {
-      width: 1000px;
-      height: 707px; /* A4比率 1 : 0.707 */
-      position: relative;
-      overflow: hidden;
-      background-color: #ffffff;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    }
+    .mysoku-canvas-container { width: 1000px; height: 707px; position: relative; overflow: hidden; background-color: #ffffff; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); }
+    .crop-box { border: 2px dashed #ef4444; background-color: rgba(239, 68, 68, 0.15); position: absolute; cursor: move; }
+    .crop-handle { width: 12px; height: 12px; background-color: #ef4444; border: 2px solid white; border-radius: 50%; position: absolute; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f1f1; }
+    ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
+    .canvas-item-active { outline: 2px solid #3b82f6 !important; }
+    .inline-menu-btn, .resize-handle { display: none !important; }
+    .canvas-item-active .inline-menu-btn, .canvas-item-active .resize-handle { display: flex !important; }
+    #mysoku-canvas * { letter-spacing: normal !important; font-feature-settings: "palt" 0 !important; }
     
-    /* トリミング枠のインタラクション用 */
-    .crop-box {
-      border: 2px dashed #ef4444;
-      background-color: rgba(239, 68, 68, 0.15);
-      position: absolute;
-      cursor: move;
-    }
-    
-    .crop-handle {
-      width: 12px;
-      height: 12px;
-      background-color: #ef4444;
-      border: 2px solid white;
-      border-radius: 50%;
-      position: absolute;
-    }
-
-    /* スクロールバー装飾 */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #f1f1f1;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: #c1c1c1;
-      border-radius: 4px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: #a8a8a8;
-    }
-
-    /* キャンバス内の要素ドラッグ・アクティブ時の一時スタイル */
-    .canvas-item-active {
-      outline: 2px solid #3b82f6 !important;
-    }
-
-    /* 非選択時はリサイズハンドルや操作ボタンを100%確実に非表示にする */
-    .inline-menu-btn, .resize-handle {
-      display: none !important;
-    }
-    .canvas-item-active .inline-menu-btn, .canvas-item-active .resize-handle {
-      display: flex !important;
-    }
-
-    /* html2canvas書き出し時の文字のズレ・プロポーショナル幅重複バグを完全に根絶するための特別ルール */
-    #mysoku-canvas * {
-      letter-spacing: normal !important;
-      font-feature-settings: "palt" 0 !important; /* プロポーショナルメトリクスを無効化 */
-    }
-    
-    /* A4横の100%印刷用特別設定 */
     @media print {
-      body * {
-        visibility: hidden;
-      }
-      #print-area-wrapper, #print-area-wrapper * {
-        visibility: visible;
-      }
-      #print-area-wrapper {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100% !important;
-        height: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-      @page {
-        size: A4 landscape;
-        margin: 0;
-      }
+      body * { visibility: hidden; }
+      #print-area-wrapper, #print-area-wrapper * { visibility: visible; }
+      #print-area-wrapper { position: absolute; left: 0; top: 0; width: 100% !important; height: 100% !important; margin: 0 !important; padding: 0 !important; }
+      @page { size: A4 landscape; margin: 0; }
     }
 
-    /* 白系統・ライトグレー系統カラー選択時の文字・枠線反転用スタイル */
     #theme-header-bg.theme-light .text-white, #theme-footer-bg.theme-light .text-white { color: #1e293b !important; }
     #theme-header-bg.theme-light .text-white\/80, #theme-footer-bg.theme-light .text-white\/80 { color: rgba(30, 41, 59, 0.8) !important; }
     #theme-header-bg.theme-light .text-white\/90, #theme-footer-bg.theme-light .text-white\/90 { color: rgba(30, 41, 59, 0.9) !important; }
@@ -150,7 +66,6 @@
       </div>
     </div>
 
-    <!-- アクションボタン群 -->
     <div class="flex items-center space-x-3">
       <div class="flex items-center gap-2 bg-slate-900/50 rounded-lg p-1 border border-slate-700 shadow-inner">
         <div class="flex items-center gap-1.5 px-2">
@@ -206,10 +121,7 @@
           </select>
         </div>
       </div>
-
       <span class="h-6 w-px bg-slate-700 mx-2"></span>
-
-      <!-- PDF出力ボタン -->
       <button onclick="exportToPDF()" class="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white rounded-lg text-sm font-bold flex items-center gap-2 transition active:scale-95 shadow-lg shadow-indigo-600/20">
         <i data-lucide="download-cloud" class="w-4 h-4"></i>
         <span>極高画質PDF出力</span>
@@ -218,45 +130,42 @@
   </header>
 
   <div class="flex-1 flex overflow-hidden">
-    <!-- 左側サイドバー（コントロール、素材、帯替えツール等） -->
+    <!-- サイドバー -->
     <aside class="w-[420px] bg-slate-800/90 border-r border-slate-700 flex flex-col h-[calc(100vh-73px)] shrink-0 overflow-y-auto font-sans">
       
-      <!-- タブ切り替え -->
       <div class="flex border-b border-slate-700 sticky top-0 bg-slate-800 z-10">
         <button id="tab-btn-info" onclick="switchSidebarTab('info')" class="flex-1 py-3 px-4 text-center text-sm font-bold border-b-2 border-indigo-500 text-indigo-400 transition flex items-center justify-center gap-2">
           <i data-lucide="edit-3" class="w-4 h-4"></i> 物件情報
         </button>
         <button id="tab-btn-crop" onclick="switchSidebarTab('crop')" class="flex-1 py-3 px-4 text-center text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-2">
-          <i data-lucide="crop" class="w-4 h-4"></i> 帯替え・トリム
+          <i data-lucide="crop" class="w-4 h-4"></i> 帯替え・配置
         </button>
         <button id="tab-btn-stamp" onclick="switchSidebarTab('stamp')" class="flex-1 py-3 px-4 text-center text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-2">
-          <i data-lucide="sparkles" class="w-4 h-4"></i> アイコン・素材
+          <i data-lucide="sparkles" class="w-4 h-4"></i> アイコン等
         </button>
       </div>
 
       <!-- パネル1: 物件情報入力 -->
       <div id="panel-info" class="p-5 space-y-6">
         <div>
-          <h3 class="text-sm font-extrabold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-            <span class="w-1.5 h-3 bg-indigo-500 rounded-full"></span> ヘッダーメイン項目
-          </h3>
+          <h3 class="text-sm font-extrabold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-1.5"><span class="w-1.5 h-3 bg-indigo-500 rounded-full"></span> ヘッダーメイン項目</h3>
           <div class="grid grid-cols-1 gap-3">
             <div>
-              <label class="block text-xs text-slate-400 mb-1 font-semibold">アピールキャッチコピー（最上段小見出し）</label>
-              <input type="text" id="input-catch" oninput="syncText('catch', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition" value="★駅チカ徒歩3分！陽当たり抜群 of 南向き角部屋フルリノベマンション★">
+              <label class="block text-xs text-slate-400 mb-1 font-semibold">アピールキャッチコピー</label>
+              <input type="text" id="input-catch" oninput="syncText('catch', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500" value="★駅チカ徒歩3分！陽当たり抜群 of 南向き角部屋フルリノベマンション★">
             </div>
             <div>
               <label class="block text-xs text-slate-400 mb-1 font-semibold">物件名</label>
-              <input type="text" id="input-title" oninput="syncText('title', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-indigo-500 transition" value="テクノハイツ代々木 402号室">
+              <input type="text" id="input-title" oninput="syncText('title', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-indigo-500" value="テクノハイツ代々木 402号室">
             </div>
             <div class="grid grid-cols-2 gap-2">
               <div>
-                <label class="block text-xs text-slate-400 mb-1 font-semibold">賃料 (数字で自動カンマ)</label>
-                <input type="text" id="input-price" oninput="syncText('price', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-indigo-500 transition" value="145000円～150000">
+                <label class="block text-xs text-slate-400 mb-1 font-semibold">賃料</label>
+                <input type="text" id="input-price" oninput="syncText('price', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-indigo-500" value="145000円～150000">
               </div>
               <div>
-                <label class="block text-xs text-slate-400 mb-1 font-semibold">管理費・共益費 (半角数字のみ)</label>
-                <input type="text" id="input-kanri" oninput="syncText('kanri', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-indigo-500 transition" value="8000">
+                <label class="block text-xs text-slate-400 mb-1 font-semibold">管理費</label>
+                <input type="text" id="input-kanri" oninput="syncText('kanri', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-bold focus:outline-none focus:border-indigo-500" value="8000">
               </div>
             </div>
           </div>
@@ -265,172 +174,101 @@
         <hr class="border-slate-700">
 
         <div>
-          <h3 class="text-sm font-extrabold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-            <span class="w-1.5 h-3 bg-indigo-500 rounded-full"></span> ヘッダーサブ・諸条件
-          </h3>
+          <h3 class="text-sm font-extrabold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-1.5"><span class="w-1.5 h-3 bg-indigo-500 rounded-full"></span> ヘッダーサブ・諸条件</h3>
           <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs text-slate-400 mb-1 font-semibold">敷金</label>
-              <input type="text" id="input-shikikin" oninput="syncText('shikikin', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition" value="1ヶ月">
-            </div>
-            <div>
-              <label class="block text-xs text-slate-400 mb-1 font-semibold">礼金</label>
-              <input type="text" id="input-reikin" oninput="syncText('reikin', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition" value="1ヶ月">
-            </div>
-            <div>
-              <label class="block text-xs text-slate-400 mb-1 font-semibold">間取り</label>
-              <input type="text" id="input-madori-text" oninput="syncText('madori-text', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition" value="1LDK">
-            </div>
-            <div>
-              <label class="block text-xs text-slate-400 mb-1 font-semibold">専有面積 (数字で平米・坪自動算)</label>
-              <input type="text" id="input-menseki" oninput="syncText('menseki', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition" value="42.50" placeholder="例: 42.50">
-            </div>
-            <div class="col-span-2">
-              <label class="block text-xs text-slate-400 mb-1 font-semibold">交通アクセス</label>
-              <textarea id="input-access" oninput="syncText('access', this.value)" rows="2" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition resize-none">JR山手線「代々木」駅 徒歩3分&#10;都営大江戸線「代々木」駅 徒歩2分</textarea>
-            </div>
-            <div class="col-span-2">
-              <label class="block text-xs text-slate-400 mb-1 font-semibold">物件所在地</label>
-              <input type="text" id="input-address" oninput="syncText('address', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition" value="東京都渋谷区代々木1丁目XX-XX">
-            </div>
-            <div>
-              <label class="block text-xs text-slate-400 mb-1 font-semibold">構造・規模</label>
-              <input type="text" id="input-kouzou" oninput="syncText('kouzou', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition" value="RC造 10階建 / 4階部分">
-            </div>
-            <div>
-              <label class="block text-xs text-slate-400 mb-1 font-semibold">築年月</label>
-              <input type="text" id="input-chikunen" oninput="syncText('chikunen', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition" value="2018年3月築">
-            </div>
+            <div><label class="block text-xs text-slate-400 mb-1 font-semibold">敷金</label><input type="text" id="input-shikikin" oninput="syncText('shikikin', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-indigo-500" value="1ヶ月"></div>
+            <div><label class="block text-xs text-slate-400 mb-1 font-semibold">礼金</label><input type="text" id="input-reikin" oninput="syncText('reikin', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-indigo-500" value="1ヶ月"></div>
+            <div><label class="block text-xs text-slate-400 mb-1 font-semibold">間取り</label><input type="text" id="input-madori-text" oninput="syncText('madori-text', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-indigo-500" value="1LDK"></div>
+            <div><label class="block text-xs text-slate-400 mb-1 font-semibold">専有面積</label><input type="text" id="input-menseki" oninput="syncText('menseki', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-indigo-500" value="42.50"></div>
+            <div class="col-span-2"><label class="block text-xs text-slate-400 mb-1 font-semibold">交通アクセス</label><textarea id="input-access" oninput="syncText('access', this.value)" rows="2" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:border-indigo-500 resize-none">JR山手線「代々木」駅 徒歩3分&#10;都営大江戸線「代々木」駅 徒歩2分</textarea></div>
+            <div class="col-span-2"><label class="block text-xs text-slate-400 mb-1 font-semibold">物件所在地</label><input type="text" id="input-address" oninput="syncText('address', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-indigo-500" value="東京都渋谷区代々木1丁目XX-XX"></div>
+            <div><label class="block text-xs text-slate-400 mb-1 font-semibold">構造・規模</label><input type="text" id="input-kouzou" oninput="syncText('kouzou', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-indigo-500" value="RC造 10階建 / 4階部分"></div>
+            <div><label class="block text-xs text-slate-400 mb-1 font-semibold">築年月</label><input type="text" id="input-chikunen" oninput="syncText('chikunen', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-indigo-500" value="2018年3月築"></div>
           </div>
         </div>
 
         <hr class="border-slate-700">
 
         <div>
-          <h3 class="text-sm font-extrabold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-1.5">
-            <span class="w-1.5 h-3 bg-indigo-500 rounded-full"></span> フッター取引条件（AD等）
-          </h3>
+          <h3 class="text-sm font-extrabold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-1.5"><span class="w-1.5 h-3 bg-indigo-500 rounded-full"></span> フッター取引条件</h3>
           <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs text-slate-400 mb-1 font-semibold">取引態様</label>
-              <input type="text" id="input-taiyou" oninput="syncText('taiyou', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition" value="媒介 (客付100%)">
-            </div>
-            <div class="col-span-2">
-              <label class="block text-xs text-slate-400 mb-1 font-semibold">フッター備考欄（フリーテキスト）</label>
-              <textarea id="input-footer-note" oninput="syncText('footer-note', this.value)" rows="2" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-indigo-500 transition resize-none">図面と現況が異なる場合は現況を優先します。</textarea>
-            </div>
-            <div class="col-span-2">
-              <label class="block text-xs text-slate-400 mb-1 font-semibold">広告有効期限</label>
-              <input type="text" id="input-pub-date" oninput="syncText('pub-date', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-indigo-500 transition" value="">
-            </div>
+            <div><label class="block text-xs text-slate-400 mb-1 font-semibold">取引態様</label><input type="text" id="input-taiyou" oninput="syncText('taiyou', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" value="媒介 (客付100%)"></div>
+            <div class="col-span-2"><label class="block text-xs text-slate-400 mb-1 font-semibold">フッター備考欄</label><textarea id="input-footer-note" oninput="syncText('footer-note', this.value)" rows="2" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white resize-none">図面と現況が異なる場合は現況を優先します。</textarea></div>
+            <div class="col-span-2"><label class="block text-xs text-slate-400 mb-1 font-semibold">広告有効期限</label><input type="text" id="input-pub-date" oninput="syncText('pub-date', this.value)" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white" value=""></div>
           </div>
         </div>
 
         <hr class="border-slate-700">
         
         <div>
-          <h3 class="text-xs font-extrabold text-amber-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
-            <span class="w-1.5 h-3 bg-amber-400 rounded-full"></span> 詳細テーブル構成（カード連動）
-          </h3>
+          <h3 class="text-xs font-extrabold text-amber-400 uppercase tracking-widest mb-3 flex items-center gap-1.5"><span class="w-1.5 h-3 bg-amber-400 rounded-full"></span> 詳細テーブル構成</h3>
           <div class="space-y-4">
             <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700 font-sans">
-              <h4 class="text-xs font-bold text-white mb-2 flex items-center gap-1">■ 物件の概要（入力・追加）</h4>
+              <h4 class="text-xs font-bold text-white mb-2 flex items-center gap-1">■ 物件の概要</h4>
               <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="block text-[10px] text-slate-400 mb-1">管理会社名</label>
-                  <input type="text" id="input-summary-kanrigai" oninput="syncSummaryCard()" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-indigo-500 transition" value="株式会社テクノ管理">
-                </div>
-                <div>
-                  <label class="block text-[10px] text-slate-400 mb-1">総戸数</label>
-                  <input type="text" id="input-summary-soukosu" oninput="syncSummaryCard()" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-indigo-500 transition" value="42戸">
-                </div>
+                <div><label class="block text-[10px] text-slate-400 mb-1">管理会社名</label><input type="text" id="input-summary-kanrigai" oninput="syncSummaryCard()" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-white" value="株式会社テクノ管理"></div>
+                <div><label class="block text-[10px] text-slate-400 mb-1">総戸数</label><input type="text" id="input-summary-soukosu" oninput="syncSummaryCard()" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-white" value="42戸"></div>
               </div>
             </div>
-
             <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700 font-sans">
-              <h4 class="text-xs font-bold text-white mb-2 flex items-center gap-1">■ 取引条件（入力・追加）</h4>
+              <h4 class="text-xs font-bold text-white mb-2 flex items-center gap-1">■ 取引条件</h4>
               <div class="grid grid-cols-1 gap-2">
-                <div>
-                  <label class="block text-[10px] text-slate-400 mb-1">更新料</label>
-                  <input type="text" id="input-summary-koshin" oninput="syncSummaryCard()" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-indigo-500 transition" value="新賃料の1ヶ月分">
-                </div>
+                <div><label class="block text-[10px] text-slate-400 mb-1">更新料</label><input type="text" id="input-summary-koshin" oninput="syncSummaryCard()" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-white" value="新賃料の1ヶ月分"></div>
               </div>
             </div>
-
             <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-700 font-sans">
               <h4 class="text-xs font-bold text-white mb-2 flex items-center gap-1">■ 広告主の情報</h4>
               <div class="grid grid-cols-2 gap-2">
-                <div>
-                  <label class="block text-[10px] text-slate-400 mb-1">広告担当者</label>
-                  <input type="text" id="input-summary-staff" oninput="syncSummaryCard()" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-indigo-500 transition" value="山田 太郎">
-                </div>
-                <div>
-                  <label class="block text-[10px] text-slate-400 mb-1">免許番号</label>
-                  <input type="text" id="input-summary-license" oninput="syncSummaryCard()" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-white focus:outline-none focus:border-indigo-500 transition" value="東京都知事（1）第XXXXXX号">
-                </div>
+                <div><label class="block text-[10px] text-slate-400 mb-1">広告担当者</label><input type="text" id="input-summary-staff" oninput="syncSummaryCard()" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-white" value="山田 太郎"></div>
+                <div><label class="block text-[10px] text-slate-400 mb-1">免許番号</label><input type="text" id="input-summary-license" oninput="syncSummaryCard()" class="w-full bg-slate-950 border border-slate-700 rounded px-2 py-1 text-xs text-white" value="東京都知事（1）第XXXXXX号"></div>
               </div>
             </div>
-
             <div class="pt-1">
-              <button onclick="spawnSummaryCard(630, 170, 340, 430)" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition active:scale-95 shadow">
-                <i data-lucide="table" class="w-4 h-4"></i>
-                詳細概要カードを再配置
-              </button>
+              <button onclick="spawnSummaryCard(630, 170, 340, 430)" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 shadow"><i data-lucide="table" class="w-4 h-4"></i> 詳細概要カードを再配置</button>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- パネル2: 帯替え・切り出し（PDF/画像のアップロード） -->
+      <!-- パネル2: 帯替え・配置（複数アップロード＆ギャラリー仕様） -->
       <div id="panel-crop" class="p-5 space-y-6 hidden">
         <div>
-          <h3 class="text-sm font-extrabold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-            <i data-lucide="arrow-left-right" class="w-4 h-4 text-emerald-400"></i>
-            他社マイソク 帯替えクロップ
-          </h3>
-          <p class="text-xs text-slate-400 mb-4 leading-relaxed">
-            他社のマイソク画像、または**PDFファイル**をアップロードし、間取り図や写真箇所をトリミング枠で囲って切り出し配置できます。
-          </p>
+          <h3 class="text-sm font-extrabold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5"><i data-lucide="arrow-left-right" class="w-4 h-4 text-emerald-400"></i>他社マイソク 帯替え・画像配置</h3>
+          <p class="text-xs text-slate-400 mb-4 leading-relaxed">複数の画像やPDFをまとめてアップロードし、ギャラリーから選択してキャンバスや専用の整列枠に綺麗に配置できます。</p>
 
-          <!-- ドロップエリア -->
           <div id="drop-zone" class="border-2 border-dashed border-slate-600 rounded-xl p-6 text-center hover:border-indigo-500 transition cursor-pointer bg-slate-900/50 group relative mb-4">
-            <input type="file" id="file-input" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*,application/pdf" onchange="handleImageUpload(event)">
+            <input type="file" id="file-input" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*,application/pdf" multiple onchange="handleMultipleFilesUpload(event)">
             <i data-lucide="upload-cloud" class="w-10 h-10 mx-auto text-slate-500 group-hover:text-indigo-400 mb-2 transition"></i>
-            <p class="text-xs text-slate-300 font-semibold">画像(PNG, JPG)やPDFをドロップ</p>
-            <p class="text-[10px] text-slate-500 mt-1">またはファイルを選択 (.png, .jpg, .pdf)</p>
+            <p class="text-xs text-slate-300 font-semibold">画像やPDFを複数ドロップ・選択</p>
+            <p class="text-[10px] text-slate-500 mt-1">複数ファイルを同時に読み込めます</p>
           </div>
         </div>
 
-        <!-- 読み込まれた画像＆プレビュー操作エリア -->
-        <div id="source-image-wrapper" class="hidden space-y-4">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-bold text-slate-300">読み込み画像プレビュー</span>
-            <span class="text-[10px] bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 px-2 py-0.5 rounded-full font-mono">トリム範囲調整可能</span>
-          </div>
+        <div id="gallery-wrapper" class="space-y-2 hidden">
+          <span class="text-xs font-bold text-slate-300 flex items-center gap-1"><i data-lucide="images" class="w-3.5 h-3.5 text-indigo-400"></i> 素材ギャラリー（クリックで選択）</span>
+          <div id="image-gallery" class="grid grid-cols-3 gap-2 bg-slate-950 p-2 rounded-lg border border-slate-700 max-h-[160px] overflow-y-auto"></div>
+        </div>
 
-          <!-- トリミング用の元画像コンテナ -->
+        <div class="flex items-center gap-1.5 bg-slate-900/60 p-2 rounded-lg border border-slate-700">
+          <span class="text-[10px] text-slate-400 font-bold whitespace-nowrap"><i data-lucide="grid" class="w-3 h-3 inline pb-0.5"></i> 画像整列枠を追加:</span>
+          <button onclick="addImageGrid(1)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 font-semibold">1列</button>
+          <button onclick="addImageGrid(2)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 font-semibold">2列</button>
+        </div>
+
+        <div id="source-image-wrapper" class="hidden space-y-4">
+          <div class="flex items-center justify-between"><span class="text-xs font-bold text-slate-300">選択中の画像の編集・トリム</span></div>
           <div class="relative bg-slate-950 border border-slate-700 rounded-lg overflow-hidden flex items-center justify-center min-h-[220px] max-h-[350px]">
             <img id="source-image" class="max-w-full max-h-[300px] object-contain select-none animate-pulse" alt="ソース画像">
-            <!-- トリミング枠 -->
             <div id="crop-box" class="crop-box hidden">
-              <!-- コーナー・リサイズ用ハンドル -->
               <div class="crop-handle top-[-6px] left-[-6px] cursor-nwse-resize" data-handle="top-left"></div>
               <div class="crop-handle top-[-6px] right-[-6px] cursor-nesw-resize" data-handle="top-right"></div>
               <div class="crop-handle bottom-[-6px] left-[-6px] cursor-nesw-resize" data-handle="bottom-left"></div>
               <div class="crop-handle bottom-[-6px] right-[-6px] cursor-nwse-resize" data-handle="bottom-right"></div>
             </div>
           </div>
-
-          <!-- クロップ操作ボタン -->
           <div class="grid grid-cols-2 gap-2">
-            <button onclick="addCroppedToCanvas()" class="py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 transition active:scale-95 col-span-2">
-              <i data-lucide="crop" class="w-4 h-4"></i>
-              選択範囲を切り出して配置
-            </button>
-            <button onclick="addFullImageToCanvas()" class="py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 transition active:scale-95 col-span-2">
-              <i data-lucide="maximize" class="w-4 h-4"></i>
-              画像をそのまま配置
-            </button>
+            <button onclick="addCroppedToCanvas()" class="py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 col-span-2 shadow"><i data-lucide="crop" class="w-4 h-4"></i> 選択範囲を切り出して配置</button>
+            <button onclick="addFullSelectedImageToCanvas()" class="py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 col-span-2 shadow"><i data-lucide="maximize" class="w-4 h-4"></i> 画像をそのまま配置</button>
           </div>
         </div>
       </div>
@@ -438,292 +276,79 @@
       <!-- パネル3: アイコン・素材 -->
       <div id="panel-stamp" class="p-5 space-y-6 hidden">
         <div>
-          <h3 class="text-sm font-extrabold text-emerald-400 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-            <i data-lucide="layout-grid" class="w-4 h-4 text-emerald-400"></i>
-            デザイナーズスタンプ型アイコン
-          </h3>
-          <p class="text-xs text-slate-400 mb-2 leading-relaxed">今流行りのリノベマイソク風、丸みのある極太黒縁取りのハイデザインスタンプです。</p>
+          <h3 class="text-sm font-extrabold text-emerald-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><i data-lucide="layout-grid" class="w-4 h-4"></i> デザイナーズスタンプ型アイコン</h3>
+          <p class="text-xs text-slate-400 mb-2">今流行りのリノベマイソク風、丸みのある極太黒縁取りアイコンです。</p>
 
-          <!-- 追加：グリッド作成メニュー -->
           <div class="flex items-center gap-1.5 mb-4 bg-slate-900/60 p-2 rounded-lg border border-slate-700">
             <span class="text-[10px] text-slate-400 font-bold whitespace-nowrap"><i data-lucide="grid" class="w-3 h-3 inline pb-0.5"></i> 整列枠を追加:</span>
-            <button onclick="addIconGrid(2)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 transition shadow-sm font-semibold">2列</button>
-            <button onclick="addIconGrid(3)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 transition shadow-sm font-semibold">3列</button>
-            <button onclick="addIconGrid(4)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 transition shadow-sm font-semibold">4列</button>
-            <span class="text-[8.5px] text-slate-500 ml-auto leading-tight">※追加した枠を選択し<br>下からアイコンを挿入</span>
+            <button onclick="addIconGrid(2)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 font-semibold">2列</button>
+            <button onclick="addIconGrid(3)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 font-semibold">3列</button>
+            <button onclick="addIconGrid(4)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 font-semibold">4列</button>
           </div>
           
           <div class="grid grid-cols-3 gap-3">
-            <!-- 各アイコンボタン -->
             <button onclick="addDesignerIconBox('B・T別')" class="p-1.5 bg-[#e0f2fe] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M2 13h14v2a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-2z" fill="#bae6fd" />
-                  <path d="M4 13V6a2 2 0 0 1 2-2h2" />
-                  <circle cx="10" cy="3" r="1.5" fill="#f8fafc" />
-                  <line x1="17" y1="2" x2="17" y2="22" stroke-dasharray="3 3" />
-                  <path d="M19 11v4h4v-2a2 2 0 0 0-2-2h-2z" fill="#e2e8f0" />
-                  <path d="M19 15c-1 0-2 1-2 2v2h4v-2c0-1-1-2-2-2z" fill="#f8fafc" />
-                </svg>
-              </div>
-              <span class="text-[9px] font-black text-slate-900 leading-none mb-0.5">B・T別</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13h14v2a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-2z" fill="#bae6fd" /><path d="M4 13V6a2 2 0 0 1 2-2h2" /><circle cx="10" cy="3" r="1.5" fill="#f8fafc" /><line x1="17" y1="2" x2="17" y2="22" stroke-dasharray="3 3" /><path d="M19 11v4h4v-2a2 2 0 0 0-2-2h-2z" fill="#e2e8f0" /><path d="M19 15c-1 0-2 1-2 2v2h4v-2c0-1-1-2-2-2z" fill="#f8fafc" /></svg></div><span class="text-[9px] font-black text-slate-900 leading-none mb-0.5">B・T別</span>
             </button>
-
             <button onclick="addDesignerIconBox('オートロック')" class="p-1.5 bg-[#ffedd5] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="5" y="11" width="14" height="10" rx="3" fill="#fcd34d" />
-                  <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-                  <circle cx="12" cy="16" r="1.5" fill="#1e293b" />
-                </svg>
-              </div>
-              <span class="text-[8.5px] font-black text-slate-900 leading-none mb-0.5">オートロック</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="3" fill="#fcd34d" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /><circle cx="12" cy="16" r="1.5" fill="#1e293b" /></svg></div><span class="text-[8.5px] font-black text-slate-900 leading-none mb-0.5">オートロック</span>
             </button>
-
             <button onclick="addDesignerIconBox('独立洗面')" class="p-1.5 bg-[#d1fae5] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="7" y="3" width="10" height="8" rx="2" fill="#e0f2fe" />
-                  <path d="M4 14h16v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3z" fill="#f8fafc" />
-                  <path d="M12 11v3" />
-                  <path d="M10 12h4" />
-                </svg>
-              </div>
-              <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">独立洗面</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="8" rx="2" fill="#e0f2fe" /><path d="M4 14h16v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3z" fill="#f8fafc" /><path d="M12 11v3" /><path d="M10 12h4" /></svg></div><span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">独立洗面</span>
             </button>
-
             <button onclick="addDesignerIconBox('温水便座')" class="p-1.5 bg-[#fef3c7] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="6" y="3" width="12" height="6" rx="2" fill="#f8fafc" />
-                  <path d="M8 9v6a4 4 0 0 0 8 0V9H8z" fill="#e2e8f0" />
-                  <path d="M12 15c-1 0-2-1-2-2s2-4 2-4 2 3 2 4-1 2-2 2z" fill="#60a5fa" stroke="none" />
-                  <circle cx="16" cy="6" r="1" fill="#94a3b8" />
-                </svg>
-              </div>
-              <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">温水便座</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="6" rx="2" fill="#f8fafc" /><path d="M8 9v6a4 4 0 0 0 8 0V9H8z" fill="#e2e8f0" /><path d="M12 15c-1 0-2-1-2-2s2-4 2-4 2 3 2 4-1 2-2 2z" fill="#60a5fa" stroke="none" /><circle cx="16" cy="6" r="1" fill="#94a3b8" /></svg></div><span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">温水便座</span>
             </button>
-
             <button onclick="addDesignerIconBox('室内洗濯')" class="p-1.5 bg-[#e0e7ff] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="5" y="3" width="14" height="18" rx="3" fill="#f8fafc" />
-                  <line x1="5" y1="8" x2="19" y2="8" />
-                  <circle cx="12" cy="14" r="4" fill="#bae6fd" />
-                  <circle cx="8" cy="5.5" r="1" fill="#1e293b" />
-                  <circle cx="11" cy="5.5" r="1" fill="#1e293b" />
-                </svg>
-              </div>
-              <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">室内洗濯</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="3" fill="#f8fafc" /><line x1="5" y1="8" x2="19" y2="8" /><circle cx="12" cy="14" r="4" fill="#bae6fd" /><circle cx="8" cy="5.5" r="1" fill="#1e293b" /><circle cx="11" cy="5.5" r="1" fill="#1e293b" /></svg></div><span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">室内洗濯</span>
             </button>
-
             <button onclick="addDesignerIconBox('システムK')" class="p-1.5 bg-[#fce7f3] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M3 13h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6z" fill="#fbcfe8" />
-                  <line x1="3" y1="13" x2="21" y2="13" />
-                  <circle cx="8" cy="11" r="2" fill="#f97316" stroke="none" />
-                  <circle cx="16" cy="11" r="2" fill="#f97316" stroke="none" />
-                  <path d="M12 9V5c0-1 1-2 2-2s2 1 2 2v2" />
-                </svg>
-              </div>
-              <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">システムK</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6z" fill="#fbcfe8" /><line x1="3" y1="13" x2="21" y2="13" /><circle cx="8" cy="11" r="2" fill="#f97316" stroke="none" /><circle cx="16" cy="11" r="2" fill="#f97316" stroke="none" /><path d="M12 9V5c0-1 1-2 2-2s2 1 2 2v2" /></svg></div><span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">システムK</span>
             </button>
-
             <button onclick="addDesignerIconBox('追い焚き')" class="p-1.5 bg-[#ffe4e6] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 14h16v2a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-2z" fill="#93c5fd" />
-                  <path d="M12 9c-1-1-2-2-2-4s2-2 2-2 2 0 2 2-1 3-2 4z" fill="#f87171" stroke="none" />
-                  <path d="M7 8c0-2 1-3 2-4" />
-                  <path d="M17 8c0-2-1-3-2-4" />
-                </svg>
-              </div>
-              <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">追い焚き</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h16v2a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-2z" fill="#93c5fd" /><path d="M12 9c-1-1-2-2-2-4s2-2 2-2 2 0 2 2-1 3-2 4z" fill="#f87171" stroke="none" /><path d="M7 8c0-2 1-3 2-4" /><path d="M17 8c0-2-1-3-2-4" /></svg></div><span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">追い焚き</span>
             </button>
-
             <button onclick="addDesignerIconBox('浴室乾燥機')" class="p-1.5 bg-[#ccfbf1] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="4" y="3" width="16" height="6" rx="1" fill="#e2e8f0" />
-                  <line x1="6" y1="6" x2="18" y2="6" stroke-dasharray="2 2" />
-                  <path d="M12 11l-3 3v6h6v-6l-3-3z" fill="#fef08a" />
-                  <path d="M12 11a1 1 0 0 0-1-1 1 1 0 0 1 1-1 1 1 0 0 1 1 1 1 1 0 0 0-1 1z" />
-                  <path d="M7 14s2 2 5 2 5-2 5-2" stroke="#94a3b8" />
-                </svg>
-              </div>
-              <span class="text-[8.5px] font-black text-slate-900 text-center leading-none mb-0.5">浴室乾燥</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="6" rx="1" fill="#e2e8f0" /><line x1="6" y1="6" x2="18" y2="6" stroke-dasharray="2 2" /><path d="M12 11l-3 3v6h6v-6l-3-3z" fill="#fef08a" /><path d="M12 11a1 1 0 0 0-1-1 1 1 0 0 1 1-1 1 1 0 0 1 1 1 1 1 0 0 0-1 1z" /><path d="M7 14s2 2 5 2 5-2 5-2" stroke="#94a3b8" /></svg></div><span class="text-[8.5px] font-black text-slate-900 text-center leading-none mb-0.5">浴室乾燥</span>
             </button>
-
             <button onclick="addDesignerIconBox('ネット無料')" class="p-1.5 bg-[#ecfccb] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M5 8.5a10 10 0 0 1 14 0" />
-                  <path d="M8.5 12.5a5 5 0 0 1 7 0" />
-                  <circle cx="12" cy="16.5" r="1.5" fill="#3b82f6" stroke="none" />
-                  <rect x="6" y="19" width="12" height="3" rx="1" fill="#1e293b" />
-                </svg>
-              </div>
-              <span class="text-[8.5px] font-black text-slate-900 text-center leading-none mb-0.5">ネット無料</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8.5a10 10 0 0 1 14 0" /><path d="M8.5 12.5a5 5 0 0 1 7 0" /><circle cx="12" cy="16.5" r="1.5" fill="#3b82f6" stroke="none" /><rect x="6" y="19" width="12" height="3" rx="1" fill="#1e293b" /></svg></div><span class="text-[8.5px] font-black text-slate-900 text-center leading-none mb-0.5">ネット無料</span>
             </button>
-
             <button onclick="addDesignerIconBox('ペット可')" class="p-1.5 bg-[#fef9c3] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 12c-2.5 0-5 2-5 5.5S9 22 12 22s5-1 5-4.5-2.5-5.5-5-5.5z" fill="#f43f5e" />
-                  <circle cx="7" cy="9" r="2.5" fill="#f43f5e" />
-                  <circle cx="10.5" cy="5.5" r="2.5" fill="#f43f5e" />
-                  <circle cx="14.5" cy="5.5" r="2.5" fill="#f43f5e" />
-                  <circle cx="18" cy="9" r="2.5" fill="#f43f5e" />
-                </svg>
-              </div>
-              <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">ペット可</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c-2.5 0-5 2-5 5.5S9 22 12 22s5-1 5-4.5-2.5-5.5-5-5.5z" fill="#f43f5e" /><circle cx="7" cy="9" r="2.5" fill="#f43f5e" /><circle cx="10.5" cy="5.5" r="2.5" fill="#f43f5e" /><circle cx="14.5" cy="5.5" r="2.5" fill="#f43f5e" /><circle cx="18" cy="9" r="2.5" fill="#f43f5e" /></svg></div><span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">ペット可</span>
             </button>
-
             <button onclick="addDesignerIconBox('宅配ボックス')" class="p-1.5 bg-[#cffafe] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="3" width="10" height="18" rx="1" fill="#e2e8f0" />
-                  <line x1="3" y1="9" x2="13" y2="9" />
-                  <line x1="3" y1="15" x2="13" y2="15" />
-                  <path d="M15 13l6 3v5l-6-3v-5z" fill="#d97706" stroke="#b45309" />
-                  <path d="M15 13l3-1.5 3 1.5-3 1.5-3-1.5z" fill="#f59e0b" stroke="#b45309" />
-                </svg>
-              </div>
-              <span class="text-[8.5px] font-black text-slate-900 text-center leading-none mb-0.5">宅配BOX</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="10" height="18" rx="1" fill="#e2e8f0" /><line x1="3" y1="9" x2="13" y2="9" /><line x1="3" y1="15" x2="13" y2="15" /><path d="M15 13l6 3v5l-6-3v-5z" fill="#d97706" stroke="#b45309" /><path d="M15 13l3-1.5 3 1.5-3 1.5-3-1.5z" fill="#f59e0b" stroke="#b45309" /></svg></div><span class="text-[8.5px] font-black text-slate-900 text-center leading-none mb-0.5">宅配BOX</span>
             </button>
-
             <button onclick="addDesignerIconBox('WIC')" class="p-1.5 bg-[#ede9fe] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="4" width="18" height="16" rx="2" fill="#ede9fe" />
-                  <path d="M3 8h18" />
-                  <path d="M8 8l-2 4h4l-2-4z" fill="#a855f7" />
-                  <path d="M16 8l-2 4h4l-2-4z" fill="#a855f7" />
-                  <path d="M8 8c0-1 .5-2 1-2s1 1 1 2" />
-                  <path d="M16 8c0-1 .5-2 1-2s1 1 1 2" />
-                </svg>
-              </div>
-              <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">WIC</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" fill="#ede9fe" /><path d="M3 8h18" /><path d="M8 8l-2 4h4l-2-4z" fill="#a855f7" /><path d="M16 8l-2 4h4l-2-4z" fill="#a855f7" /><path d="M8 8c0-1 .5-2 1-2s1 1 1 2" /><path d="M16 8c0-1 .5-2 1-2s1 1 1 2" /></svg></div><span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">WIC</span>
             </button>
-
             <button onclick="addDesignerIconBox('エレベーター')" class="p-1.5 bg-[#e2e8f0] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="4" y="2" width="16" height="20" rx="1" fill="#cbd5e1" />
-                  <line x1="12" y1="2" x2="12" y2="22" />
-                  <path d="M9 10l-2-2-2 2" stroke="#475569" />
-                  <line x1="7" y1="8" x2="7" y2="16" stroke="#475569" />
-                  <path d="M15 14l2 2 2-2" stroke="#475569" />
-                  <line x1="17" y1="8" x2="17" y2="16" stroke="#475569" />
-                </svg>
-              </div>
-              <span class="text-[8.5px] font-black text-slate-900 text-center leading-none mb-0.5">エレベーター</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="1" fill="#cbd5e1" /><line x1="12" y1="2" x2="12" y2="22" /><path d="M9 10l-2-2-2 2" stroke="#475569" /><line x1="7" y1="8" x2="7" y2="16" stroke="#475569" /><path d="M15 14l2 2 2-2" stroke="#475569" /><line x1="17" y1="8" x2="17" y2="16" stroke="#475569" /></svg></div><span class="text-[8.5px] font-black text-slate-900 text-center leading-none mb-0.5">エレベーター</span>
             </button>
-
             <button onclick="addDesignerIconBox('防犯カメラ')" class="p-1.5 bg-[#fef08a] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="5" y="8" width="14" height="8" rx="2" fill="#cbd5e1" />
-                  <path d="M19 10l3-2v8l-3-2" fill="#cbd5e1" />
-                  <circle cx="9" cy="12" r="2" fill="#1e293b" />
-                  <circle cx="9" cy="12" r="0.5" fill="#ef4444" stroke="none" />
-                </svg>
-              </div>
-              <span class="text-[8.5px] font-black text-slate-900 text-center leading-none mb-0.5">防犯カメラ</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="8" rx="2" fill="#cbd5e1" /><path d="M19 10l3-2v8l-3-2" fill="#cbd5e1" /><circle cx="9" cy="12" r="2" fill="#1e293b" /><circle cx="9" cy="12" r="0.5" fill="#ef4444" stroke="none" /></svg></div><span class="text-[8.5px] font-black text-slate-900 text-center leading-none mb-0.5">防犯カメラ</span>
             </button>
-
             <button onclick="addDesignerIconBox('駐輪場')" class="p-1.5 bg-[#dcfce7] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="6" cy="16" r="4" fill="#a7f3d0" />
-                  <circle cx="18" cy="16" r="4" fill="#a7f3d0" />
-                  <path d="M6 16l3-6h6l3 6" />
-                  <path d="M12 16v-6" />
-                  <path d="M8 10h8" />
-                </svg>
-              </div>
-              <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">駐輪場</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="16" r="4" fill="#a7f3d0" /><circle cx="18" cy="16" r="4" fill="#a7f3d0" /><path d="M6 16l3-6h6l3 6" /><path d="M12 16v-6" /><path d="M8 10h8" /></svg></div><span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">駐輪場</span>
             </button>
-
             <button onclick="addDesignerIconBox('駐車場')" class="p-1.5 bg-[#fed7aa] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M5 15h14a2 2 0 0 0 2-2v-2l-3-4H6l-3 4v2a2 2 0 0 0 2 2z" fill="#fdba74" />
-                  <circle cx="7" cy="16" r="3" fill="#1e293b" />
-                  <circle cx="17" cy="16" r="3" fill="#1e293b" />
-                  <path d="M6 11h12" />
-                </svg>
-              </div>
-              <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">駐車場</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15h14a2 2 0 0 0 2-2v-2l-3-4H6l-3 4v2a2 2 0 0 0 2 2z" fill="#fdba74" /><circle cx="7" cy="16" r="3" fill="#1e293b" /><circle cx="17" cy="16" r="3" fill="#1e293b" /><path d="M6 11h12" /></svg></div><span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">駐車場</span>
             </button>
-
             <button onclick="addDesignerIconBox('エアコン')" class="p-1.5 bg-[#e0f2fe] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="4" width="18" height="8" rx="2" fill="#f8fafc" />
-                  <line x1="6" y1="8" x2="18" y2="8" />
-                  <line x1="8" y1="16" x2="10" y2="20" stroke="#60a5fa" />
-                  <line x1="12" y1="16" x2="12" y2="20" stroke="#60a5fa" />
-                  <line x1="16" y1="16" x2="14" y2="20" stroke="#60a5fa" />
-                </svg>
-              </div>
-              <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">エアコン</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="8" rx="2" fill="#f8fafc" /><line x1="6" y1="8" x2="18" y2="8" /><line x1="8" y1="16" x2="10" y2="20" stroke="#60a5fa" /><line x1="12" y1="16" x2="12" y2="20" stroke="#60a5fa" /><line x1="16" y1="16" x2="14" y2="20" stroke="#60a5fa" /></svg></div><span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">エアコン</span>
             </button>
-
             <button onclick="addDesignerIconBox('TVモニターホン')" class="p-1.5 bg-[#f3e8ff] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="4" y="3" width="16" height="18" rx="2" fill="#e9d5ff" />
-                  <rect x="6" y="6" width="12" height="8" rx="1" fill="#f8fafc" />
-                  <circle cx="12" cy="10" r="2" fill="#a855f7" stroke="none" />
-                  <circle cx="9" cy="17" r="1.5" fill="#a855f7" />
-                  <circle cx="15" cy="17" r="1.5" fill="#a855f7" />
-                </svg>
-              </div>
-              <span class="text-[7.5px] font-black text-slate-900 text-center leading-none mb-0.5">TVモニターホン</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2" fill="#e9d5ff" /><rect x="6" y="6" width="12" height="8" rx="1" fill="#f8fafc" /><circle cx="12" cy="10" r="2" fill="#a855f7" stroke="none" /><circle cx="9" cy="17" r="1.5" fill="#a855f7" /><circle cx="15" cy="17" r="1.5" fill="#a855f7" /></svg></div><span class="text-[7.5px] font-black text-slate-900 text-center leading-none mb-0.5">TVモニターホン</span>
             </button>
-
             <button onclick="addDesignerIconBox('カウンターK')" class="p-1.5 bg-[#fce7f3] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 18v-8h16" fill="none" />
-                  <path d="M4 18h4v-4h12V10H4z" fill="#fbcfe8" />
-                  <path d="M12 18v-4" />
-                  <path d="M10 14h4" />
-                  <path d="M18 18v-4" />
-                  <path d="M16 14h4" />
-                </svg>
-              </div>
-              <span class="text-[8.5px] font-black text-slate-900 text-center leading-none mb-0.5">カウンターK</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18v-8h16" fill="none" /><path d="M4 18h4v-4h12V10H4z" fill="#fbcfe8" /><path d="M12 18v-4" /><path d="M10 14h4" /><path d="M18 18v-4" /><path d="M16 14h4" /></svg></div><span class="text-[8.5px] font-black text-slate-900 text-center leading-none mb-0.5">カウンターK</span>
             </button>
-
             <button onclick="addDesignerIconBox('新築')" class="p-1.5 bg-[#ffedd5] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 3l8 6v12H4V9l8-6z" fill="#fed7aa" />
-                  <path d="M10 21V14h4v7" fill="#f8fafc" />
-                  <path d="M5 5l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" />
-                  <path d="M19 5l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" />
-                  <path d="M19 12l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" />
-                </svg>
-              </div>
-              <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">新築</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 6v12H4V9l8-6z" fill="#fed7aa" /><path d="M10 21V14h4v7" fill="#f8fafc" /><path d="M5 5l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" /><path d="M19 5l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" /><path d="M19 12l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" /></svg></div><span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">新築</span>
             </button>
-
             <button onclick="addDesignerIconBox('RC')" class="p-1.5 bg-[#e5e7eb] border-2 border-slate-900 hover:scale-105 active:scale-95 rounded-xl flex flex-col items-center justify-between h-[72px] transition duration-200">
-              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden">
-                <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="5" y="4" width="14" height="18" rx="1" fill="#e2e8f0" />
-                  <rect x="8" y="7" width="3" height="3" fill="#64748b" stroke="none" />
-                  <rect x="13" y="7" width="3" height="3" fill="#64748b" stroke="none" />
-                  <rect x="8" y="12" width="3" height="3" fill="#64748b" stroke="none" />
-                  <rect x="13" y="12" width="3" height="3" fill="#64748b" stroke="none" />
-                  <rect x="8" y="17" width="3" height="3" fill="#64748b" stroke="none" />
-                  <rect x="13" y="17" width="3" height="3" fill="#64748b" stroke="none" />
-                </svg>
-              </div>
-              <span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">RC</span>
+              <div class="flex items-center justify-center w-full h-[44px] overflow-hidden"><svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="18" rx="1" fill="#e2e8f0" /><rect x="8" y="7" width="3" height="3" fill="#64748b" stroke="none" /><rect x="13" y="7" width="3" height="3" fill="#64748b" stroke="none" /><rect x="8" y="12" width="3" height="3" fill="#64748b" stroke="none" /><rect x="13" y="12" width="3" height="3" fill="#64748b" stroke="none" /><rect x="8" y="17" width="3" height="3" fill="#64748b" stroke="none" /><rect x="13" y="17" width="3" height="3" fill="#64748b" stroke="none" /></svg></div><span class="text-[9px] font-black text-slate-900 text-center leading-none mb-0.5">RC</span>
             </button>
           </div>
         </div>
@@ -736,39 +361,26 @@
           </h3>
           <p class="text-xs text-slate-400 mb-2 leading-relaxed">目を引くカラー付き帯テキストをキャンバスに追加します。</p>
           
-          <!-- 追加：アピール文言用グリッド作成メニュー -->
           <div class="flex items-center gap-1.5 mb-4 bg-slate-900/60 p-2 rounded-lg border border-slate-700">
             <span class="text-[10px] text-slate-400 font-bold whitespace-nowrap"><i data-lucide="grid" class="w-3 h-3 inline pb-0.5"></i> 整列枠を追加:</span>
+            <button onclick="addAppealGrid(1)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 transition shadow-sm font-semibold">1列</button>
             <button onclick="addAppealGrid(2)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 transition shadow-sm font-semibold">2列</button>
-            <button onclick="addAppealGrid(3)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 transition shadow-sm font-semibold">3列</button>
-            <button onclick="addAppealGrid(4)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 transition shadow-sm font-semibold">4列</button>
-            <span class="text-[8.5px] text-slate-500 ml-auto leading-tight">※追加した枠を選択し<br>下からスタンプを挿入</span>
+            <span class="text-[8.5px] text-slate-500 ml-auto leading-tight">※枠を選択して下から挿入</span>
           </div>
 
-          <div class="flex flex-wrap gap-2">
-            <button onclick="addAppealText('賃料交渉可！', 'bg-red-600 text-white')" class="px-2.5 py-1.5 bg-red-950 text-red-400 hover:bg-red-900/50 rounded-lg text-xs font-semibold border border-red-500/30 transition">
-              賃料交渉可！
-            </button>
-            <button onclick="addAppealText('初期費用安め', 'bg-emerald-600 text-white')" class="px-2.5 py-1.5 bg-emerald-950 text-emerald-400 hover:bg-emerald-900/50 rounded-lg text-xs font-semibold border border-emerald-500/30 transition">
-              初期費用安め
-            </button>
-            <button onclick="addAppealText('仲介手数料不要', 'bg-amber-600 text-white')" class="px-2.5 py-1.5 bg-amber-950 text-amber-400 hover:bg-amber-900/50 rounded-lg text-xs font-semibold border border-amber-500/30 transition">
-              仲介手数料不要
-            </button>
-            <button onclick="addAppealText('即入居可能！', 'bg-blue-600 text-white')" class="px-2.5 py-1.5 bg-blue-950 text-blue-400 hover:bg-blue-900/50 rounded-lg text-xs font-semibold border border-blue-500/30 transition">
-              即入居可能！
-            </button>
-            <button onclick="addAppealText('角部屋', 'bg-purple-600 text-white')" class="px-2.5 py-1.5 bg-purple-950 text-purple-400 hover:bg-purple-900/50 rounded-lg text-xs font-semibold border border-purple-500/30 transition">
-              角部屋
-            </button>
-            <button onclick="addAppealText('2人入居可', 'bg-teal-600 text-white')" class="px-2.5 py-1.5 bg-teal-950 text-teal-400 hover:bg-teal-900/50 rounded-lg text-xs font-semibold border border-teal-500/30 transition">
-              2人入居可
-            </button>
-            <button onclick="addAppealText('店舗事務所可', 'bg-indigo-600 text-white')" class="px-2.5 py-1.5 bg-indigo-950 text-indigo-400 hover:bg-indigo-900/50 rounded-lg text-xs font-semibold border border-indigo-500/30 transition">
-              店舗事務所可
-            </button>
-            <button onclick="addAppealText('最上階', 'bg-pink-600 text-white')" class="px-2.5 py-1.5 bg-pink-950 text-pink-400 hover:bg-pink-900/50 rounded-lg text-xs font-semibold border border-pink-500/30 transition">
-              最上階
+          <!-- フリーワード入力＆配置エリア -->
+          <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-700">
+            <label class="block text-[10px] text-slate-400 mb-1.5 font-bold">自由にテキストを入力してスタンプを作成</label>
+            <div class="flex gap-2 mb-2">
+              <input type="text" id="custom-appeal-text" placeholder="例: 角部屋、敷礼ゼロ！" class="flex-1 bg-slate-950 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 transition">
+              <select id="custom-appeal-color" class="bg-slate-950 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500 transition w-[110px] shrink-0">
+                <option value="bg-slate-800 text-white border-[2.5px] border-slate-600">ダーク系</option>
+                <option value="bg-amber-300 text-slate-900 border-[2.5px] border-amber-400">明るい系</option>
+                <option value="bg-white text-slate-900 border-[2.5px] border-slate-800">白系</option>
+              </select>
+            </div>
+            <button onclick="addCustomAppealText()" class="w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded font-bold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 shadow">
+              <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> キャンバスに配置する
             </button>
           </div>
         </div>
@@ -798,27 +410,21 @@
           
           <!-- ==================== ヘッダー ==================== -->
           <div id="theme-header-bg" class="w-full h-[170px] bg-gradient-to-r from-emerald-800 to-teal-700 px-3.5 pt-2 pb-3 flex flex-col justify-between relative z-10 transition-all duration-300">
-            <!-- 追加: 最前面に表示される専用の下線要素 -->
             <div id="theme-header-border" class="absolute bottom-0 left-0 right-0 h-[6px] bg-amber-400 z-50 pointer-events-none transition-colors duration-300"></div>
 
-            <!-- キャッチコピーブロック -->
             <div id="header-catch-block" class="flex items-center justify-between min-h-[32px] overflow-visible transition-colors duration-300 relative z-30">
               <div id="canvas-catch" class="text-[18px] font-black text-white truncate max-w-full leading-normal tracking-wider overflow-visible pb-1 pt-0.5">
                 ★駅チカ徒歩3分！陽当たり抜群 of 南向き角部屋フルリノベマンション★
               </div>
             </div>
 
-            <!-- ヘッダーメイン -->
             <div class="flex justify-between items-stretch h-[85px] w-full gap-x-2 relative z-20">
-              <!-- 物件名ブロック -->
               <div id="header-title-block" class="flex-1 min-w-0 pr-3 flex flex-col justify-center overflow-visible transition-colors duration-300 relative z-40">
-                <!-- 修正: break-words を whitespace-nowrap に変更 -->
                 <h2 id="canvas-title" class="text-[36px] font-black text-white leading-[1.2] font-rounded whitespace-nowrap text-left w-full overflow-visible">
                   テクノハイツ代々木 402号室
                 </h2>
               </div>
 
-              <!-- 間取りブロック -->
               <div class="w-[110px] shrink-0 border-l border-white/25 pl-3 flex flex-col justify-center min-w-0 overflow-visible">
                 <div class="h-[20px] flex items-end mb-1">
                   <div class="text-[10px] text-white/80 font-bold uppercase leading-none mb-0.5">間取り</div>
@@ -828,7 +434,6 @@
                 </div>
               </div>
 
-              <!-- 賃料・管理費ブロック -->
               <div class="w-[310px] shrink-0 border-l border-white/25 pl-3 flex flex-col justify-center min-w-0 overflow-visible">
                 <div class="h-[20px] flex items-end gap-2 mb-1">
                   <div class="text-[10px] text-white/80 font-bold uppercase leading-none mb-0.5">賃料</div>
@@ -840,7 +445,6 @@
                 </div>
               </div>
 
-              <!-- 交通アクセスブロック -->
               <div class="w-[280px] shrink-0 border-l border-white/25 pl-4 flex flex-col justify-center min-w-0 overflow-visible">
                 <div class="text-[12px] text-white/80 font-bold uppercase leading-none mb-1">交通アクセス</div>
                 <div id="canvas-access" class="text-[16px] font-extrabold text-white leading-[1.3] whitespace-pre-line overflow-visible tracking-tight">
@@ -850,7 +454,6 @@
               </div>
             </div>
 
-            <!-- ヘッダーサブ情報バー -->
             <div id="theme-sub-bar" class="w-full bg-emerald-950/60 rounded px-3 py-1.5 flex items-center justify-between text-[11px] text-white transition-all duration-300 mt-0.5">
               <div class="flex gap-4 shrink-0 items-baseline overflow-visible text-[14px] pt-0.5">
                 <div class="overflow-visible flex items-baseline"><span class="sub-label text-emerald-300 font-bold mr-0.5">敷金:</span> <span id="canvas-shikikin" class="font-black text-[18px] ml-1 leading-none">1ヶ月</span></div>
@@ -866,12 +469,10 @@
 
           <!-- ==================== メイン描画エリア ==================== -->
           <div id="canvas-work-area" class="absolute top-[170px] bottom-[95px] left-0 right-0 bg-orange-50/25 overflow-hidden transition-all duration-300">
-            <!-- 透かし背景 -->
             <div id="canvas-bg-watermark" class="absolute inset-0 flex items-center justify-center opacity-[0.03] select-none pointer-events-none">
               <i data-lucide="home" class="w-[300px] h-[300px] text-emerald-800"></i>
             </div>
             
-            <!-- デフォルトガイド -->
             <div id="canvas-guide" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400/70 p-6 pointer-events-none transition-opacity duration-300">
               <i data-lucide="layout-grid" class="w-16 h-16 text-slate-300 mb-2"></i>
               <p class="text-sm font-bold text-slate-500">他社マイソクの切り出し画像やアセットを選択・配置して</p>
@@ -882,11 +483,9 @@
           <!-- ==================== フッター ==================== -->
           <div id="theme-footer-bg" class="absolute bottom-0 left-0 right-0 h-[95px] bg-gradient-to-r from-emerald-800 to-teal-700 border-t-[5px] border-amber-400 p-2.5 grid grid-cols-12 gap-2 text-white z-10 transition-all duration-300 font-sans">
             
-            <!-- 左9/12: お問合せ情報 -->
             <div id="footer-left" class="col-span-9 border-r border-white/20 pr-3 flex items-center gap-3 relative overflow-hidden">
               <div id="footer-obi-html" class="flex items-center justify-between gap-3 w-full">
                 
-                <!-- 会社情報ブロック（左側） -->
                 <div class="flex items-center gap-3 min-w-0">
                   <div id="footer-logo-bg" class="p-2.5 bg-emerald-950/60 rounded-lg flex items-center justify-center shrink-0 shadow">
                     <i id="footer-logo-icon" data-lucide="home" class="w-7 h-7 text-white"></i>
@@ -908,11 +507,9 @@
                 <div class="flex-1 max-w-[380px] pointer-events-auto flex items-center justify-end h-[75px]">
                   <img id="footer-custom-logo" src="logo.6.25.png" alt="テクノホームロゴ" class="w-full h-full object-contain object-right drop-shadow-sm scale-[1.6] origin-right" data-original-src="logo.6.25.png">
                 </div>
-
               </div>
             </div>
 
-            <!-- 右3/12: AD割合・掲載日等 -->
             <div id="footer-right" class="col-span-3 flex flex-col justify-between pl-2">
               <div class="grid grid-cols-2 gap-1.5 text-center">
                 <div></div>
@@ -970,10 +567,10 @@
     let activeResizeHandle = null;
     let isCanvasGlobalEventRegistered = false;
 
-    // カスケード出現カウンタ
-    let cascadeOffsetCounter = 0;
+    // 複数画像・ギャラリー制御用
+    let selectedGalleryImage = null;
 
-    // 追加：最後に操作したアイコンとスタンプのサイズ記憶用変数
+    let cascadeOffsetCounter = 0;
     let lastIconSize = { w: 75, h: 75 };
     let lastAppealSize = { w: 180, h: 45 };
 
@@ -981,7 +578,6 @@
     // 2. コア・共通ユーティリティ関数
     // ==========================================
     
-    // 金額フォーマット
     function formatToYen(value) {
       if (!value) return "0";
       return value.toString().replace(/\d+/g, function(match) {
@@ -989,7 +585,6 @@
       });
     }
 
-    // 面積フォーマット (平米 ⇄ 坪数自動算出)
     function formatArea(val) {
       if (!val) return "0.00㎡";
       const cleanVal = val.toString().trim();
@@ -1003,7 +598,6 @@
       return val;
     }
 
-    // リアルタイム同期
     function syncText(targetId, val) {
       const displayEl = document.getElementById('canvas-' + targetId);
       if (displayEl) {
@@ -1016,7 +610,6 @@
         } else if (targetId === 'pub-date') {
           displayEl.innerHTML = '広告有効期限：' + val;
         } else if (targetId === 'title') {
-          // 追加・修正: 物件名の場合はスペース（半角・全角）を確実に改行タグに変換する
           displayEl.innerHTML = val.replace(/[ 　]+/g, '<br>').replace(/\n/g, '<br>');
         } else {
           displayEl.innerHTML = val.replace(/\n/g, '<br>');
@@ -1024,64 +617,38 @@
       }
       syncSummaryCard();
 
-      // 物件名が変更された場合はフォントサイズを自動調整
-      if (targetId === 'title') {
-        setTimeout(adjustTitleFontSize, 10);
-      }
-
-      // 交通アクセスが変更された場合はフォントサイズを自動調整
-      if (targetId === 'access') {
-        setTimeout(adjustAccessFontSize, 10);
-      }
-      
-      // 賃料が変更された場合はフォントサイズを自動調整
-      if (targetId === 'price') {
-        setTimeout(adjustPriceFontSize, 10);
-      }
+      if (targetId === 'title') setTimeout(adjustTitleFontSize, 10);
+      if (targetId === 'access') setTimeout(adjustAccessFontSize, 10);
+      if (targetId === 'price') setTimeout(adjustPriceFontSize, 10);
     }
 
-    // 物件名の自動フォントサイズ調整
     function adjustTitleFontSize() {
       const titleEl = document.getElementById('canvas-title');
       const containerEl = titleEl.parentElement;
       if (!titleEl || !containerEl) return;
 
-      // 一旦ベースサイズにリセット
       titleEl.style.fontSize = '36px';
-
-      // 正確な幅と高さを計算するため一時的にスタイル変更
       const origWidth = titleEl.style.width;
       titleEl.style.width = 'max-content';
 
       let fontSize = 36;
-      // 親コンテナの実質幅（pr-3=12pxを考慮）
       const maxWidth = containerEl.clientWidth - 12;
-      
-      // 修正: 固定値ではなく「親コンテナの現在の実際の高さ」から安全マージンを引いて上限を計算
-      // これにより、他の要素に押しつぶされて枠が縮んでいても確実に枠内に収まります
       const maxHeight = containerEl.clientHeight > 0 ? containerEl.clientHeight - 8 : 70;
 
-      // 横幅を超えるか、縦幅（高さ）が上限を超える場合は1pxずつ縮小
       while ((titleEl.scrollWidth > maxWidth || titleEl.scrollHeight > maxHeight) && fontSize > 10) {
         fontSize -= 1;
         titleEl.style.fontSize = fontSize + 'px';
       }
-
-      // スタイルを元に戻す
       titleEl.style.width = origWidth;
     }
 
-    // 賃料の自動フォントサイズ調整
     function adjustPriceFontSize() {
       const priceEl = document.getElementById('canvas-price');
       const containerEl = priceEl ? priceEl.parentElement.parentElement : null;
       if (!priceEl || !containerEl) return;
 
-      // 一旦ベースサイズにリセット
       priceEl.style.fontSize = '36px';
-      
       let fontSize = 36;
-      // 親コンテナの横幅からマージンと「円」の文字幅を引いた最大許容幅
       const maxWidth = containerEl.clientWidth - 32;
 
       while (priceEl.scrollWidth > maxWidth && fontSize > 14) {
@@ -1090,7 +657,6 @@
       }
     }
 
-    // 交通アクセスの自動フォントサイズ調整
     function adjustAccessFontSize() {
       const accessEl = document.getElementById('canvas-access');
       const inputAccess = document.getElementById('input-access');
@@ -1101,15 +667,11 @@
       const val = inputAccess.value.trim();
 
       if (!val.includes('\n')) {
-        // 1行の場合は最大24pxをベースにはみ出さないよう調整
         accessEl.style.fontSize = '24px';
-        
-        // 正確な文字幅を計測するため、折り返し禁止と幅をコンテンツに合わせる設定を一時付与
         accessEl.style.width = 'max-content';
         accessEl.style.whiteSpace = 'nowrap';
         
         let fontSize = 24;
-        // 親のパディング(pl-4 = 16px)を考慮した実質の最大許容幅
         const maxWidth = containerEl.clientWidth - 16;
 
         while (accessEl.scrollWidth > maxWidth && fontSize > 12) {
@@ -1117,18 +679,14 @@
           accessEl.style.fontSize = fontSize + 'px';
         }
         
-        // 計測用のスタイルを解除し、元の表示設定に戻す
         accessEl.style.width = '';
         accessEl.style.whiteSpace = '';
       } else {
-        // 2行以上の場合はデフォルトの16px
         accessEl.style.fontSize = '16px';
       }
     }
 
-    // 初期起動時同期
     function initInputs() {
-      // 広告有効期限に作成日（本日）から14日後の日付を自動設定
       const pubDateInput = document.getElementById('input-pub-date');
       if (pubDateInput) {
         const targetDate = new Date();
@@ -1147,7 +705,6 @@
       });
     }
 
-    // 通知メッセージトースト
     function showToast(msg) {
       const toast = document.getElementById('toast');
       const msgEl = document.getElementById('toast-message');
@@ -1161,7 +718,6 @@
       }, 3000);
     }
 
-    // スケーリング幅調整
     function resizeCanvas() {
       const canvas = document.getElementById('mysoku-canvas');
       const wrapper = document.getElementById('print-area-wrapper');
@@ -1185,14 +741,12 @@
       wrapper.style.height = `${707 * scale}px`;
     }
 
-    // アイテムセレクト
     function selectCanvasItem(el) {
       deselectAllItems();
       selectedCanvasItem = el;
       el.classList.add('canvas-item-active', 'ring-4', 'ring-indigo-500/50');
     }
 
-    // セレクト解除
     function deselectAllItems(e) {
       if (e && e.target.id !== 'canvas-work-area' && e.target.id !== 'mysoku-canvas') return;
       
@@ -1203,7 +757,6 @@
       selectedCanvasItem = null;
     }
 
-    // タブ切り替え
     function switchSidebarTab(tab) {
       activeTab = tab;
       
@@ -1223,7 +776,6 @@
       });
     }
 
-    // 空確認
     function checkEmptyCanvas() {
       const workArea = document.getElementById('canvas-work-area');
       if (!workArea) return;
@@ -1240,7 +792,6 @@
       }
     }
     
-    // キャンバスクリア関数
     function clearCanvas() {
       const workArea = document.getElementById('canvas-work-area');
       if (!workArea) return;
@@ -1260,12 +811,9 @@
       });
       
       selectedCanvasItem = null;
-
-      // 追加：記憶していたアイコンとスタンプのサイズを初期値にリセット
       lastIconSize = { w: 75, h: 75 };
       lastAppealSize = { w: 180, h: 45 };
 
-      // 追加：広告有効期限を本日の14日後の日付にリセット
       const pubDateInput = document.getElementById('input-pub-date');
       if (pubDateInput) {
         const targetDate = new Date();
@@ -1278,7 +826,6 @@
       showToast('キャンバスをクリアしました。');
     }
 
-    // 重ね順調整
     function changeZIndexDirect(el, direction) {
       let currentZ = parseInt(el.style.zIndex) || 10;
       if (direction === 'up') {
@@ -1290,7 +837,6 @@
       }
     }
 
-    // フォント変更
     function changeFont(fontType) {
       let fontFamilyStr = "";
       if (fontType === 'serif') fontFamilyStr = "'Noto Serif JP', serif";
@@ -1304,24 +850,15 @@
       else if (fontType === 'yuji') fontFamilyStr = "'Yuji Syuku', serif";
       else if (fontType === 'kaisei') fontFamilyStr = "'Kaisei Decol', serif";
 
-      const targetIds = [
-        'canvas-title', 
-        'canvas-price', 
-        'canvas-madori-text', 
-        'canvas-catch', 
-        'theme-sub-bar', 
-        'theme-footer-bg'
-      ];
+      const targetIds = ['canvas-title', 'canvas-price', 'canvas-madori-text', 'canvas-catch', 'theme-sub-bar', 'theme-footer-bg'];
 
       targetIds.forEach(id => {
         const el = document.getElementById(id);
         if (el) {
           el.style.setProperty('font-family', fontFamilyStr, 'important');
-          // 敷金・礼金・面積の帯とフッター内のすべての文字に選択したフォントを強制適用
           if (id === 'theme-sub-bar' || id === 'theme-footer-bg') {
             const children = el.querySelectorAll('*');
             children.forEach(child => {
-              // アイコンの描画要素には影響させない
               if (!['svg', 'path', 'line', 'circle', 'rect'].includes(child.tagName.toLowerCase())) {
                 child.style.setProperty('font-family', 'inherit', 'important');
               }
@@ -1335,7 +872,6 @@
       setTimeout(adjustPriceFontSize, 10);
     }
 
-    // カラー変更
     function changeColor(color) {
       const headerBg = document.getElementById('theme-header-bg');
       const headerBorder = document.getElementById('theme-header-border');
@@ -1383,7 +919,6 @@
         canvasCatch.style.removeProperty('padding-bottom');
       }
 
-      // --- グラデーション 10種類 ---
       if (color === 'amber') {
         headerBg.classList.add('bg-gradient-to-r', 'from-amber-950', 'via-stone-900', 'to-amber-950');
         if (headerBorder) headerBorder.classList.add('bg-amber-500');
@@ -1655,7 +1190,6 @@
         if (headerBorder) headerBorder.classList.add('bg-red-600');
         footerBg.classList.add('bg-white', 'border-t-[5px]', 'border-red-600');
         
-        // キャッチコピー背景を赤に変更し、配置を上部に寄せる（文字見切れ防止のため下部余白も確保）
         if (headerCatchBlock) {
           headerCatchBlock.classList.add('bg-red-600', '-mx-3.5', 'px-3.5', '-mt-2', 'pt-1.5', 'pb-2');
           headerCatchBlock.classList.remove('items-center');
@@ -1666,7 +1200,6 @@
           canvasCatch.style.setProperty('padding-bottom', '8px', 'important');
         }
 
-        // ヘッダー物件名のみネイビーブルー
         if (headerTitleBlock) {
           headerTitleBlock.classList.add('bg-blue-900', '-ml-3.5', 'pl-3.5');
         }
@@ -1674,11 +1207,9 @@
           canvasTitle.style.setProperty('color', '#ffffff', 'important');
         }
 
-        // 帯の背景をホワイトグレーに変更
         subBar.classList.remove('bg-stone-950/40');
         subBar.classList.add('bg-slate-200');
 
-        // フッターは白背景にグレー文字
         if (footerLeft) footerLeft.className = "col-span-9 border-r border-slate-300 pr-3 flex items-center gap-3 relative overflow-hidden text-slate-800";
         if (logoBg) logoBg.className = "p-2.5 bg-slate-100 rounded-lg flex items-center justify-center shrink-0 shadow border border-slate-300";
         if (labelText) labelText.className = "text-[9px] font-bold text-slate-500 leading-none";
@@ -1694,8 +1225,7 @@
         
         watermark.innerHTML = `<i data-lucide="flag" class="w-[300px] h-[300px] text-slate-100"></i>`;
       }
-      
-      // --- 単色 10種類 ---
+
       else if (color === 'solid-blue') {
         headerBg.classList.add('bg-blue-900');
         if (headerBorder) headerBorder.classList.add('bg-blue-400');
@@ -2063,13 +1593,46 @@
       }, 50);
     }
 
+    // 画像整列枠配置
+    function addImageGrid(cols) {
+      const guide = document.getElementById('canvas-guide');
+      if (guide) guide.style.opacity = '0';
+
+      const div = document.createElement('div');
+      div.className = `absolute cursor-move overflow-visible group flex flex-col justify-start bg-indigo-50/5 border-2 border-dashed border-indigo-400/50 transition-colors image-grid-container`;
+      div.dataset.itemType = 'image-grid';
+
+      const pos = getNextSpawnPos(100, 220);
+      div.style.left = `${pos.x}px`;
+      div.style.top = `${pos.y}px`;
+      div.style.width = `${cols * 250 + (cols - 1) * 8 + 16}px`; 
+      div.style.height = 'auto'; 
+      div.style.minHeight = '100px';
+
+      div.innerHTML = `
+        <div class="grid-inner w-full p-2 grid gap-2 content-start" style="grid-template-columns: repeat(${cols}, minmax(0, 1fr));">
+        </div>
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none empty-grid-msg opacity-40">
+           <span class="text-[10px] font-bold text-indigo-400 text-center leading-tight">画像整列枠<br>画像を選択して配置</span>
+        </div>
+      `;
+
+      setupCanvasItemInteractions(div);
+      showToast(`${cols}列の画像整列枠を配置しました。`);
+      
+      setTimeout(() => {
+        selectCanvasItem(div);
+      }, 50);
+    }
+
     // 画像アセット自由配置
     function addPresetAssetToCanvas(src, customX = 80, customY = 60, customW = 280, customH = 210) {
       const guide = document.getElementById('canvas-guide');
       if (guide) guide.style.opacity = '0';
 
       const div = document.createElement('div');
-      div.className = "absolute p-0 border border-transparent hover:border-indigo-400 transition-all shadow-sm cursor-move bg-white overflow-visible flex items-center justify-center";
+      div.className = "absolute p-0 border border-transparent hover:border-indigo-400 transition-all shadow-sm cursor-move bg-white overflow-visible flex items-center justify-center group";
+      div.dataset.itemType = 'image';
       div.style.width = `${customW}px`;
       div.style.height = `${customH}px`;
       
@@ -2125,7 +1688,6 @@
       syncSummaryCard();
     }
 
-    // 「詳細概要カードを再配置」ボタンから呼び出される専用関数を追加
     function spawnSummaryCardDirect() {
       spawnSummaryCard(630, 170, 340, 430);
     }
@@ -2212,81 +1774,6 @@
       `;
     }
 
-    // 間取りSVG配置
-    function addSvgFloorplan(type, customX = 120, customY = 80, customW = 260, customH = 260) {
-      let svgHtml = '';
-      
-      if (type === '1ldk') {
-        svgHtml = `<svg viewBox="0 0 100 100" class="w-full h-full bg-white p-3 border border-slate-300" xmlns="http://www.w3.org/2000/svg">
-          <rect x="5" y="5" width="90" height="90" fill="none" stroke="#222" stroke-width="2"/>
-          <line x1="5" y1="35" x2="65" y2="35" stroke="#222" stroke-width="1.5"/>
-          <line x1="65" y1="5" x2="65" y2="50" stroke="#222" stroke-width="1.5"/>
-          <line x1="40" y1="35" x2="40" y2="95" stroke="#222" stroke-width="1.5"/>
-          <text x="35" y="22" font-size="7" font-weight="bold" font-family="sans-serif" text-anchor="middle">洋室 (6.0帖)</text>
-          <text x="22" y="65" font-size="7" font-weight="bold" font-family="sans-serif" text-anchor="middle">LDK (12.0帖)</text>
-          <text x="78" y="20" font-size="5" font-family="sans-serif" text-anchor="middle">UB/Bath</text>
-          <text x="78" y="42" font-size="5" font-family="sans-serif" text-anchor="middle">WC</text>
-          <text x="78" y="60" font-size="5" font-family="sans-serif" text-anchor="middle">玄関</text>
-          <text x="78" y="80" font-size="5" font-family="sans-serif" text-anchor="middle">CL</text>
-          <text x="50" y="90" font-size="6" font-weight="bold" fill="#dc2626" text-anchor="middle">バルコニー</text>
-          <path d="M 65,30 A 10,10 0 0,1 55,35" fill="none" stroke="#222" stroke-width="1"/>
-          <line x1="65" y1="30" x2="65" y2="35" stroke="#222" stroke-width="1"/>
-          <line x1="5" y1="95" x2="95" y2="95" stroke="#222" stroke-width="1"/>
-        </svg>`;
-      } else if (type === '2ldk') {
-        svgHtml = `<svg viewBox="0 0 100 100" class="w-full h-full bg-white p-3 border border-slate-300" xmlns="http://www.w3.org/2000/svg">
-          <rect x="5" y="5" width="90" height="90" fill="none" stroke="#222" stroke-width="2"/>
-          <line x1="5" y1="40" x2="95" y2="40" stroke="#222" stroke-width="1.5"/>
-          <line x1="50" y1="5" x2="50" y2="40" stroke="#222" stroke-width="1.5"/>
-          <line x1="35" y1="40" x2="35" y2="95" stroke="#222" stroke-width="1.5"/>
-          <line x1="70" y1="40" x2="70" y2="80" stroke="#222" stroke-width="1.5"/>
-          <line x1="70" y1="80" x2="95" y2="80" stroke="#222" stroke-width="1.5"/>
-          <text x="27" y="24" font-size="6" font-weight="bold" text-anchor="middle">洋室1 (5.5帖)</text>
-          <text x="72" y="24" font-size="6" font-weight="bold" text-anchor="middle">洋室2 (6.2帖)</text>
-          <text x="20" y="68" font-size="6" font-weight="bold" text-anchor="middle">LDK (14帖)</text>
-          <text x="52" y="54" font-size="5" text-anchor="middle">洗面室</text>
-          <text x="52" y="74" font-size="5" text-anchor="middle">浴室</text>
-          <text x="82" y="52" font-size="5" text-anchor="middle">玄関</text>
-          <text x="82" y="70" font-size="5" text-anchor="middle">トイレ</text>
-          <text x="50" y="91" font-size="6" font-weight="bold" fill="#dc2626" text-anchor="middle">ワイドバルコニー</text>
-          <line x1="5" y1="95" x2="95" y2="95" stroke="#222" stroke-width="1"/>
-        </svg>`;
-      } else {
-        svgHtml = `<svg viewBox="0 0 100 100" class="w-full h-full bg-white p-3 border border-slate-300" xmlns="http://www.w3.org/2000/svg">
-          <rect x="5" y="5" width="90" height="90" fill="none" stroke="#222" stroke-width="2"/>
-          <line x1="5" y1="35" x2="95" y2="35" stroke="#222" stroke-width="1.5"/>
-          <line x1="33" y1="5" x2="33" y2="35" stroke="#222" stroke-width="1.5"/>
-          <line x1="66" y1="5" x2="66" y2="35" stroke="#222" stroke-width="1.5"/>
-          <path d="M 66,35 L 45,95" stroke="#222" stroke-width="1.5"/>
-          <line x1="45" y1="35" x2="45" y2="95" stroke="#222" stroke-width="1.5"/>
-          <line x1="45" y1="65" x2="95" y2="65" stroke="#222" stroke-width="1.5"/>
-          <text x="19" y="22" font-size="5" font-weight="bold" text-anchor="middle">洋室A (5.0帖)</text>
-          <text x="50" y="22" font-size="5" font-weight="bold" text-anchor="middle">和室 (6.0帖)</text>
-          <text x="80" y="22" font-size="5" font-weight="bold" text-anchor="middle">洋室B (5.5帖)</text>
-          <text x="25" y="65" font-size="6" font-weight="bold" text-anchor="middle">LDK (16帖)</text>
-          <text x="70" y="50" font-size="5" text-anchor="middle">バス・キッチン</text>
-          <text x="70" y="80" font-size="5" text-anchor="middle">主寝室 (7.0帖)</text>
-          <text x="25" y="91" font-size="5" font-weight="bold" fill="#dc2626" text-anchor="middle">バルコニー</text>
-        </svg>`;
-      }
-
-      const container = document.createElement('div');
-      container.className = "absolute p-0 border border-slate-400 shadow-sm cursor-move flex items-center justify-center bg-white overflow-visible";
-      container.style.width = `${customW}px`;
-      container.style.height = `${customH}px`;
-      
-      const pos = getNextSpawnPos(customX, customY);
-      container.style.left = `${pos.x}px`;
-      container.style.top = `${pos.y}px`;
-      
-      const innerContainer = document.createElement('div');
-      innerContainer.className = "w-full h-full overflow-hidden";
-      innerContainer.innerHTML = svgHtml;
-
-      container.appendChild(innerContainer);
-      setupCanvasItemInteractions(container);
-    }
-
     // デザイナーズアイコン配置
     function addDesignerIconBox(type) {
       const guide = document.getElementById('canvas-guide');
@@ -2296,15 +1783,13 @@
       let targetGrid = null;
       let isGridMode = false;
 
-      // 1. 選択中の要素が「アイコン整列枠」だった場合
       if (selectedCanvasItem && selectedCanvasItem.dataset.itemType === 'icon-grid') {
         targetGrid = selectedCanvasItem;
       } 
-      // 2. 何も選択されていない場合でも、キャンバス上に「アイコン整列枠」があれば自動で拾って吸着させる
       else if (!selectedCanvasItem) {
         const grids = document.querySelectorAll('.icon-grid-container');
         if (grids.length > 0) {
-          targetGrid = grids[grids.length - 1]; // 複数あれば最後に操作・追加した枠
+          targetGrid = grids[grids.length - 1]; 
         }
       }
 
@@ -2552,34 +2037,26 @@
       }
 
       if (isGridMode) {
-        // グリッド枠内の場合は、絶対配置を解除し、幅100%（セルの幅に合わせる）にする
         div.className = `relative w-full aspect-square group`;
         div.dataset.itemType = 'icon-in-grid';
-        
-        // 修正: アイコンの座標ズレを防ぐため、念のためインラインスタイルをリセット
         div.style.left = '';
         div.style.top = '';
         div.style.width = '';
         div.style.height = '';
       } else {
-        // 通常の自由配置の場合は、今まで通りの絶対配置
         div.className = `absolute cursor-move overflow-visible group`;
         div.dataset.itemType = 'icon';
         const pos = getNextSpawnPos(120, 180);
         div.style.left = `${pos.x}px`;
         div.style.top = `${pos.y}px`;
-        // 記憶されたサイズを適用
         div.style.width = `${lastIconSize.w}px`;
         div.style.height = `${lastIconSize.h}px`;
       }
 
-      // 初期の描画スケール計算
       const initialScale = isGridMode ? 1 : (lastIconSize.w / 75);
       
-      // グリッドモード時のみ、個別に削除できる「×」ボタンを追加（削除して空になったらガイドを再表示する）
       const deleteBtnHtml = isGridMode ? `<button onclick="const p = this.parentElement; const g = p.closest('.icon-grid-container'); p.remove(); if(g && g.querySelector('.grid-inner').children.length === 0){ g.querySelector('.empty-grid-msg').style.display = 'flex'; } event.stopPropagation();" class="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center shadow font-bold text-[8px] opacity-0 group-hover:opacity-100 transition z-50 pointer-events-auto">×</button>` : '';
 
-      // 修正: absolute top-0 left-0 を追加し、親の枠や高さを圧迫せずにピッタリと追従するように変更
       div.innerHTML = `
         <div class="icon-scale-wrapper absolute top-0 left-0 w-[75px] h-[75px] origin-top-left pointer-events-none" style="transform: scale(${initialScale});">
           <div class="w-full h-full flex flex-col items-center justify-between p-1.5 ${bgClass} border-[2.5px] border-slate-900 rounded-2xl transition duration-150 group-hover:scale-105">
@@ -2592,13 +2069,12 @@
         ${deleteBtnHtml}
       `;
 
-      // 親要素のリサイズを監視し、中身全体を自動で拡大縮小させる処理
       const scaleWrapper = div.querySelector('.icon-scale-wrapper');
       const ro = new ResizeObserver(entries => {
         for (let entry of entries) {
           const currentW = entry.contentRect.width;
           if (currentW > 0) {
-            const scale = currentW / 75; // 初期サイズ(75px)に対する現在の倍率
+            const scale = currentW / 75;
             scaleWrapper.style.transform = `scale(${scale})`;
           }
         }
@@ -2607,13 +2083,11 @@
 
       if (isGridMode) {
         targetContainer.appendChild(div);
-        targetGrid.style.height = 'auto'; // 親の枠が中身に合わせて伸びるようにheightをリセット
+        targetGrid.style.height = 'auto';
         
-        // ガイドメッセージを非表示にする
         const msg = targetGrid.querySelector('.empty-grid-msg');
         if (msg) msg.style.display = 'none';
 
-        // 枠が未選択状態だったら、操作しやすくするため自動的に選択状態に戻す
         if (selectedCanvasItem !== targetGrid) {
            selectCanvasItem(targetGrid);
         }
@@ -2650,12 +2124,113 @@
       });
 
       dropZone.addEventListener('drop', (e) => {
-        const file = e.dataTransfer.files[0];
-        if (file) {
-          processUploadedFile(file);
+        if (e.dataTransfer.files.length) {
+          processMultipleFiles(e.dataTransfer.files);
         }
       }, false);
     }
+
+    // ==========================================
+    // 4. アピール文言（フリーワード）配置ロジック
+    // ==========================================
+    function addCustomAppealText() {
+      const text = document.getElementById('custom-appeal-text').value.trim();
+      const bgClass = document.getElementById('custom-appeal-color').value;
+      if (!text) {
+        showToast("アピール文言を入力してください。");
+        return;
+      }
+
+      const guide = document.getElementById('canvas-guide');
+      if (guide) guide.style.opacity = '0';
+
+      let targetContainer = null;
+      let targetGrid = null;
+      let isGridMode = false;
+
+      // 1. 選択中の要素が「スタンプ整列枠」だった場合
+      if (selectedCanvasItem && selectedCanvasItem.dataset.itemType === 'appeal-grid') {
+        targetGrid = selectedCanvasItem;
+      } 
+      // 2. 何も選択されていない場合でも、キャンバス上に「スタンプ整列枠」があれば自動で拾って吸着させる
+      else if (!selectedCanvasItem) {
+        const grids = document.querySelectorAll('.appeal-grid-container');
+        if (grids.length > 0) {
+          targetGrid = grids[grids.length - 1];
+        }
+      }
+
+      if (targetGrid) {
+        targetContainer = targetGrid.querySelector('.grid-inner');
+        isGridMode = true;
+      }
+
+      const div = document.createElement('div');
+      
+      if (isGridMode) {
+        div.className = `relative w-full h-[45px] group`;
+        div.dataset.itemType = 'appeal-in-grid';
+        div.style.left = '';
+        div.style.top = '';
+        div.style.width = '';
+        div.style.height = '';
+      } else {
+        div.className = `absolute ${bgClass} rounded shadow-lg cursor-move flex items-center justify-center text-center font-black font-rounded text-[26px] leading-none tracking-widest min-w-[150px] overflow-hidden group`;
+        div.dataset.itemType = 'appeal';
+        
+        const pos = getNextSpawnPos(150, 200);
+        div.style.left = `${pos.x}px`;
+        div.style.top = `${pos.y}px`;
+        div.style.width = `${lastAppealSize.w}px`;
+        div.style.height = `${lastAppealSize.h}px`;
+        div.style.zIndex = 100;
+      }
+
+      const deleteBtnHtml = isGridMode ? `<button onclick="const p = this.parentElement; const g = p.closest('.appeal-grid-container'); p.remove(); if(g && g.querySelector('.grid-inner').children.length === 0){ g.querySelector('.empty-grid-msg').style.display = 'flex'; } event.stopPropagation();" class="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center shadow font-bold text-[8px] opacity-0 group-hover:opacity-100 transition z-50 pointer-events-auto">×</button>` : '';
+
+      if (isGridMode) {
+        div.innerHTML = `
+          <div class="w-full h-full flex items-center justify-center text-center font-black text-[18px] leading-none tracking-widest rounded shadow-sm pointer-events-none ${bgClass}">
+            <span>${text}</span>
+          </div>
+          ${deleteBtnHtml}
+        `;
+      } else {
+        div.innerHTML = `<span style="display:inline-block; white-space:nowrap; transform-origin:center center;">${text}</span>`;
+      }
+
+      // 自由配置モードの時の自動リサイズ
+      if (!isGridMode) {
+        const span = div.querySelector('span');
+        const ro = new ResizeObserver(entries => {
+          for (let entry of entries) {
+            const rect = entry.contentRect;
+            const wRatio = rect.width / 150;
+            const hRatio = rect.height / 45;
+            span.style.transform = `scale(${wRatio}, ${hRatio})`;
+          }
+        });
+        ro.observe(div);
+      }
+
+      if (isGridMode) {
+        targetContainer.appendChild(div);
+        targetGrid.style.height = 'auto';
+        
+        const msg = targetGrid.querySelector('.empty-grid-msg');
+        if (msg) msg.style.display = 'none';
+
+        if (selectedCanvasItem !== targetGrid) {
+           selectCanvasItem(targetGrid);
+        }
+
+        showToast(`枠内にスタンプ「${text}」を追加しました。`);
+      } else {
+        setupCanvasItemInteractions(div);
+        showToast(`スタンプ「${text}」を自由に配置しました。`);
+      }
+    }
+
 
     // ==========================================
     // 6. キャンバスアセットの移動・リサイズ
@@ -2779,8 +2354,8 @@
         const newTop = currentTop - (newH - currentH) / 2;
         
         el.style.width = `${newW}px`;
-        // 修正: アイコン整列枠の場合は高さを自動調整(auto)に保ち、中身のはみ出しを防ぐ
-        if (el.dataset.itemType === 'icon-grid' || el.dataset.itemType === 'appeal-grid') {
+        // 修正: アイコン整列枠やスタンプ整列枠の場合は高さを自動調整(auto)に保ち、中身のはみ出しを防ぐ
+        if (el.dataset.itemType === 'icon-grid' || el.dataset.itemType === 'appeal-grid' || el.dataset.itemType === 'image-grid') {
           el.style.height = 'auto';
         } else {
           el.style.height = `${newH}px`;
@@ -2818,57 +2393,37 @@
             selectedCanvasItem.style.left = `${Math.max(minX, Math.min(maxX, newLeft))}px`;
             selectedCanvasItem.style.top = `${Math.max(minY, Math.min(maxY, newTop))}px`;
           } else if (isResizingCanvasItem && selectedCanvasItem) {
-            const aspectRatio = activeCanvasItemPos.w / activeCanvasItemPos.h;
+            // 画像・スタンプ含め縦横比を固定せず自由にリサイズ可能にする
             let newW = activeCanvasItemPos.w;
             let newH = activeCanvasItemPos.h;
             let newX = activeCanvasItemPos.x;
             let newY = activeCanvasItemPos.y;
             
             if (activeResizeHandle === 'top-left') {
-              if (activeCanvasItemPos.w >= activeCanvasItemPos.h) {
-                newW = Math.max(40, activeCanvasItemPos.w - deltaX);
-                newH = newW / aspectRatio;
-              } else {
-                newH = Math.max(40, activeCanvasItemPos.h - deltaY);
-                newW = newH * aspectRatio;
-              }
+              newW = Math.max(40, activeCanvasItemPos.w - deltaX);
+              newH = Math.max(40, activeCanvasItemPos.h - deltaY);
               newX = activeCanvasItemPos.x + (activeCanvasItemPos.w - newW);
               newY = activeCanvasItemPos.y + (activeCanvasItemPos.h - newH);
             } else if (activeResizeHandle === 'top-right') {
-              if (activeCanvasItemPos.w >= activeCanvasItemPos.h) {
-                newW = Math.max(40, activeCanvasItemPos.w + deltaX);
-                newH = newW / aspectRatio;
-              } else {
-                newH = Math.max(40, activeCanvasItemPos.h - deltaY);
-                newW = newH * aspectRatio;
-              }
+              newW = Math.max(40, activeCanvasItemPos.w + deltaX);
+              newH = Math.max(40, activeCanvasItemPos.h - deltaY);
               newX = activeCanvasItemPos.x;
               newY = activeCanvasItemPos.y + (activeCanvasItemPos.h - newH);
             } else if (activeResizeHandle === 'bottom-left') {
-              if (activeCanvasItemPos.w >= activeCanvasItemPos.h) {
-                newW = Math.max(40, activeCanvasItemPos.w - deltaX);
-                newH = newW / aspectRatio;
-              } else {
-                newH = Math.max(40, activeCanvasItemPos.h + deltaY);
-                newW = newH * aspectRatio;
-              }
+              newW = Math.max(40, activeCanvasItemPos.w - deltaX);
+              newH = Math.max(40, activeCanvasItemPos.h + deltaY);
               newX = activeCanvasItemPos.x + (activeCanvasItemPos.w - newW);
               newY = activeCanvasItemPos.y;
             } else {
-              if (activeCanvasItemPos.w >= activeCanvasItemPos.h) {
-                newW = Math.max(40, activeCanvasItemPos.w + deltaX);
-                newH = newW / aspectRatio;
-              } else {
-                newH = Math.max(40, activeCanvasItemPos.h + deltaY);
-                newW = newH * aspectRatio;
-              }
+              newW = Math.max(40, activeCanvasItemPos.w + deltaX);
+              newH = Math.max(40, activeCanvasItemPos.h + deltaY);
               newX = activeCanvasItemPos.x;
               newY = activeCanvasItemPos.y;
             }
 
             selectedCanvasItem.style.width = `${newW}px`;
             // 修正: アイコン整列枠の場合はリサイズ時も高さを自動調整(auto)に保つ
-            if (selectedCanvasItem.dataset.itemType === 'icon-grid' || selectedCanvasItem.dataset.itemType === 'appeal-grid') {
+            if (selectedCanvasItem.dataset.itemType === 'icon-grid' || selectedCanvasItem.dataset.itemType === 'appeal-grid' || selectedCanvasItem.dataset.itemType === 'image-grid') {
               selectedCanvasItem.style.height = 'auto';
             } else {
               selectedCanvasItem.style.height = `${newH}px`;
@@ -2910,86 +2465,21 @@
       img.onload = function() {
         img.classList.remove('animate-pulse');
         resetCropBox();
-        showToast("トリミング範囲を赤枠で調整してください。");
       };
       img.src = src;
       document.getElementById('source-image-wrapper').classList.remove('hidden');
       document.getElementById('crop-box').classList.remove('hidden');
     }
 
-    function processUploadedFile(file) {
-      if (!file) return;
-      const img = document.getElementById('source-image');
-      if (img) img.classList.add('animate-pulse');
-
-      if (file.type === "application/pdf" || file.name.toLowerCase().endsWith('.pdf')) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const arrayBuffer = e.target.result;
-          renderPdfToImage(arrayBuffer);
-        };
-        reader.readAsArrayBuffer(file);
-      } else {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          uploadedImageBase64 = e.target.result;
-          setSourceImage(uploadedImageBase64);
-        };
-        reader.readAsDataURL(file);
+    function handleMultipleFilesUpload(event) {
+      if (event.target.files && event.target.files.length > 0) {
+        processMultipleFiles(event.target.files);
       }
     }
 
-    function handleImageUpload(event) {
-      const file = event.target.files[0];
-      processUploadedFile(file);
-    }
-
-    // PDF解析処理
-    function renderPdfToImage(arrayBuffer) {
-      if (typeof pdfjsLib === 'undefined') {
-        showToast("PDFエンジンロード中。再試行してください。");
-        return;
-      }
-
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
-
-      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-      loadingTask.promise.then(function(pdf) {
-        pdf.getPage(1).then(function(page) {
-          const scale = 2.0;
-          const viewport = page.getViewport({ scale: scale });
-
-          const realCanvas = document.createElement('canvas');
-          const realContext = realCanvas.getContext('2d');
-          realCanvas.height = viewport.height;
-          realCanvas.width = viewport.width;
-
-          const renderContext = {
-            canvasContext: realContext,
-            viewport: viewport
-          };
-          
-          const renderTask = page.render(renderContext);
-          renderTask.promise.then(function() {
-            const base64Png = realCanvas.toDataURL('image/png');
-            uploadedImageBase64 = base64Png;
-            setSourceImage(base64Png);
-            showToast("PDFマイソクの1ページ目を取り込みました！");
-          });
-        });
-      }, function (reason) {
-        console.error("PDF Error: ", reason);
-        showToast("PDFの読み込みに失敗しました。");
-        const img = document.getElementById('source-image');
-        if (img) img.classList.remove('animate-pulse');
-      });
-    }
-
-    // トリミング枠操作
     function initCropBoxInteractions() {
       const cropBox = document.getElementById('crop-box');
-      const img = document.getElementById('source-image');
-      if (!cropBox || !img) return;
+      if (!cropBox) return;
 
       cropBox.addEventListener('mousedown', function(e) {
         if (e.target.classList.contains('crop-handle')) {
@@ -3000,6 +2490,7 @@
         }
         cropStartPos = { x: e.clientX, y: e.clientY };
         e.preventDefault();
+        e.stopPropagation();
       });
 
       document.addEventListener('mousemove', function(e) {
@@ -3075,13 +2566,95 @@
       });
 
       document.addEventListener('mouseup', function() {
-        isMovingCanvasItem = false;
-        isResizingCanvasItem = false;
         isCroppingDrag = false;
         cropActiveHandle = null;
       });
     }
 
+    // PDFドロップやファイル選択経由での複数ファイル処理へルーティング
+    function handleImageUpload(event) {
+      const files = event.target.files;
+      if (files && files.length > 0) {
+        processMultipleFiles(files);
+      }
+    }
+
+    // ギャラリーへの複数ファイル読み込み処理
+    function processMultipleFiles(files) {
+      const galleryWrapper = document.getElementById('gallery-wrapper');
+      if (galleryWrapper) galleryWrapper.classList.remove('hidden');
+
+      Array.from(files).forEach(file => {
+        if (file.type === "application/pdf" || file.name.toLowerCase().endsWith('.pdf')) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            renderPdfToGallery(e.target.result);
+          };
+          reader.readAsArrayBuffer(file);
+        } else {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            createGalleryThumbnail(e.target.result);
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+      lucide.createIcons();
+    }
+
+    // ギャラリー内にサムネイルを生成
+    function createGalleryThumbnail(src) {
+      const gallery = document.getElementById('image-gallery');
+      if (!gallery) return;
+
+      const container = document.createElement('div');
+      container.className = "relative aspect-square bg-slate-900 border border-slate-800 hover:border-indigo-500 rounded overflow-hidden cursor-pointer transition thumbnail-item group";
+      
+      container.innerHTML = `
+        <img src="${src}" class="w-full h-full object-contain pointer-events-none">
+        <button onclick="this.parentElement.remove(); event.stopPropagation();" class="absolute top-0.5 right-0.5 w-3.5 h-3.5 bg-red-600/90 hover:bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-[8px] opacity-0 group-hover:opacity-100 transition z-20">×</button>
+      `;
+      
+      container.addEventListener('click', function() {
+        document.querySelectorAll('.thumbnail-item').forEach(item => item.classList.remove('border-indigo-500', 'ring-2', 'ring-indigo-500/40'));
+        container.classList.add('border-indigo-500', 'ring-2', 'ring-indigo-500/40');
+        
+        selectedGalleryImage = src;
+        setSourceImage(src);
+      });
+
+      gallery.appendChild(container);
+      
+      // 最初に追加された画像、または現在選択がない場合は自動的に選択状態にする
+      if (!selectedGalleryImage) {
+        container.click();
+      }
+    }
+
+    // PDFをパースしてギャラリーに投げる
+    function renderPdfToGallery(arrayBuffer) {
+      if (typeof pdfjsLib === 'undefined') {
+        showToast("PDFエンジンロード中。再試行してください。");
+        return;
+      }
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+      
+      pdfjsLib.getDocument({ data: arrayBuffer }).promise.then(function(pdf) {
+        pdf.getPage(1).then(function(page) {
+          const viewport = page.getViewport({ scale: 2.0 });
+          const tempCanvas = document.createElement('canvas');
+          const context = tempCanvas.getContext('2d');
+          tempCanvas.height = viewport.height;
+          tempCanvas.width = viewport.width;
+
+          page.render({ canvasContext: context, viewport: viewport }).promise.then(function() {
+            createGalleryThumbnail(tempCanvas.toDataURL('image/png'));
+          });
+        });
+      });
+    }
+
+    // キャンバスから切り出し画像を抽出して配置（整列枠対応）
     function addCroppedToCanvas() {
       const img = document.getElementById('source-image');
       if (!img || !img.src || img.naturalWidth === 0) {
@@ -3118,211 +2691,183 @@
         ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
         const croppedBase64 = canvas.toDataURL('image/png');
         
-        // 切り抜いた範囲の縦横比（アスペクト比）を維持したまま、キャンバス配置用のサイズを計算
-        let spawnW = 400;
-        let spawnH = 400 * (cropH / cropW);
-        
-        // 縦長すぎる画像の場合は高さを基準に再計算
-        if (spawnH > 400) {
-            spawnH = 400;
-            spawnW = 400 * (cropW / cropH);
+        // --- 修正: 切り出した画像も、整列枠があればそこへ吸着させる ---
+        let targetGrid = null;
+        if (selectedCanvasItem && selectedCanvasItem.dataset.itemType === 'image-grid') {
+          targetGrid = selectedCanvasItem;
+        } else {
+          const grids = document.querySelectorAll('.image-grid-container');
+          if (grids.length > 0) {
+            targetGrid = grids[grids.length - 1];
+          }
         }
-        
-        addPresetAssetToCanvas(croppedBase64, 150, 150, spawnW, spawnH);
-        showToast("選択範囲を切りぬいて配置しました。");
+
+        if (targetGrid) {
+          const innerContainer = targetGrid.querySelector('.grid-inner');
+          const div = document.createElement('div');
+          div.className = "relative w-full aspect-[4/3] bg-white overflow-hidden group border border-slate-300 shadow-sm";
+          div.innerHTML = `
+            <img src="${croppedBase64}" class="w-full h-full object-cover pointer-events-none">
+            <button onclick="const p = this.parentElement; const g = p.closest('.image-grid-container'); p.remove(); if(g && g.querySelector('.grid-inner').children.length === 0){ g.querySelector('.empty-grid-msg').style.display = 'flex'; } event.stopPropagation();" class="absolute top-1 right-1 w-4 h-4 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-[9px] opacity-0 group-hover:opacity-100 transition z-10 pointer-events-auto">×</button>
+          `;
+          innerContainer.appendChild(div);
+          targetGrid.style.height = 'auto';
+          
+          const msg = targetGrid.querySelector('.empty-grid-msg');
+          if (msg) msg.style.display = 'none';
+
+          if (selectedCanvasItem !== targetGrid) selectCanvasItem(targetGrid);
+          showToast("切り出し画像を整列枠内に配置しました。");
+        } else {
+          let spawnW = 400;
+          let spawnH = 400 * (cropH / cropW);
+          if (spawnH > 400) {
+              spawnH = 400;
+              spawnW = 400 * (cropW / cropH);
+          }
+          addPresetAssetToCanvas(croppedBase64, 150, 150, spawnW, spawnH);
+          showToast("選択範囲を切りぬいて配置しました。");
+        }
       } catch (err) {
         console.error("Cropping Error: ", err);
-        showToast("切り取りエラーが発生しました。アップロードした画像を使用してください。");
+        showToast("切り取りエラーが発生しました。");
       }
     }
 
-    // 画像の配置
-    function addFullImageToCanvas() {
-      if (!uploadedImageBase64) {
-        showToast("画像がアップロードされていません。");
+    // そのまま配置ボタン（ギャラリー選択中の画像を配置）
+    function addFullSelectedImageToCanvas() {
+      if (!selectedGalleryImage) {
+        showToast("ギャラリーから画像を選択してください。");
         return;
       }
-      addPresetAssetToCanvas(uploadedImageBase64, 100, 180, 300, 250);
-      showToast("画像をそのまま配置しました。");
-    }
 
-    // アピールテキスト帯の配置
-    function addAppealText(text, bgClass) {
-      const guide = document.getElementById('canvas-guide');
-      if (guide) guide.style.opacity = '0';
-
-      let targetContainer = null;
       let targetGrid = null;
-      let isGridMode = false;
-
-      // 1. 選択中の要素が「スタンプ整列枠」だった場合
-      if (selectedCanvasItem && selectedCanvasItem.dataset.itemType === 'appeal-grid') {
+      if (selectedCanvasItem && selectedCanvasItem.dataset.itemType === 'image-grid') {
         targetGrid = selectedCanvasItem;
-      } 
-      // 2. 何も選択されていない場合でも、キャンバス上に「スタンプ整列枠」があれば自動で拾って吸着させる
-      else if (!selectedCanvasItem) {
-        const grids = document.querySelectorAll('.appeal-grid-container');
+      } else {
+        const grids = document.querySelectorAll('.image-grid-container');
         if (grids.length > 0) {
           targetGrid = grids[grids.length - 1];
         }
       }
 
       if (targetGrid) {
-        targetContainer = targetGrid.querySelector('.grid-inner');
-        isGridMode = true;
-      }
-
-      const div = document.createElement('div');
-      
-      if (isGridMode) {
-        div.className = `relative w-full h-[45px] group`;
-        div.dataset.itemType = 'appeal-in-grid';
-      } else {
-        // 修正: 文字を枠に対して大きくするため text-sm から text-[18px] に変更
-        div.className = `absolute py-2 px-4 ${bgClass} rounded shadow-lg cursor-move flex items-center justify-center text-center font-black font-rounded text-[18px] leading-none tracking-widest min-w-[150px] overflow-visible group`;
-        div.dataset.itemType = 'appeal';
+        const innerContainer = targetGrid.querySelector('.grid-inner');
+        const div = document.createElement('div');
+        div.className = "relative w-full aspect-[4/3] bg-white overflow-hidden group border border-slate-300 shadow-sm";
+        div.innerHTML = `
+          <img src="${selectedGalleryImage}" class="w-full h-full object-cover pointer-events-none">
+          <button onclick="const p = this.parentElement; const g = p.closest('.image-grid-container'); p.remove(); if(g && g.querySelector('.grid-inner').children.length === 0){ g.querySelector('.empty-grid-msg').style.display = 'flex'; } event.stopPropagation();" class="absolute top-1 right-1 w-4 h-4 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-[9px] opacity-0 group-hover:opacity-100 transition z-10 pointer-events-auto">×</button>
+        `;
+        innerContainer.appendChild(div);
+        targetGrid.style.height = 'auto';
         
-        const pos = getNextSpawnPos(150, 200);
-        div.style.left = `${pos.x}px`;
-        div.style.top = `${pos.y}px`;
-        div.style.width = `${lastAppealSize.w}px`;
-        div.style.height = `${lastAppealSize.h}px`;
-        div.style.zIndex = 100;
-      }
+        const msg = targetGrid.querySelector('.empty-grid-msg');
+        if (msg) msg.style.display = 'none';
 
-      const deleteBtnHtml = isGridMode ? `<button onclick="const p = this.parentElement; const g = p.closest('.appeal-grid-container'); p.remove(); if(g && g.querySelector('.grid-inner').children.length === 0){ g.querySelector('.empty-grid-msg').style.display = 'flex'; } event.stopPropagation();" class="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center shadow font-bold text-[8px] opacity-0 group-hover:opacity-100 transition z-50 pointer-events-auto">×</button>` : '';
-
-      if (isGridMode) {
-         // グリッド内の文字サイズも text-[18px] で大きく表示
-         div.innerHTML = `
-           <div class="w-full h-full flex items-center justify-center text-center font-black font-rounded text-[18px] leading-none tracking-widest overflow-hidden rounded shadow-sm ${bgClass} transition duration-150 hover:scale-[1.02]">
-             <span>${text}</span>
-           </div>
-           ${deleteBtnHtml}
-         `;
-         targetContainer.appendChild(div);
-         targetGrid.style.height = 'auto';
-
-         const msg = targetGrid.querySelector('.empty-grid-msg');
-         if (msg) msg.style.display = 'none';
-
-         if (selectedCanvasItem !== targetGrid) {
-            selectCanvasItem(targetGrid);
-         }
-         showToast(`枠内に「${text}」を追加しました。`);
+        if (selectedCanvasItem !== targetGrid) selectCanvasItem(targetGrid);
+        showToast("整列枠内に画像を配置しました。");
       } else {
-         div.innerHTML = `<span>${text}</span>`;
-         setupCanvasItemInteractions(div);
-         showToast(`「${text}」帯をキャンバスに配置しました。`);
+        addPresetAssetToCanvas(selectedGalleryImage, 100, 180, 300, 225);
+        showToast("画像をそのまま配置しました。");
       }
     }
 
-    // 初期サンプルアセット
-    function addSampleInitialAssets() {
-      try {
-        spawnSummaryCard(630, 15, 340, 430);
-      } catch (e) {
-        console.error("Sample assets error:", e);
-      }
+
+    // ==========================================
+    // 7. 出力・エクスポート
+    // ==========================================
+
+    function exportToPDF() {
+      deselectAllItems();
+      const cEl = document.getElementById('mysoku-canvas');
+      const wrapper = document.getElementById('print-area-wrapper');
+      
+      showToast("極高画質PDFをレンダリング中...");
+
+      // 一時的にスケールを解除して実寸でレンダリング
+      const origT = cEl.style.transform;
+      const origH = wrapper.style.height;
+      cEl.style.transform = 'none';
+      wrapper.style.height = 'auto';
+
+      // 整列枠の破線と背景を一時的に透明化する
+      const grids = document.querySelectorAll('.icon-grid-container, .appeal-grid-container, .image-grid-container');
+      grids.forEach(g => {
+        g.classList.add('!border-transparent', '!bg-transparent');
+      });
+
+      // レンダリングが確実に完了するよう少し待つ
+      setTimeout(() => {
+        html2canvas(cEl, { 
+          scale: 3.5, // 超高解像度
+          useCORS: true, 
+          allowTaint: true, 
+          backgroundColor: '#ffffff',
+          logging: false 
+        }).then(canvas => {
+          // 元に戻す
+          cEl.style.transform = origT;
+          wrapper.style.height = origH;
+          grids.forEach(g => g.classList.remove('!border-transparent', '!bg-transparent'));
+          
+          try {
+            const imgData = canvas.toDataURL('image/jpeg', 1.0);
+            const pdf = new window.jspdf.jsPDF({
+              orientation: 'landscape',
+              unit: 'mm',
+              format: 'a4'
+            });
+            // A4横サイズにピッタリ合わせる (297x210)
+            pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210, undefined, 'FAST');
+            pdf.save(`販売図面_${document.getElementById('input-title').value.replace(/\s+/g, '_')}.pdf`);
+            showToast("A4横向きの極高画質PDFファイルを出力しました！");
+          } catch (e) {
+            showToast("外部画像のセキュリティ制限によりPDF出力を実行できません。");
+          }
+        }).catch(e => {
+          cEl.style.transform = origT;
+          wrapper.style.height = origH;
+          grids.forEach(g => g.classList.remove('!border-transparent', '!bg-transparent'));
+          showToast("PDFの生成に失敗しました。");
+        });
+      }, 100);
     }
 
-    // 起動処理
+    // 初期化
     window.onload = function() {
       lucide.createIcons();
       resizeCanvas();
       window.addEventListener('resize', resizeCanvas);
+      
       initInputs();
       changeColor('amber');
       changeFont('serif');
 
-      // キーボードでの要素削除サポート
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Delete' || e.key === 'Backspace') {
-          if (document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
-            const selected = document.querySelector('.canvas-item-active');
-            if (selected) {
-              selected.remove();
-              showToast("要素を削除しました。");
-              checkEmptyCanvas();
-            }
+          // 入力フォーム操作中は無効化
+          const activeEl = document.activeElement;
+          if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable)) {
+            return;
+          }
+          const sel = document.querySelector('.canvas-item-active');
+          if (sel) {
+            sel.remove();
+            showToast("要素を削除しました。");
+            checkEmptyCanvas();
           }
         }
       });
 
       initDropZone();
       initCropBoxInteractions();
-      
+
       setTimeout(() => {
-        addSampleInitialAssets();
+        spawnSummaryCardDirect();
         resizeCanvas();
       }, 80);
     };
-
-    // ==========================================
-    // 10. 高画質PDFエクスポート制御
-    // ==========================================
-    function exportToPDF() {
-      deselectAllItems();
-      const canvasEl = document.getElementById('mysoku-canvas');
-      const wrapper = document.getElementById('print-area-wrapper');
-      showToast("極高画質PDFをレンダリング中（約1〜2秒）...");
-
-      const originalTransform = canvasEl.style.transform;
-      const originalHeight = wrapper.style.height;
-      canvasEl.style.transform = 'none';
-      wrapper.style.height = 'auto';
-
-      // 追加: アイコン・スタンプ整列枠を印刷に映らないよう透明化
-      const grids = document.querySelectorAll('.icon-grid-container, .appeal-grid-container');
-      grids.forEach(g => {
-        g.classList.add('!border-transparent', '!bg-transparent');
-      });
-
-      setTimeout(() => {
-        html2canvas(canvasEl, {
-          scale: 3.5, 
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: '#ffffff',
-          logging: false
-        }).then(canvas => {
-          canvasEl.style.transform = originalTransform;
-          wrapper.style.height = originalHeight;
-          
-          grids.forEach(g => {
-            g.classList.remove('!border-transparent', '!bg-transparent');
-          });
-
-          try {
-            const imgData = canvas.toDataURL('image/jpeg', 1.0);
-            
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF({
-              orientation: 'landscape',
-              unit: 'mm',
-              format: 'a4'
-            });
-
-            pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210, undefined, 'FAST');
-            
-            const filename = `販売図面_${document.getElementById('input-title').value.replace(/\s+/g, '_')}.pdf`;
-            pdf.save(filename);
-            showToast("A4横向きの極高画質PDFファイルを出力しました！");
-          } catch (dataUrlErr) {
-            console.error(dataUrlErr);
-            showToast("外部画像のセキュリティ制限によりPDF出力を実行できません。直接アップロードした写真のみをご使用ください。");
-          }
-        }).catch(err => {
-          console.error(err);
-          canvasEl.style.transform = originalTransform;
-          wrapper.style.height = originalHeight;
-          grids.forEach(g => {
-            g.classList.remove('!border-transparent', '!bg-transparent');
-          });
-          showToast("PDFの生成に失敗しました。");
-        });
-      }, 100);
-    }
   </script>
 </body>
 </html>
