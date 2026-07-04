@@ -52,7 +52,6 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex flex-col overflow-x-hidden">
 
-  <!-- ヘッダー -->
   <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex items-center justify-between sticky top-0 z-50 shadow-md">
     <div class="flex items-center space-x-3">
       <div class="p-2.5 bg-gradient-to-br from-indigo-500 to-emerald-500 rounded-xl shadow-lg shadow-indigo-500/20">
@@ -130,7 +129,6 @@
   </header>
 
   <div class="flex-1 flex overflow-hidden">
-    <!-- サイドバー -->
     <aside class="w-[420px] bg-slate-800/90 border-r border-slate-700 flex flex-col h-[calc(100vh-73px)] shrink-0 overflow-y-auto font-sans">
       
       <div class="flex border-b border-slate-700 sticky top-0 bg-slate-800 z-10">
@@ -145,7 +143,6 @@
         </button>
       </div>
 
-      <!-- パネル1: 物件情報入力 -->
       <div id="panel-info" class="p-5 space-y-6">
         <div>
           <h3 class="text-sm font-extrabold text-slate-300 uppercase tracking-wider mb-3 flex items-center gap-1.5"><span class="w-1.5 h-3 bg-indigo-500 rounded-full"></span> ヘッダーメイン項目</h3>
@@ -230,7 +227,6 @@
         </div>
       </div>
 
-      <!-- パネル2: 帯替え・配置（複数アップロード＆ギャラリー仕様） -->
       <div id="panel-crop" class="p-5 space-y-6 hidden">
         <div>
           <h3 class="text-sm font-extrabold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5"><i data-lucide="arrow-left-right" class="w-4 h-4 text-emerald-400"></i>他社マイソク 帯替え・画像配置</h3>
@@ -253,6 +249,9 @@
           <span class="text-[10px] text-slate-400 font-bold whitespace-nowrap"><i data-lucide="grid" class="w-3 h-3 inline pb-0.5"></i> 画像整列枠を追加:</span>
           <button onclick="addImageGrid(1)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 font-semibold">1列</button>
           <button onclick="addImageGrid(2)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 font-semibold">2列</button>
+          <button onclick="addImageGrid(3)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 font-semibold">3列</button>
+          <button onclick="addImageGrid(4)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 font-semibold">4列</button>
+          <button onclick="addImageGrid(5)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 font-semibold">5列</button>
         </div>
 
         <div id="source-image-wrapper" class="hidden space-y-4">
@@ -273,7 +272,6 @@
         </div>
       </div>
 
-      <!-- パネル3: アイコン・素材 -->
       <div id="panel-stamp" class="p-5 space-y-6 hidden">
         <div>
           <h3 class="text-sm font-extrabold text-emerald-400 uppercase tracking-wider mb-2 flex items-center gap-1.5"><i data-lucide="layout-grid" class="w-4 h-4"></i> デザイナーズスタンプ型アイコン</h3>
@@ -368,7 +366,6 @@
             <span class="text-[8.5px] text-slate-500 ml-auto leading-tight">※枠を選択して下から挿入</span>
           </div>
 
-          <!-- フリーワード入力＆配置エリア -->
           <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-700">
             <label class="block text-[10px] text-slate-400 mb-1.5 font-bold">自由にテキストを入力してスタンプを作成</label>
             <div class="flex gap-2 mb-2">
@@ -387,10 +384,8 @@
       </div>
     </aside>
 
-    <!-- メインワークエリア（中央キャンバス） -->
     <main class="flex-1 bg-slate-950 p-6 flex flex-col items-center justify-start overflow-y-auto relative">
       
-      <!-- キャンバス情報・操作ヘルパー -->
       <div class="w-[1000px] max-w-full mb-3 flex items-center justify-between text-xs text-slate-400 px-2 shrink-0">
         <div class="flex items-center gap-1.5">
           <i data-lucide="info" class="w-4 h-4 text-indigo-400"></i>
@@ -403,12 +398,9 @@
         </div>
       </div>
 
-      <!-- キャンバスを囲うラッパー -->
       <div id="print-area-wrapper" class="w-full flex justify-center items-start overflow-hidden">
-        <!-- マイソクメインキャンバス (1000px * 707px 固定) -->
         <div id="mysoku-canvas" class="mysoku-canvas-container relative select-none rounded border border-slate-800 shrink-0" onclick="deselectAllItems(event)">
           
-          <!-- ==================== ヘッダー ==================== -->
           <div id="theme-header-bg" class="w-full h-[170px] bg-gradient-to-r from-emerald-800 to-teal-700 px-3.5 pt-2 pb-3 flex flex-col justify-between relative z-10 transition-all duration-300">
             <div id="theme-header-border" class="absolute bottom-0 left-0 right-0 h-[6px] bg-amber-400 z-50 pointer-events-none transition-colors duration-300"></div>
 
@@ -467,7 +459,6 @@
             </div>
           </div>
 
-          <!-- ==================== メイン描画エリア ==================== -->
           <div id="canvas-work-area" class="absolute top-[170px] bottom-[95px] left-0 right-0 bg-orange-50/25 overflow-hidden transition-all duration-300">
             <div id="canvas-bg-watermark" class="absolute inset-0 flex items-center justify-center opacity-[0.03] select-none pointer-events-none">
               <i data-lucide="home" class="w-[300px] h-[300px] text-emerald-800"></i>
@@ -480,7 +471,6 @@
             </div>
           </div>
 
-          <!-- ==================== フッター ==================== -->
           <div id="theme-footer-bg" class="absolute bottom-0 left-0 right-0 h-[95px] bg-gradient-to-r from-emerald-800 to-teal-700 border-t-[5px] border-amber-400 p-2.5 grid grid-cols-12 gap-2 text-white z-10 transition-all duration-300 font-sans">
             
             <div id="footer-left" class="col-span-9 border-r border-white/20 pr-3 flex items-center gap-3 relative overflow-hidden">
@@ -499,7 +489,7 @@
                     <div class="flex flex-wrap gap-x-4 gap-y-1 text-[10px] text-white/95 font-mono leading-none pt-0.5">
                       <span class="flex items-end gap-1.5"><i id="footer-phone-icon" data-lucide="phone" class="w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]"></i> <strong class="text-white align-bottom leading-none">03-6808-3031</strong></span>
                       <span class="flex items-end gap-1.5"><i id="footer-mail-icon" data-lucide="mail" class="w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]"></i> <span class="text-white align-bottom leading-none">chintai@techno-home.jp</span></span>
-                      <span class="flex items-end gap-1.5"><i id="footer-map-icon" data-lucide="map-pin" class="w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]"></i> <span class="text-white align-bottom leading-none">〒134-0084 東京都江戸川区東葛西6-4-17 ELLEPLAN1階</span></span>
+                      <span class="flex items-end gap-1.5"><i id="footer-map-icon" data-lucide="map-pin" class="w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]"></i> <span class="text-white align-bottom leading-none truncate">〒134-0084 東京都江戸川区東葛西6-4-17 ELLEPLAN1階</span></span>
                     </div>
                   </div>
                 </div>
@@ -535,7 +525,6 @@
     </main>
   </div>
 
-  <!-- 画面最下部に表示される美しいトースト通知 -->
   <div id="toast" class="fixed bottom-6 right-6 bg-slate-800 border border-indigo-500/30 text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 transform translate-y-20 opacity-0 transition-all duration-300 ease-out z-50 pointer-events-none">
     <div class="p-1.5 bg-indigo-500/20 text-indigo-400 rounded-lg">
       <i data-lucide="bell" class="w-4 h-4"></i>
@@ -544,22 +533,17 @@
   </div>
 
   <script>
-    // ==========================================
-    // 1. グローバルステート定義
-    // ==========================================
     let activeTab = 'info';
     let currentTheme = 'premium';
     let uploadedImageBase64 = null;
     let selectedCanvasItem = null;
     let canvasItemIdCounter = 0;
 
-    // トリミング用のドラッグ制御
     let isCroppingDrag = false;
     let cropStartPos = { x: 0, y: 0 };
     let cropBoxPos = { x: 20, y: 20, w: 120, h: 120 };
     let cropActiveHandle = null;
 
-    // キャンバス上のアイテム移動・リサイズ制御
     let isMovingCanvasItem = false;
     let isResizingCanvasItem = false;
     let activeCanvasItemPos = { x: 0, y: 0, w: 0, h: 0 };
@@ -567,17 +551,11 @@
     let activeResizeHandle = null;
     let isCanvasGlobalEventRegistered = false;
 
-    // 複数画像・ギャラリー制御用
     let selectedGalleryImage = null;
-
     let cascadeOffsetCounter = 0;
     let lastIconSize = { w: 75, h: 75 };
     let lastAppealSize = { w: 180, h: 45 };
 
-    // ==========================================
-    // 2. コア・共通ユーティリティ関数
-    // ==========================================
-    
     function formatToYen(value) {
       if (!value) return "0";
       return value.toString().replace(/\d+/g, function(match) {
@@ -727,12 +705,8 @@
       if (containerWidth <= 0) {
         const mainEl = wrapper.parentElement;
         containerWidth = mainEl ? mainEl.clientWidth : 0;
-        if (containerWidth <= 0) {
-          containerWidth = window.innerWidth - 440;
-        }
-        if (containerWidth <= 0) {
-          containerWidth = 1000;
-        }
+        if (containerWidth <= 0) containerWidth = window.innerWidth - 440;
+        if (containerWidth <= 0) containerWidth = 1000;
       }
 
       const scale = Math.max(0.1, Math.min(1, containerWidth / 1020));
@@ -749,7 +723,6 @@
 
     function deselectAllItems(e) {
       if (e && e.target.id !== 'canvas-work-area' && e.target.id !== 'mysoku-canvas') return;
-      
       const items = document.querySelectorAll('.canvas-item-active');
       items.forEach(it => {
         it.classList.remove('canvas-item-active', 'ring-4', 'ring-indigo-500/50');
@@ -759,7 +732,6 @@
 
     function switchSidebarTab(tab) {
       activeTab = tab;
-      
       const tabs = ['info', 'crop', 'stamp'];
       tabs.forEach(t => {
         const btn = document.getElementById('tab-btn-' + t);
@@ -805,9 +777,7 @@
       }
       
       childrenToRemove.forEach(child => {
-        if (child.parentNode) {
-          child.parentNode.removeChild(child);
-        }
+        if (child.parentNode) child.parentNode.removeChild(child);
       });
       
       selectedCanvasItem = null;
@@ -885,8 +855,6 @@
       const phoneIcon = document.getElementById('footer-phone-icon');
       const mailIcon = document.getElementById('footer-mail-icon');
       const mapIcon = document.getElementById('footer-map-icon');
-      const adBg = document.getElementById('footer-ad-bg');
-      const adLabel = document.getElementById('footer-ad-label');
       const taiyouBg = document.getElementById('footer-taiyou-bg');
 
       const subLabels = document.querySelectorAll('.sub-label');
@@ -905,559 +873,39 @@
       subBar.className = "w-full rounded px-3 py-1.5 flex items-center justify-between text-[11px] text-white transition-all duration-300 mt-0.5 bg-stone-950/40";
       watermark.innerHTML = '';
       
-      if (headerTitleBlock) {
-        headerTitleBlock.className = "flex-1 min-w-0 pr-3 flex flex-col justify-center overflow-visible transition-colors duration-300 relative z-40";
-      }
-      if (canvasTitle) {
-        canvasTitle.style.removeProperty('color');
-      }
-      if (headerCatchBlock) {
-        headerCatchBlock.className = "flex items-center justify-between min-h-[32px] overflow-visible transition-colors duration-300 relative z-30";
-      }
+      if (headerTitleBlock) headerTitleBlock.className = "flex-1 min-w-0 pr-3 flex flex-col justify-center overflow-visible transition-colors duration-300 relative z-40";
+      if (canvasTitle) canvasTitle.style.removeProperty('color');
+      if (headerCatchBlock) headerCatchBlock.className = "flex items-center justify-between min-h-[32px] overflow-visible transition-colors duration-300 relative z-30";
       if (canvasCatch) {
         canvasCatch.style.removeProperty('color');
         canvasCatch.style.removeProperty('padding-bottom');
       }
 
-      if (color === 'amber') {
-        headerBg.classList.add('bg-gradient-to-r', 'from-amber-950', 'via-stone-900', 'to-amber-950');
-        if (headerBorder) headerBorder.classList.add('bg-amber-500');
-        footerBg.classList.add('bg-gradient-to-r', 'from-amber-950', 'via-stone-900', 'to-amber-950', 'border-t-[5px]', 'border-amber-500');
+      const applyTheme = (mainBg, borderBg, iconCol, iconHtml) => {
+        headerBg.classList.add(...mainBg.split(' '));
+        if (headerBorder) headerBorder.classList.add(borderBg);
+        footerBg.classList.add(...mainBg.split(' '), 'border-t-[5px]', `border-${borderBg.split('-')[1]}-500`);
         
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-amber-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-stone-950/90 rounded-lg flex items-center justify-center shrink-0 shadow border border-amber-500/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-amber-400 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-amber-400 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-amber-400 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-amber-400 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-stone-950/80 border border-amber-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-amber-400 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-stone-900/60 border border-amber-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
+        if (footerLeft) footerLeft.className = `col-span-9 border-r border-${borderBg.split('-')[1]}-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white`;
+        if (logoBg) logoBg.className = `p-2.5 bg-stone-950/90 rounded-lg flex items-center justify-center shrink-0 shadow border border-${borderBg.split('-')[1]}-500/20`;
+        if (labelText) labelText.className = `text-[9px] font-bold ${iconCol} leading-none`;
+        if (phoneIcon) phoneIcon.className = `w-3.5 h-3.5 ${iconCol} shrink-0 self-end mb-[-1.5px]`;
+        if (mailIcon) mailIcon.className = `w-3.5 h-3.5 ${iconCol} shrink-0 self-end mb-[-1.5px]`;
+        if (mapIcon) mapIcon.className = `w-3.5 h-3.5 ${iconCol} shrink-0 self-end mb-[-1.5px]`;
+        if (taiyouBg) taiyouBg.className = `bg-stone-900/60 border border-${borderBg.split('-')[1]}-500/10 rounded py-1.5 leading-none flex flex-col justify-center`;
 
-        subLabels.forEach(el => { el.className = "sub-label text-amber-300 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-amber-500 text-stone-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="crown" class="w-[300px] h-[300px] text-amber-900"></i>`;
-      } else if (color === 'blue') {
-        headerBg.classList.add('bg-gradient-to-r', 'from-blue-950', 'via-slate-900', 'to-blue-950');
-        if (headerBorder) headerBorder.classList.add('bg-blue-500');
-        footerBg.classList.add('bg-gradient-to-r', 'from-blue-950', 'via-slate-900', 'to-blue-950', 'border-t-[5px]', 'border-blue-500');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-blue-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-stone-950/90 rounded-lg flex items-center justify-center shrink-0 shadow border border-blue-500/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-blue-400 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-blue-400 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-blue-400 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-stone-950/80 border border-blue-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-blue-400 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-stone-900/60 border border-blue-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
+        subLabels.forEach(el => { el.className = `sub-label ${iconCol} font-bold mr-0.5`; });
+        if (locationBadge) locationBadge.className = `bg-${borderBg.split('-')[1]}-500 text-stone-950 px-2 py-1 rounded font-black shrink-0 text-[10px]`;
+        watermark.innerHTML = iconHtml;
+      };
 
-        subLabels.forEach(el => { el.className = "sub-label text-blue-300 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-blue-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="crown" class="w-[300px] h-[300px] text-blue-900"></i>`;
-      } else if (color === 'emerald') {
-        headerBg.classList.add('bg-gradient-to-r', 'from-emerald-950', 'via-stone-900', 'to-emerald-950');
-        if (headerBorder) headerBorder.classList.add('bg-emerald-500');
-        footerBg.classList.add('bg-gradient-to-r', 'from-emerald-950', 'via-stone-900', 'to-emerald-950', 'border-t-[5px]', 'border-emerald-500');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-emerald-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-stone-950/90 rounded-lg flex items-center justify-center shrink-0 shadow border border-emerald-500/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-emerald-400 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-emerald-400 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-emerald-400 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-emerald-400 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-stone-950/80 border border-emerald-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-emerald-400 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-stone-900/60 border border-emerald-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
+      if (color === 'amber') applyTheme('bg-gradient-to-r from-amber-950 via-stone-900 to-amber-950', 'bg-amber-500', 'text-amber-400', '<i data-lucide="crown" class="w-[300px] h-[300px] text-amber-900"></i>');
+      else if (color === 'blue' || color === 'solid-blue') applyTheme('bg-gradient-to-r from-blue-950 via-slate-900 to-blue-950', 'bg-blue-500', 'text-blue-400', '<i data-lucide="building" class="w-[300px] h-[300px] text-blue-900"></i>');
+      else if (color === 'emerald' || color === 'solid-emerald') applyTheme('bg-gradient-to-r from-emerald-950 via-stone-900 to-emerald-950', 'bg-emerald-500', 'text-emerald-400', '<i data-lucide="home" class="w-[300px] h-[300px] text-emerald-900"></i>');
+      else if (color === 'rose') applyTheme('bg-gradient-to-r from-rose-950 via-stone-900 to-rose-950', 'bg-rose-500', 'text-rose-400', '<i data-lucide="crown" class="w-[300px] h-[300px] text-rose-900"></i>');
+      else applyTheme('bg-slate-800', 'bg-slate-500', 'text-slate-400', '<i data-lucide="layers" class="w-[300px] h-[300px] text-slate-700"></i>');
 
-        subLabels.forEach(el => { el.className = "sub-label text-emerald-300 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-emerald-500 text-stone-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="crown" class="w-[300px] h-[300px] text-emerald-900"></i>`;
-      } else if (color === 'rose') {
-        headerBg.classList.add('bg-gradient-to-r', 'from-rose-950', 'via-stone-900', 'to-rose-950');
-        if (headerBorder) headerBorder.classList.add('bg-rose-500');
-        footerBg.classList.add('bg-gradient-to-r', 'from-rose-950', 'via-stone-900', 'to-rose-950', 'border-t-[5px]', 'border-rose-500');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-rose-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-stone-950/90 rounded-lg flex items-center justify-center shrink-0 shadow border border-rose-500/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-rose-400 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-rose-400 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-rose-400 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-rose-400 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-stone-950/80 border border-rose-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-rose-400 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-stone-900/60 border border-rose-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-rose-300 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-rose-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="crown" class="w-[300px] h-[300px] text-rose-900"></i>`;
-      } else if (color === 'slate') {
-        headerBg.classList.add('bg-gradient-to-r', 'from-slate-900', 'via-zinc-900', 'to-slate-900');
-        if (headerBorder) headerBorder.classList.add('bg-slate-500');
-        footerBg.classList.add('bg-gradient-to-r', 'from-slate-900', 'via-zinc-900', 'to-slate-900', 'border-t-[5px]', 'border-slate-500');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-slate-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-stone-950/90 rounded-lg flex items-center justify-center shrink-0 shadow border border-slate-500/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-slate-400 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-slate-400 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-slate-400 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-slate-400 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-stone-950/80 border border-slate-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-slate-400 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-stone-900/60 border border-slate-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-slate-300 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-slate-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="crown" class="w-[300px] h-[300px] text-slate-800"></i>`;
-      } else if (color === 'grad-gold') {
-        headerBg.classList.add('bg-gradient-to-r', 'from-yellow-950', 'via-amber-800', 'to-yellow-950');
-        if (headerBorder) headerBorder.classList.add('bg-yellow-500');
-        footerBg.classList.add('bg-gradient-to-r', 'from-yellow-950', 'via-amber-800', 'to-yellow-950', 'border-t-[5px]', 'border-yellow-500');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-yellow-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-yellow-950/80 rounded-lg flex items-center justify-center shrink-0 shadow border border-yellow-500/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-yellow-400 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-yellow-400 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-yellow-400 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-yellow-400 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-yellow-950/80 border border-yellow-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-yellow-400 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-yellow-900/60 border border-yellow-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-yellow-300 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-yellow-500 text-yellow-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="crown" class="w-[300px] h-[300px] text-yellow-900"></i>`;
-      } else if (color === 'grad-navy') {
-        headerBg.classList.add('bg-gradient-to-r', 'from-slate-950', 'via-blue-950', 'to-slate-950');
-        if (headerBorder) headerBorder.classList.add('bg-blue-600');
-        footerBg.classList.add('bg-gradient-to-r', 'from-slate-950', 'via-blue-950', 'to-slate-950', 'border-t-[5px]', 'border-blue-600');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-blue-600/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-slate-900/80 rounded-lg flex items-center justify-center shrink-0 shadow border border-blue-600/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-blue-300 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-slate-900/80 border border-blue-600/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-blue-300 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-slate-800/60 border border-blue-600/10 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-blue-200 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-blue-600 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="building-2" class="w-[300px] h-[300px] text-blue-950"></i>`;
-      } else if (color === 'grad-burgundy') {
-        headerBg.classList.add('bg-gradient-to-r', 'from-rose-950', 'via-red-900', 'to-rose-950');
-        if (headerBorder) headerBorder.classList.add('bg-rose-500');
-        footerBg.classList.add('bg-gradient-to-r', 'from-rose-950', 'via-red-900', 'to-rose-950', 'border-t-[5px]', 'border-rose-500');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-rose-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-rose-950/80 rounded-lg flex items-center justify-center shrink-0 shadow border border-rose-500/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-rose-300 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-rose-300 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-rose-300 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-rose-300 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-rose-950/80 border border-rose-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-rose-300 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-rose-900/60 border border-rose-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-rose-200 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-rose-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="gem" class="w-[300px] h-[300px] text-rose-950"></i>`;
-      } else if (color === 'grad-forest') {
-        headerBg.classList.add('bg-gradient-to-r', 'from-emerald-950', 'via-green-900', 'to-emerald-950');
-        if (headerBorder) headerBorder.classList.add('bg-emerald-500');
-        footerBg.classList.add('bg-gradient-to-r', 'from-emerald-950', 'via-green-900', 'to-emerald-950', 'border-t-[5px]', 'border-emerald-500');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-emerald-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-emerald-950/80 rounded-lg flex items-center justify-center shrink-0 shadow border border-emerald-500/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-emerald-300 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-emerald-300 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-emerald-300 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-emerald-300 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-emerald-950/80 border border-emerald-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-emerald-300 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-emerald-900/60 border border-emerald-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-emerald-200 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-emerald-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="tree-pine" class="w-[300px] h-[300px] text-emerald-950"></i>`;
-      } else if (color === 'grad-bronze') {
-        headerBg.classList.add('bg-gradient-to-r', 'from-orange-950', 'via-stone-800', 'to-orange-950');
-        if (headerBorder) headerBorder.classList.add('bg-orange-500');
-        footerBg.classList.add('bg-gradient-to-r', 'from-orange-950', 'via-stone-800', 'to-orange-950', 'border-t-[5px]', 'border-orange-500');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-orange-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-orange-950/80 rounded-lg flex items-center justify-center shrink-0 shadow border border-orange-500/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-orange-300 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-orange-300 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-orange-300 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-orange-300 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-orange-950/80 border border-orange-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-orange-300 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-orange-900/60 border border-orange-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-orange-200 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-orange-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="landmark" class="w-[300px] h-[300px] text-orange-950"></i>`;
-      } else if (color === 'grad-silver') {
-        headerBg.classList.add('bg-gradient-to-r', 'from-white', 'via-slate-100', 'to-slate-200');
-        if (headerBorder) headerBorder.classList.add('bg-slate-400');
-        footerBg.classList.add('bg-gradient-to-r', 'from-white', 'via-slate-100', 'to-slate-200', 'border-t-[5px]', 'border-slate-400');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-slate-300 pr-3 flex items-center gap-3 relative overflow-hidden text-slate-800";
-        if (logoBg) logoBg.className = "p-2.5 bg-slate-100 rounded-lg flex items-center justify-center shrink-0 shadow border border-slate-300";
-        if (labelText) labelText.className = "text-[9px] font-bold text-slate-500 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-slate-600 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-slate-600 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-slate-600 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-slate-100 border border-slate-300 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-slate-500 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-slate-50 border border-slate-200 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-slate-500 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-slate-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="layers" class="w-[300px] h-[300px] text-slate-200"></i>`;
-      } else if (color === 'grad-iceblue') {
-        headerBg.classList.add('bg-sky-50');
-        if (headerBorder) headerBorder.classList.add('bg-sky-400');
-        footerBg.classList.add('bg-sky-50', 'border-t-[5px]', 'border-sky-400');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-sky-200 pr-3 flex items-center gap-3 relative overflow-hidden text-slate-800";
-        if (logoBg) logoBg.className = "p-2.5 bg-white rounded-lg flex items-center justify-center shrink-0 shadow border border-sky-200";
-        if (labelText) labelText.className = "text-[9px] font-bold text-sky-600 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-sky-600 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-sky-600 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-sky-600 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-white border border-sky-200 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-sky-600 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-sky-100 border border-sky-200 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-sky-600 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-sky-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="droplets" class="w-[300px] h-[300px] text-sky-100"></i>`;
-      } else if (color === 'grad-mint') {
-        headerBg.classList.add('bg-emerald-50');
-        if (headerBorder) headerBorder.classList.add('bg-emerald-400');
-        footerBg.classList.add('bg-emerald-50', 'border-t-[5px]', 'border-emerald-400');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-emerald-200 pr-3 flex items-center gap-3 relative overflow-hidden text-slate-800";
-        if (logoBg) logoBg.className = "p-2.5 bg-white rounded-lg flex items-center justify-center shrink-0 shadow border border-emerald-200";
-        if (labelText) labelText.className = "text-[9px] font-bold text-emerald-600 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-emerald-600 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-emerald-600 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-emerald-600 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-white border border-emerald-200 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-emerald-600 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-emerald-100 border border-emerald-200 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-emerald-600 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-emerald-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="leaf" class="w-[300px] h-[300px] text-emerald-100"></i>`;
-      } else if (color === 'grad-champagne') {
-        headerBg.classList.add('bg-amber-50');
-        if (headerBorder) headerBorder.classList.add('bg-amber-400');
-        footerBg.classList.add('bg-amber-50', 'border-t-[5px]', 'border-amber-400');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-amber-200 pr-3 flex items-center gap-3 relative overflow-hidden text-slate-800";
-        if (logoBg) logoBg.className = "p-2.5 bg-white rounded-lg flex items-center justify-center shrink-0 shadow border border-amber-200";
-        if (labelText) labelText.className = "text-[9px] font-bold text-amber-600 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-amber-600 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-amber-600 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-amber-600 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-white border border-amber-200 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-amber-600 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-amber-100 border border-amber-200 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-amber-600 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-amber-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="sparkles" class="w-[300px] h-[300px] text-amber-100"></i>`;
-      } else if (color === 'grad-tricolor') {
-        headerBg.classList.add('bg-white');
-        if (headerBorder) headerBorder.classList.add('bg-red-600');
-        footerBg.classList.add('bg-white', 'border-t-[5px]', 'border-red-600');
-        
-        if (headerCatchBlock) {
-          headerCatchBlock.classList.add('bg-red-600', '-mx-3.5', 'px-3.5', '-mt-2', 'pt-1.5', 'pb-2');
-          headerCatchBlock.classList.remove('items-center');
-          headerCatchBlock.classList.add('items-start');
-        }
-        if (canvasCatch) {
-          canvasCatch.style.setProperty('color', '#ffffff', 'important');
-          canvasCatch.style.setProperty('padding-bottom', '8px', 'important');
-        }
-
-        if (headerTitleBlock) {
-          headerTitleBlock.classList.add('bg-blue-900', '-ml-3.5', 'pl-3.5');
-        }
-        if (canvasTitle) {
-          canvasTitle.style.setProperty('color', '#ffffff', 'important');
-        }
-
-        subBar.classList.remove('bg-stone-950/40');
-        subBar.classList.add('bg-slate-200');
-
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-slate-300 pr-3 flex items-center gap-3 relative overflow-hidden text-slate-800";
-        if (logoBg) logoBg.className = "p-2.5 bg-slate-100 rounded-lg flex items-center justify-center shrink-0 shadow border border-slate-300";
-        if (labelText) labelText.className = "text-[9px] font-bold text-slate-500 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-slate-600 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-slate-600 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-slate-600 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-white border border-slate-300 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-slate-500 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-slate-50 border border-slate-200 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-slate-500 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-slate-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="flag" class="w-[300px] h-[300px] text-slate-100"></i>`;
-      }
-
-      else if (color === 'solid-blue') {
-        headerBg.classList.add('bg-blue-900');
-        if (headerBorder) headerBorder.classList.add('bg-blue-400');
-        footerBg.classList.add('bg-blue-900', 'border-t-[5px]', 'border-blue-400');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-blue-400/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-blue-950/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-blue-400/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-blue-300 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-blue-950/40 border border-blue-400/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-blue-300 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-blue-900/40 border border-blue-400/10 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-blue-200 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-blue-400 text-blue-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="building" class="w-[300px] h-[300px] text-blue-800"></i>`;
-      } else if (color === 'solid-emerald') {
-        headerBg.classList.add('bg-emerald-900');
-        if (headerBorder) headerBorder.classList.add('bg-emerald-400');
-        footerBg.classList.add('bg-emerald-900', 'border-t-[5px]', 'border-emerald-400');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-emerald-400/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-emerald-950/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-emerald-400/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-emerald-300 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-emerald-300 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-emerald-300 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-emerald-300 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-emerald-950/40 border border-emerald-400/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-emerald-300 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-emerald-900/40 border border-emerald-400/10 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-emerald-200 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-emerald-400 text-emerald-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="home" class="w-[300px] h-[300px] text-emerald-800"></i>`;
-      } else if (color === 'solid-amber') {
-        headerBg.classList.add('bg-amber-900');
-        if (headerBorder) headerBorder.classList.add('bg-amber-400');
-        footerBg.classList.add('bg-amber-900', 'border-t-[5px]', 'border-amber-400');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-amber-400/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-amber-950/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-amber-400/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-amber-300 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-amber-300 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-amber-950/40 border border-amber-400/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-amber-300 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-amber-900/40 border border-amber-400/10 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-amber-200 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-amber-400 text-amber-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="crown" class="w-[300px] h-[300px] text-amber-800"></i>`;
-      } else if (color === 'solid-slate') {
-        headerBg.classList.add('bg-slate-800');
-        if (headerBorder) headerBorder.classList.add('bg-slate-400');
-        footerBg.classList.add('bg-slate-800', 'border-t-[5px]', 'border-slate-400');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-slate-400/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-slate-900/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-slate-400/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-slate-300 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-slate-300 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-slate-300 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-slate-300 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-slate-900/40 border border-slate-400/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-slate-300 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-slate-800/40 border border-slate-400/10 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-slate-200 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-slate-400 text-slate-900 px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="building" class="w-[300px] h-[300px] text-slate-700"></i>`;
-      } else if (color === 'solid-black') {
-        headerBg.classList.add('bg-zinc-950');
-        if (headerBorder) headerBorder.classList.add('bg-zinc-500');
-        footerBg.classList.add('bg-zinc-950', 'border-t-[5px]', 'border-zinc-500');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-zinc-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-black/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-zinc-500/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-zinc-300 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-zinc-300 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-zinc-300 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-zinc-300 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-black/40 border border-zinc-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-zinc-300 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-zinc-900/40 border border-zinc-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-zinc-200 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-zinc-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="crown" class="w-[300px] h-[300px] text-zinc-800"></i>`;
-      } else if (color === 'solid-red') {
-        headerBg.classList.add('bg-red-900');
-        if (headerBorder) headerBorder.classList.add('bg-red-500');
-        footerBg.classList.add('bg-red-900', 'border-t-[5px]', 'border-red-500');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-red-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-red-950/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-red-500/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-red-300 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-red-300 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-red-300 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-red-300 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-red-950/40 border border-red-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-red-300 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-red-900/40 border border-red-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-red-200 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-red-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="megaphone" class="w-[300px] h-[300px] text-red-800"></i>`;
-      } else if (color === 'solid-navy') {
-        headerBg.classList.add('bg-blue-950');
-        if (headerBorder) headerBorder.classList.add('bg-blue-500');
-        footerBg.classList.add('bg-blue-950', 'border-t-[5px]', 'border-blue-500');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-blue-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-slate-950/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-blue-500/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-blue-300 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-blue-300 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-slate-950/40 border border-blue-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-blue-300 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-slate-900/40 border border-blue-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-blue-200 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-blue-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="shield-check" class="w-[300px] h-[300px] text-blue-900"></i>`;
-      } else if (color === 'solid-teal') {
-        headerBg.classList.add('bg-teal-900');
-        if (headerBorder) headerBorder.classList.add('bg-teal-500');
-        footerBg.classList.add('bg-teal-900', 'border-t-[5px]', 'border-teal-500');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-teal-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-teal-950/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-teal-500/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-teal-300 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-teal-300 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-teal-300 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-teal-300 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-teal-950/40 border border-teal-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-teal-300 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-teal-900/40 border border-teal-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-teal-200 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-teal-500 text-teal-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="sparkles" class="w-[300px] h-[300px] text-teal-800"></i>`;
-      } else if (color === 'solid-orange') {
-        headerBg.classList.add('bg-orange-800');
-        if (headerBorder) headerBorder.classList.add('bg-orange-500');
-        footerBg.classList.add('bg-orange-800', 'border-t-[5px]', 'border-orange-500');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-orange-500/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-orange-950/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-orange-500/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-orange-300 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-orange-300 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-orange-300 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-orange-300 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-orange-950/40 border border-orange-500/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-orange-300 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-orange-900/40 border border-orange-500/10 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-orange-200 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-orange-500 text-orange-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="sun" class="w-[300px] h-[300px] text-orange-700"></i>`;
-      } else if (color === 'solid-indigo') {
-        headerBg.classList.add('bg-indigo-900');
-        if (headerBorder) headerBorder.classList.add('bg-indigo-400');
-        footerBg.classList.add('bg-indigo-900', 'border-t-[5px]', 'border-indigo-400');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-indigo-400/20 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-indigo-950/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-indigo-400/20";
-        if (labelText) labelText.className = "text-[9px] font-bold text-indigo-300 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-indigo-300 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-indigo-300 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-indigo-300 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-indigo-950/40 border border-indigo-400/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-indigo-300 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-indigo-900/40 border border-indigo-400/10 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-indigo-200 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-indigo-400 text-indigo-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="compass" class="w-[300px] h-[300px] text-indigo-800"></i>`;
-      } else if (color === 'solid-light-yellow') {
-        headerBg.classList.add('bg-yellow-600');
-        if (headerBorder) headerBorder.classList.add('bg-yellow-300');
-        footerBg.classList.add('bg-yellow-600', 'border-t-[5px]', 'border-yellow-300');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-yellow-300/30 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-yellow-700/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-yellow-300/30";
-        if (labelText) labelText.className = "text-[9px] font-bold text-yellow-200 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-yellow-200 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-yellow-200 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-yellow-200 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-yellow-700/40 border border-yellow-300/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-yellow-200 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-yellow-700/30 border border-yellow-300/20 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-yellow-200 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-yellow-300 text-yellow-900 px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="sun" class="w-[300px] h-[300px] text-yellow-500"></i>`;
-      } else if (color === 'solid-dusty-pink') {
-        headerBg.classList.add('bg-rose-800');
-        if (headerBorder) headerBorder.classList.add('bg-rose-300');
-        footerBg.classList.add('bg-rose-800', 'border-t-[5px]', 'border-rose-300');
-        
-        if (footerLeft) footerLeft.className = "col-span-9 border-r border-rose-300/30 pr-3 flex items-center gap-3 relative overflow-hidden text-white";
-        if (logoBg) logoBg.className = "p-2.5 bg-rose-900/50 rounded-lg flex items-center justify-center shrink-0 shadow border border-rose-300/30";
-        if (labelText) labelText.className = "text-[9px] font-bold text-rose-200 leading-none";
-        if (phoneIcon) phoneIcon.className = "w-3.5 h-3.5 text-rose-200 shrink-0 self-end mb-[-1.5px]";
-        if (mailIcon) mailIcon.className = "w-3.5 h-3.5 text-rose-200 shrink-0 self-end mb-[-1.5px]";
-        if (mapIcon) mapIcon.className = "w-3.5 h-3.5 text-rose-200 shrink-0 self-end mb-[-1.5px]";
-        if (adBg) adBg.className = "bg-rose-900/40 border border-rose-300/30 rounded py-1.5 leading-none flex flex-col justify-center";
-        if (adLabel) adLabel.className = "text-[8px] text-rose-200 font-bold scale-90 leading-none mb-0.5";
-        if (taiyouBg) taiyouBg.className = "bg-rose-900/30 border border-rose-300/20 rounded py-1.5 leading-none flex flex-col justify-center";
-
-        subLabels.forEach(el => { el.className = "sub-label text-rose-200 font-bold mr-0.5"; });
-        if (locationBadge) locationBadge.className = "bg-rose-300 text-rose-950 px-2 py-1 rounded font-black shrink-0 text-[10px]";
-        
-        watermark.innerHTML = `<i data-lucide="heart" class="w-[300px] h-[300px] text-rose-900"></i>`;
-      }
-      
-      // 白・ライトグレー時の文字色反転制御
-      if (color === 'grad-silver' || color === 'grad-iceblue' || color === 'grad-mint' || color === 'grad-champagne' || color === 'grad-tricolor') {
+      if (color.includes('silver') || color.includes('light') || color.includes('mint') || color.includes('champagne')) {
         headerBg.classList.add('theme-light');
         footerBg.classList.add('theme-light');
         subBar.classList.add('theme-light');
@@ -1470,7 +918,6 @@
       lucide.createIcons();
     }
 
-    // 画像描画境界取得
     function getImageBounds() {
       const img = document.getElementById('source-image');
       const container = img.parentElement;
@@ -1481,17 +928,9 @@
       const imgH = img.clientHeight;
       const left = Math.max(0, (container.clientWidth - imgW) / 2);
       const top = Math.max(0, (container.clientHeight - imgH) / 2);
-      return {
-        left: left,
-        top: top,
-        right: left + imgW,
-        bottom: top + imgH,
-        width: imgW,
-        height: imgH
-      };
+      return { left: left, top: top, right: left + imgW, bottom: top + imgH, width: imgW, height: imgH };
     }
 
-    // クロップ初期化
     function resetCropBox() {
       const bounds = getImageBounds();
       const w = Math.max(50, bounds.width * 0.6);
@@ -1499,13 +938,11 @@
       cropBoxPos = {
         x: bounds.left + (bounds.width - w) / 2,
         y: bounds.top + (bounds.height - h) / 2,
-        w: w,
-        h: h
+        w: w, h: h
       };
       updateCropBoxUI();
     }
 
-    // クロップUI更新
     function updateCropBoxUI() {
       const cropBox = document.getElementById('crop-box');
       if (!cropBox) return;
@@ -1517,17 +954,9 @@
 
     function getNextSpawnPos(baseX, baseY) {
       cascadeOffsetCounter = (cascadeOffsetCounter + 15) % 120;
-      return {
-        x: baseX + cascadeOffsetCounter,
-        y: baseY + cascadeOffsetCounter
-      };
+      return { x: baseX + cascadeOffsetCounter, y: baseY + cascadeOffsetCounter };
     }
 
-    // ==========================================
-    // 3. アセット作成・配置コントロール
-    // ==========================================
-
-    // アイコン整列枠配置
     function addIconGrid(cols) {
       const guide = document.getElementById('canvas-guide');
       if (guide) guide.style.opacity = '0';
@@ -1560,7 +989,6 @@
       }, 50);
     }
 
-    // スタンプ整列枠配置
     function addAppealGrid(cols) {
       const guide = document.getElementById('canvas-guide');
       if (guide) guide.style.opacity = '0';
@@ -1587,13 +1015,9 @@
       setupCanvasItemInteractions(div);
       showToast(`${cols}列のスタンプ整列枠を配置しました。そのままスタンプを追加してください。`);
       
-      setTimeout(() => {
-        selectCanvasItem(div);
-        lucide.createIcons();
-      }, 50);
+      setTimeout(() => { selectCanvasItem(div); lucide.createIcons(); }, 50);
     }
 
-    // 画像整列枠配置
     function addImageGrid(cols) {
       const guide = document.getElementById('canvas-guide');
       if (guide) guide.style.opacity = '0';
@@ -1620,12 +1044,9 @@
       setupCanvasItemInteractions(div);
       showToast(`${cols}列の画像整列枠を配置しました。`);
       
-      setTimeout(() => {
-        selectCanvasItem(div);
-      }, 50);
+      setTimeout(() => { selectCanvasItem(div); }, 50);
     }
 
-    // 画像アセット自由配置
     function addPresetAssetToCanvas(src, customX = 80, customY = 60, customW = 280, customH = 210) {
       const guide = document.getElementById('canvas-guide');
       if (guide) guide.style.opacity = '0';
@@ -1659,14 +1080,11 @@
       setupCanvasItemInteractions(div);
     }
 
-    // 詳細概要カード生成
     function spawnSummaryCard(customX = 630, customY = 170, customW = 340, customH = 430) {
       const existingInner = document.getElementById('summary-card-inner');
       if (existingInner && existingInner.parentElement) {
         const parentDiv = existingInner.parentElement;
-        if (parentDiv.parentNode) {
-          parentDiv.parentNode.removeChild(parentDiv);
-        }
+        if (parentDiv.parentNode) parentDiv.parentNode.removeChild(parentDiv);
       }
 
       const guide = document.getElementById('canvas-guide');
@@ -1679,20 +1097,14 @@
       div.style.left = `${customX}px`;
       div.style.top = `${customY}px`;
 
-      div.innerHTML = `
-        <div id="summary-card-inner" class="w-full h-full p-2.5 border border-slate-800 flex flex-col justify-between text-slate-900 bg-white font-sans overflow-hidden">
-        </div>
-      `;
+      div.innerHTML = `<div id="summary-card-inner" class="w-full h-full p-2.5 border border-slate-800 flex flex-col justify-between text-slate-900 bg-white font-sans overflow-hidden"></div>`;
 
       setupCanvasItemInteractions(div);
       syncSummaryCard();
     }
 
-    function spawnSummaryCardDirect() {
-      spawnSummaryCard(630, 170, 340, 430);
-    }
+    function spawnSummaryCardDirect() { spawnSummaryCard(630, 170, 340, 430); }
 
-    // 概要同期ロジック
     function syncSummaryCard() {
       const inner = document.getElementById('summary-card-inner');
       if (!inner) return;
@@ -1700,81 +1112,38 @@
       const address = document.getElementById('input-address')?.value || '東京都渋谷区代々木1丁目XX-XX';
       const menseki = formatArea(document.getElementById('input-menseki')?.value || '42.50');
       const kouzou = document.getElementById('input-kouzou')?.value || 'RC造 10階建 / 4階部分';
-      
-      const r_kanrigai = document.getElementById('input-summary-kanrigai');
-      const kanrigai = r_kanrigai ? r_kanrigai.value : '株式会社テクノ管理';
-      const r_soukosu = document.getElementById('input-summary-soukosu');
-      const soukosu = r_soukosu ? r_soukosu.value : '42戸';
-
+      const kanrigai = document.getElementById('input-summary-kanrigai')?.value || '株式会社テクノ管理';
+      const soukosu = document.getElementById('input-summary-soukosu')?.value || '42戸';
       const price = formatToYen(document.getElementById('input-price')?.value || '148000') + "円";
       const kanri = formatToYen(document.getElementById('input-kanri')?.value || '8000') + "円";
       const shikikin = document.getElementById('input-shikikin')?.value || '1ヶ月';
       const reikin = document.getElementById('input-reikin')?.value || '1ヶ月';
-      
-      const r_koshin = document.getElementById('input-summary-koshin');
-      const koshin = r_koshin ? r_koshin.value : '新賃料の1ヶ月分';
-
-      const r_staff = document.getElementById('input-summary-staff');
-      const staff = r_staff ? r_staff.value : '山田 太郎';
-      const r_license = document.getElementById('input-summary-license');
-      const license = r_license ? r_license.value : '東京都知事（1）第XXXXXX号';
+      const koshin = document.getElementById('input-summary-koshin')?.value || '新賃料の1ヶ月分';
+      const staff = document.getElementById('input-summary-staff')?.value || '山田 太郎';
+      const license = document.getElementById('input-summary-license')?.value || '東京都知事（1）第XXXXXX号';
       const advertiser = "株式会社テクノホーム";
 
       inner.innerHTML = `
         <div class="text-[9.5px] font-black border-b-[1.5px] border-slate-800 pb-1 mb-1 text-center bg-slate-100 uppercase tracking-widest text-slate-800 font-sans select-none">詳細情報・取引諸条件</div>
-        
         <div class="text-[7.5px] font-bold text-slate-500 mb-0.5 font-sans select-none">■ 物件の概要</div>
         <table class="w-full text-[8px] border-collapse border border-slate-800 mb-1 font-sans">
-          <tr>
-            <td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">物件所在地</td>
-            <td class="border border-slate-800 p-1 w-[75%] font-medium leading-tight align-middle text-slate-800" colspan="3">${address}</td>
-          </tr>
-          <tr>
-            <td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">専有面積</td>
-            <td class="border border-slate-800 p-1 w-[25%] font-medium text-slate-800 leading-none align-middle">${menseki}</td>
-            <td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">構造・規模</td>
-            <td class="border border-slate-800 p-1 w-[25%] font-medium text-slate-800 leading-none align-middle">${kouzou}</td>
-          </tr>
-          <tr>
-            <td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">管理会社名</td>
-            <td class="border border-slate-800 p-1 w-[25%] font-medium text-slate-800 leading-none align-middle truncate max-w-[50px]">${kanrigai}</td>
-            <td class="border border-slate-800 p-1 w-[25%] font-medium text-slate-800 leading-none align-middle">${soukosu}</td>
-          </tr>
+          <tr><td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">物件所在地</td><td class="border border-slate-800 p-1 w-[75%] font-medium leading-tight align-middle text-slate-800" colspan="3">${address}</td></tr>
+          <tr><td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">専有面積</td><td class="border border-slate-800 p-1 w-[25%] font-medium text-slate-800 leading-none align-middle">${menseki}</td><td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">構造・規模</td><td class="border border-slate-800 p-1 w-[25%] font-medium text-slate-800 leading-none align-middle">${kouzou}</td></tr>
+          <tr><td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">管理会社名</td><td class="border border-slate-800 p-1 w-[25%] font-medium text-slate-800 leading-none align-middle truncate max-w-[50px]">${kanrigai}</td><td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">総戸数</td><td class="border border-slate-800 p-1 w-[25%] font-medium text-slate-800 leading-none align-middle">${soukosu}</td></tr>
         </table>
-
         <div class="text-[7.5px] font-bold text-slate-500 mb-0.5 font-sans select-none">■ 取引条件</div>
         <table class="w-full text-[8px] border-collapse border border-slate-800 mb-1 font-sans">
-          <tr>
-            <td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">賃料</td>
-            <td class="border border-slate-800 p-1 w-[25%] font-bold text-red-600 leading-none align-middle">${price}</td>
-            <td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">管理費等</td>
-            <td class="border border-slate-800 p-1 w-[25%] font-medium text-slate-800 leading-none align-middle">${kanri}</td>
-          </tr>
-          <tr>
-            <td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">敷金・礼金</td>
-            <td class="border border-slate-800 p-1 w-[25%] font-medium text-slate-800 leading-none align-middle">敷${shikikin} / 礼${reikin}</td>
-            <td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">更新料</td>
-            <td class="border border-slate-800 p-1 w-[25%] font-medium text-slate-800 leading-none align-middle">${koshin}</td>
-          </tr>
+          <tr><td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">賃料</td><td class="border border-slate-800 p-1 w-[25%] font-bold text-red-600 leading-none align-middle">${price}</td><td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">管理費等</td><td class="border border-slate-800 p-1 w-[25%] font-medium text-slate-800 leading-none align-middle">${kanri}</td></tr>
+          <tr><td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">敷金・礼金</td><td class="border border-slate-800 p-1 w-[25%] font-medium text-slate-800 leading-none align-middle">敷${shikikin} / 礼${reikin}</td><td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">更新料</td><td class="border border-slate-800 p-1 w-[25%] font-medium text-slate-800 leading-none align-middle">${koshin}</td></tr>
         </table>
-
         <div class="text-[7.5px] font-bold text-slate-500 mb-0.5 font-sans select-none">■ 広告主の情報</div>
         <table class="w-full text-[8px] border-collapse border border-slate-800 font-sans">
-          <tr>
-            <td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">広告主</td>
-            <td class="border border-slate-800 p-1 w-[75%] font-bold text-slate-800 leading-none align-middle" colspan="3">${advertiser}</td>
-          </tr>
-          <tr>
-            <td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">担当者</td>
-            <td class="border border-slate-800 p-1 w-[25%] font-medium text-slate-800 leading-none align-middle">${staff}</td>
-            <td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">免許番号</td>
-            <td class="border border-slate-800 p-1 w-[25%] font-medium text-slate-800 leading-none align-middle truncate max-w-[50px]">${license}</td>
-          </tr>
+          <tr><td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">広告主</td><td class="border border-slate-800 p-1 w-[75%] font-bold text-slate-800 leading-none align-middle" colspan="3">${advertiser}</td></tr>
+          <tr><td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">担当者</td><td class="border border-slate-800 p-1 w-[25%] font-medium text-slate-800 leading-none align-middle">${staff}</td><td class="border border-slate-800 bg-slate-50 p-1 font-bold w-[25%] text-center text-slate-700 leading-none">免許番号</td><td class="border border-slate-800 p-1 w-[25%] font-medium text-slate-800 leading-none align-middle truncate max-w-[50px]">${license}</td></tr>
         </table>
       `;
     }
 
-    // デザイナーズアイコン配置
     function addDesignerIconBox(type) {
       const guide = document.getElementById('canvas-guide');
       if (guide) guide.style.opacity = '0';
@@ -1785,12 +1154,9 @@
 
       if (selectedCanvasItem && selectedCanvasItem.dataset.itemType === 'icon-grid') {
         targetGrid = selectedCanvasItem;
-      } 
-      else if (!selectedCanvasItem) {
+      } else if (!selectedCanvasItem) {
         const grids = document.querySelectorAll('.icon-grid-container');
-        if (grids.length > 0) {
-          targetGrid = grids[grids.length - 1]; 
-        }
+        if (grids.length > 0) targetGrid = grids[grids.length - 1]; 
       }
 
       if (targetGrid) {
@@ -1824,225 +1190,31 @@
       else if (type === 'RC') bgClass = "bg-[#e5e7eb]";
 
       let svgContent = '';
-      let labelText = type;
-
-      if (type === 'B・T別') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 13h14v2a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-2z" fill="#bae6fd" />
-            <path d="M4 13V6a2 2 0 0 1 2-2h2" />
-            <circle cx="10" cy="3" r="1.5" fill="#f8fafc" />
-            <line x1="17" y1="2" x2="17" y2="22" stroke-dasharray="3 3" />
-            <path d="M19 11v4h4v-2a2 2 0 0 0-2-2h-2z" fill="#e2e8f0" />
-            <path d="M19 15c-1 0-2 1-2 2v2h4v-2c0-1-1-2-2-2z" fill="#f8fafc" />
-          </svg>
-        `;
-      } else if (type === 'オートロック') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="5" y="11" width="14" height="10" rx="3" fill="#fcd34d" />
-            <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-            <circle cx="12" cy="16" r="1.5" fill="#1e293b" />
-          </svg>
-        `;
-      } else if (type === '独立洗面') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="7" y="3" width="10" height="8" rx="2" fill="#e0f2fe" />
-            <path d="M4 14h16v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3z" fill="#f8fafc" />
-            <path d="M12 11v3" />
-            <path d="M10 12h4" />
-          </svg>
-        `;
-      } else if (type === '温水便座') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="6" y="3" width="12" height="6" rx="2" fill="#f8fafc" />
-            <path d="M8 9v6a4 4 0 0 0 8 0V9H8z" fill="#e2e8f0" />
-            <path d="M12 15c-1 0-2-1-2-2s2-4 2-4 2 3 2 4-1 2-2 2z" fill="#60a5fa" stroke="none" />
-            <circle cx="16" cy="6" r="1" fill="#94a3b8" />
-          </svg>
-        `;
-      } else if (type === '室内洗濯') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="5" y="3" width="14" height="18" rx="3" fill="#f8fafc" />
-            <line x1="5" y1="8" x2="19" y2="8" />
-            <circle cx="12" cy="14" r="4" fill="#bae6fd" />
-            <circle cx="8" cy="5.5" r="1" fill="#1e293b" />
-            <circle cx="11" cy="5.5" r="1" fill="#1e293b" />
-          </svg>
-        `;
-      } else if (type === 'システムK') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 13h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6z" fill="#fbcfe8" />
-            <line x1="3" y1="13" x2="21" y2="13" />
-            <circle cx="8" cy="11" r="2" fill="#f97316" stroke="none" />
-            <circle cx="16" cy="11" r="2" fill="#f97316" stroke="none" />
-            <path d="M12 9V5c0-1 1-2 2-2s2 1 2 2v2" />
-          </svg>
-        `;
-      } else if (type === '追い焚き') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 14h16v2a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-2z" fill="#93c5fd" />
-            <path d="M12 9c-1-1-2-2-2-4s2-2 2-2 2 0 2 2-1 3-2 4z" fill="#f87171" stroke="none" />
-            <path d="M7 8c0-2 1-3 2-4" />
-            <path d="M17 8c0-2-1-3-2-4" />
-          </svg>
-        `;
-      } else if (type === '浴室乾燥機') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="4" y="3" width="16" height="6" rx="1" fill="#e2e8f0" />
-            <line x1="6" y1="6" x2="18" y2="6" stroke-dasharray="2 2" />
-            <path d="M12 11l-3 3v6h6v-6l-3-3z" fill="#fef08a" />
-            <path d="M12 11a1 1 0 0 0-1-1 1 1 0 0 1 1-1 1 1 0 0 1 1 1 1 1 0 0 0-1 1z" />
-            <path d="M7 14s2 2 5 2 5-2 5-2" stroke="#94a3b8" />
-          </svg>
-        `;
-      } else if (type === 'ネット無料') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 8.5a10 10 0 0 1 14 0" />
-            <path d="M8.5 12.5a5 5 0 0 1 7 0" />
-            <circle cx="12" cy="16.5" r="1.5" fill="#3b82f6" stroke="none" />
-            <rect x="6" y="19" width="12" height="3" rx="1" fill="#1e293b" />
-          </svg>
-        `;
-      } else if (type === 'ペット可') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 12c-2.5 0-5 2-5 5.5S9 22 12 22s5-1 5-4.5-2.5-5.5-5-5.5z" fill="#f43f5e" />
-            <circle cx="7" cy="9" r="2.5" fill="#f43f5e" />
-            <circle cx="10.5" cy="5.5" r="2.5" fill="#f43f5e" />
-            <circle cx="14.5" cy="5.5" r="2.5" fill="#f43f5e" />
-            <circle cx="18" cy="9" r="2.5" fill="#f43f5e" />
-          </svg>
-        `;
-      } else if (type === '宅配ボックス') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="10" height="18" rx="1" fill="#e2e8f0" />
-            <line x1="3" y1="9" x2="13" y2="9" />
-            <line x1="3" y1="15" x2="13" y2="15" />
-            <path d="M15 13l6 3v5l-6-3v-5z" fill="#d97706" stroke="#b45309" />
-            <path d="M15 13l3-1.5 3 1.5-3 1.5-3-1.5z" fill="#f59e0b" stroke="#b45309" />
-          </svg>
-        `;
-      } else if (type === 'WIC') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="16" rx="2" fill="#ede9fe" />
-            <path d="M3 8h18" />
-            <path d="M8 8l-2 4h4l-2-4z" fill="#a855f7" />
-            <path d="M16 8l-2 4h4l-2-4z" fill="#a855f7" />
-            <path d="M8 8c0-1 .5-2 1-2s1 1 1 2" />
-            <path d="M16 8c0-1 .5-2 1-2s1 1 1 2" />
-          </svg>
-        `;
-      } else if (type === 'エレベーター') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="4" y="2" width="16" height="20" rx="1" fill="#cbd5e1" />
-            <line x1="12" y1="2" x2="12" y2="22" />
-            <path d="M9 10l-2-2-2 2" stroke="#475569" />
-            <line x1="7" y1="8" x2="7" y2="16" stroke="#475569" />
-            <path d="M15 14l2 2 2-2" stroke="#475569" />
-            <line x1="17" y1="8" x2="17" y2="16" stroke="#475569" />
-          </svg>
-        `;
-      } else if (type === '防犯カメラ') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="5" y="8" width="14" height="8" rx="2" fill="#cbd5e1" />
-            <path d="M19 10l3-2v8l-3-2" fill="#cbd5e1" />
-            <circle cx="9" cy="12" r="2" fill="#1e293b" />
-            <circle cx="9" cy="12" r="0.5" fill="#ef4444" stroke="none" />
-          </svg>
-        `;
-      } else if (type === '駐輪場') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="6" cy="16" r="4" fill="#a7f3d0" />
-            <circle cx="18" cy="16" r="4" fill="#a7f3d0" />
-            <path d="M6 16l3-6h6l3 6" />
-            <path d="M12 16v-6" />
-            <path d="M8 10h8" />
-          </svg>
-        `;
-      } else if (type === '駐車場') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 15h14a2 2 0 0 0 2-2v-2l-3-4H6l-3 4v2a2 2 0 0 0 2 2z" fill="#fdba74" />
-            <circle cx="7" cy="16" r="3" fill="#1e293b" />
-            <circle cx="17" cy="16" r="3" fill="#1e293b" />
-            <path d="M6 11h12" />
-          </svg>
-        `;
-      } else if (type === 'エアコン') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="8" rx="2" fill="#f8fafc" />
-            <line x1="6" y1="8" x2="18" y2="8" />
-            <line x1="8" y1="16" x2="10" y2="20" stroke="#60a5fa" />
-            <line x1="12" y1="16" x2="12" y2="20" stroke="#60a5fa" />
-            <line x1="16" y1="16" x2="14" y2="20" stroke="#60a5fa" />
-          </svg>
-        `;
-      } else if (type === 'TVモニターホン') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="4" y="3" width="16" height="18" rx="2" fill="#e9d5ff" />
-            <rect x="6" y="6" width="12" height="8" rx="1" fill="#f8fafc" />
-            <circle cx="12" cy="10" r="2" fill="#a855f7" stroke="none" />
-            <circle cx="9" cy="17" r="1.5" fill="#a855f7" />
-            <circle cx="15" cy="17" r="1.5" fill="#a855f7" />
-          </svg>
-        `;
-      } else if (type === 'カウンターK') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 18v-8h16" fill="none" />
-            <path d="M4 18h4v-4h12V10H4z" fill="#fbcfe8" />
-            <path d="M12 18v-4" />
-            <path d="M10 14h4" />
-            <path d="M18 18v-4" />
-            <path d="M16 14h4" />
-          </svg>
-        `;
-      } else if (type === '新築') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 3l8 6v12H4V9l8-6z" fill="#fed7aa" />
-            <path d="M10 21V14h4v7" fill="#f8fafc" />
-            <path d="M5 5l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" />
-            <path d="M19 5l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" />
-            <path d="M19 12l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" />
-          </svg>
-        `;
-      } else if (type === 'RC') {
-        svgContent = `
-          <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="5" y="4" width="14" height="18" rx="1" fill="#e2e8f0" />
-            <rect x="8" y="7" width="3" height="3" fill="#64748b" stroke="none" />
-            <rect x="13" y="7" width="3" height="3" fill="#64748b" stroke="none" />
-            <rect x="8" y="12" width="3" height="3" fill="#64748b" stroke="none" />
-            <rect x="13" y="12" width="3" height="3" fill="#64748b" stroke="none" />
-            <rect x="8" y="17" width="3" height="3" fill="#64748b" stroke="none" />
-            <rect x="13" y="17" width="3" height="3" fill="#64748b" stroke="none" />
-          </svg>
-        `;
-      }
+      if (type === 'B・T別') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13h14v2a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-2z" fill="#bae6fd" /><path d="M4 13V6a2 2 0 0 1 2-2h2" /><circle cx="10" cy="3" r="1.5" fill="#f8fafc" /><line x1="17" y1="2" x2="17" y2="22" stroke-dasharray="3 3" /><path d="M19 11v4h4v-2a2 2 0 0 0-2-2h-2z" fill="#e2e8f0" /><path d="M19 15c-1 0-2 1-2 2v2h4v-2c0-1-1-2-2-2z" fill="#f8fafc" /></svg>`;
+      else if (type === 'オートロック') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="3" fill="#fcd34d" /><path d="M8 11V7a4 4 0 0 1 8 0v4" /><circle cx="12" cy="16" r="1.5" fill="#1e293b" /></svg>`;
+      else if (type === '独立洗面') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="8" rx="2" fill="#e0f2fe" /><path d="M4 14h16v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3z" fill="#f8fafc" /><path d="M12 11v3" /><path d="M10 12h4" /></svg>`;
+      else if (type === '温水便座') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="3" width="12" height="6" rx="2" fill="#f8fafc" /><path d="M8 9v6a4 4 0 0 0 8 0V9H8z" fill="#e2e8f0" /><path d="M12 15c-1 0-2-1-2-2s2-4 2-4 2 3 2 4-1 2-2 2z" fill="#60a5fa" stroke="none" /><circle cx="16" cy="6" r="1" fill="#94a3b8" /></svg>`;
+      else if (type === '室内洗濯') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3" width="14" height="18" rx="3" fill="#f8fafc" /><line x1="5" y1="8" x2="19" y2="8" /><circle cx="12" cy="14" r="4" fill="#bae6fd" /><circle cx="8" cy="5.5" r="1" fill="#1e293b" /><circle cx="11" cy="5.5" r="1" fill="#1e293b" /></svg>`;
+      else if (type === 'システムK') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6z" fill="#fbcfe8" /><line x1="3" y1="13" x2="21" y2="13" /><circle cx="8" cy="11" r="2" fill="#f97316" stroke="none" /><circle cx="16" cy="11" r="2" fill="#f97316" stroke="none" /><path d="M12 9V5c0-1 1-2 2-2s2 1 2 2v2" /></svg>`;
+      else if (type === '追い焚き') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h16v2a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-2z" fill="#93c5fd" /><path d="M12 9c-1-1-2-2-2-4s2-2 2-2 2 0 2 2-1 3-2 4z" fill="#f87171" stroke="none" /><path d="M7 8c0-2 1-3 2-4" /><path d="M17 8c0-2-1-3-2-4" /></svg>`;
+      else if (type === '浴室乾燥機') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="6" rx="1" fill="#e2e8f0" /><line x1="6" y1="6" x2="18" y2="6" stroke-dasharray="2 2" /><path d="M12 11l-3 3v6h6v-6l-3-3z" fill="#fef08a" /><path d="M12 11a1 1 0 0 0-1-1 1 1 0 0 1 1-1 1 1 0 0 1 1 1 1 1 0 0 0-1 1z" /><path d="M7 14s2 2 5 2 5-2 5-2" stroke="#94a3b8" /></svg>`;
+      else if (type === 'ネット無料') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8.5a10 10 0 0 1 14 0" /><path d="M8.5 12.5a5 5 0 0 1 7 0" /><circle cx="12" cy="16.5" r="1.5" fill="#3b82f6" stroke="none" /><rect x="6" y="19" width="12" height="3" rx="1" fill="#1e293b" /></svg>`;
+      else if (type === 'ペット可') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c-2.5 0-5 2-5 5.5S9 22 12 22s5-1 5-4.5-2.5-5.5-5-5.5z" fill="#f43f5e" /><circle cx="7" cy="9" r="2.5" fill="#f43f5e" /><circle cx="10.5" cy="5.5" r="2.5" fill="#f43f5e" /><circle cx="14.5" cy="5.5" r="2.5" fill="#f43f5e" /><circle cx="18" cy="9" r="2.5" fill="#f43f5e" /></svg>`;
+      else if (type === '宅配ボックス') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="10" height="18" rx="1" fill="#e2e8f0" /><line x1="3" y1="9" x2="13" y2="9" /><line x1="3" y1="15" x2="13" y2="15" /><path d="M15 13l6 3v5l-6-3v-5z" fill="#d97706" stroke="#b45309" /><path d="M15 13l3-1.5 3 1.5-3 1.5-3-1.5z" fill="#f59e0b" stroke="#b45309" /></svg>`;
+      else if (type === 'WIC') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2" fill="#ede9fe" /><path d="M3 8h18" /><path d="M8 8l-2 4h4l-2-4z" fill="#a855f7" /><path d="M16 8l-2 4h4l-2-4z" fill="#a855f7" /><path d="M8 8c0-1 .5-2 1-2s1 1 1 2" /><path d="M16 8c0-1 .5-2 1-2s1 1 1 2" /></svg>`;
+      else if (type === 'エレベーター') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="1" fill="#cbd5e1" /><line x1="12" y1="2" x2="12" y2="22" /><path d="M9 10l-2-2-2 2" stroke="#475569" /><line x1="7" y1="8" x2="7" y2="16" stroke="#475569" /><path d="M15 14l2 2 2-2" stroke="#475569" /><line x1="17" y1="8" x2="17" y2="16" stroke="#475569" /></svg>`;
+      else if (type === '防犯カメラ') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="8" width="14" height="8" rx="2" fill="#cbd5e1" /><path d="M19 10l3-2v8l-3-2" fill="#cbd5e1" /><circle cx="9" cy="12" r="2" fill="#1e293b" /><circle cx="9" cy="12" r="0.5" fill="#ef4444" stroke="none" /></svg>`;
+      else if (type === '駐輪場') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="16" r="4" fill="#a7f3d0" /><circle cx="18" cy="16" r="4" fill="#a7f3d0" /><path d="M6 16l3-6h6l3 6" /><path d="M12 16v-6" /><path d="M8 10h8" /></svg>`;
+      else if (type === '駐車場') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15h14a2 2 0 0 0 2-2v-2l-3-4H6l-3 4v2a2 2 0 0 0 2 2z" fill="#fdba74" /><circle cx="7" cy="16" r="3" fill="#1e293b" /><circle cx="17" cy="16" r="3" fill="#1e293b" /><path d="M6 11h12" /></svg>`;
+      else if (type === 'エアコン') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="8" rx="2" fill="#f8fafc" /><line x1="6" y1="8" x2="18" y2="8" /><line x1="8" y1="16" x2="10" y2="20" stroke="#60a5fa" /><line x1="12" y1="16" x2="12" y2="20" stroke="#60a5fa" /><line x1="16" y1="16" x2="14" y2="20" stroke="#60a5fa" /></svg>`;
+      else if (type === 'TVモニターホン') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2" fill="#e9d5ff" /><rect x="6" y="6" width="12" height="8" rx="1" fill="#f8fafc" /><circle cx="12" cy="10" r="2" fill="#a855f7" stroke="none" /><circle cx="9" cy="17" r="1.5" fill="#a855f7" /><circle cx="15" cy="17" r="1.5" fill="#a855f7" /></svg>`;
+      else if (type === 'カウンターK') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18v-8h16" fill="none" /><path d="M4 18h4v-4h12V10H4z" fill="#fbcfe8" /><path d="M12 18v-4" /><path d="M10 14h4" /><path d="M18 18v-4" /><path d="M16 14h4" /></svg>`;
+      else if (type === '新築') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 6v12H4V9l8-6z" fill="#fed7aa" /><path d="M10 21V14h4v7" fill="#f8fafc" /><path d="M5 5l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" /><path d="M19 5l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" /><path d="M19 12l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" /></svg>`;
+      else if (type === 'RC') svgContent = `<svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="18" rx="1" fill="#e2e8f0" /><rect x="8" y="7" width="3" height="3" fill="#64748b" stroke="none" /><rect x="13" y="7" width="3" height="3" fill="#64748b" stroke="none" /><rect x="8" y="12" width="3" height="3" fill="#64748b" stroke="none" /><rect x="13" y="12" width="3" height="3" fill="#64748b" stroke="none" /><rect x="8" y="17" width="3" height="3" fill="#64748b" stroke="none" /><rect x="13" y="17" width="3" height="3" fill="#64748b" stroke="none" /></svg>`;
 
       if (isGridMode) {
         div.className = `relative w-full aspect-square group`;
         div.dataset.itemType = 'icon-in-grid';
-        div.style.left = '';
-        div.style.top = '';
-        div.style.width = '';
-        div.style.height = '';
       } else {
         div.className = `absolute cursor-move overflow-visible group`;
         div.dataset.itemType = 'icon';
@@ -2054,7 +1226,6 @@
       }
 
       const initialScale = isGridMode ? 1 : (lastIconSize.w / 75);
-      
       const deleteBtnHtml = isGridMode ? `<button onclick="const p = this.parentElement; const g = p.closest('.icon-grid-container'); p.remove(); if(g && g.querySelector('.grid-inner').children.length === 0){ g.querySelector('.empty-grid-msg').style.display = 'flex'; } event.stopPropagation();" class="absolute -top-1.5 -right-1.5 w-4 h-4 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center shadow font-bold text-[8px] opacity-0 group-hover:opacity-100 transition z-50 pointer-events-auto">×</button>` : '';
 
       div.innerHTML = `
@@ -2063,7 +1234,7 @@
             <div class="flex items-center justify-center w-full h-[46px] overflow-visible select-none pointer-events-none">
               ${svgContent}
             </div>
-            <span class="text-[8.5px] font-black tracking-widest text-slate-900 text-center leading-none select-none w-full block mt-0.5 whitespace-nowrap overflow-visible">${labelText}</span>
+            <span class="text-[8.5px] font-black tracking-widest text-slate-900 text-center leading-none select-none w-full block mt-0.5 whitespace-nowrap overflow-visible">${type}</span>
           </div>
         </div>
         ${deleteBtnHtml}
@@ -2084,14 +1255,9 @@
       if (isGridMode) {
         targetContainer.appendChild(div);
         targetGrid.style.height = 'auto';
-        
         const msg = targetGrid.querySelector('.empty-grid-msg');
         if (msg) msg.style.display = 'none';
-
-        if (selectedCanvasItem !== targetGrid) {
-           selectCanvasItem(targetGrid);
-        }
-
+        if (selectedCanvasItem !== targetGrid) selectCanvasItem(targetGrid);
         showToast(`枠内に「${type}」を追加しました。`);
       } else {
         setupCanvasItemInteractions(div);
@@ -2099,47 +1265,10 @@
       }
     }
 
-    // PDFドロップ連携
-    function initDropZone() {
-      const dropZone = document.getElementById('drop-zone');
-      if (!dropZone) return;
-
-      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }, false);
-      });
-
-      ['dragenter', 'dragover'].forEach(eventName => {
-        dropZone.addEventListener(eventName, () => {
-          dropZone.classList.add('border-indigo-500', 'bg-slate-800/80');
-        }, false);
-      });
-
-      ['dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, () => {
-          dropZone.classList.remove('border-indigo-500', 'bg-slate-800/80');
-        }, false);
-      });
-
-      dropZone.addEventListener('drop', (e) => {
-        if (e.dataTransfer.files.length) {
-          processMultipleFiles(e.dataTransfer.files);
-        }
-      }, false);
-    }
-
-    // ==========================================
-    // 4. アピール文言（フリーワード）配置ロジック
-    // ==========================================
     function addCustomAppealText() {
       const text = document.getElementById('custom-appeal-text').value.trim();
       const bgClass = document.getElementById('custom-appeal-color').value;
-      if (!text) {
-        showToast("アピール文言を入力してください。");
-        return;
-      }
+      if (!text) { showToast("アピール文言を入力してください。"); return; }
 
       const guide = document.getElementById('canvas-guide');
       if (guide) guide.style.opacity = '0';
@@ -2148,16 +1277,11 @@
       let targetGrid = null;
       let isGridMode = false;
 
-      // 1. 選択中の要素が「スタンプ整列枠」だった場合
       if (selectedCanvasItem && selectedCanvasItem.dataset.itemType === 'appeal-grid') {
         targetGrid = selectedCanvasItem;
-      } 
-      // 2. 何も選択されていない場合でも、キャンバス上に「スタンプ整列枠」があれば自動で拾って吸着させる
-      else if (!selectedCanvasItem) {
+      } else if (!selectedCanvasItem) {
         const grids = document.querySelectorAll('.appeal-grid-container');
-        if (grids.length > 0) {
-          targetGrid = grids[grids.length - 1];
-        }
+        if (grids.length > 0) targetGrid = grids[grids.length - 1];
       }
 
       if (targetGrid) {
@@ -2170,14 +1294,9 @@
       if (isGridMode) {
         div.className = `relative w-full h-[45px] group`;
         div.dataset.itemType = 'appeal-in-grid';
-        div.style.left = '';
-        div.style.top = '';
-        div.style.width = '';
-        div.style.height = '';
       } else {
         div.className = `absolute ${bgClass} rounded shadow-lg cursor-move flex items-center justify-center text-center font-black font-rounded text-[26px] leading-none tracking-widest min-w-[150px] overflow-hidden group`;
         div.dataset.itemType = 'appeal';
-        
         const pos = getNextSpawnPos(150, 200);
         div.style.left = `${pos.x}px`;
         div.style.top = `${pos.y}px`;
@@ -2199,7 +1318,6 @@
         div.innerHTML = `<span style="display:inline-block; white-space:nowrap; transform-origin:center center;">${text}</span>`;
       }
 
-      // 自由配置モードの時の自動リサイズ
       if (!isGridMode) {
         const span = div.querySelector('span');
         const ro = new ResizeObserver(entries => {
@@ -2216,14 +1334,9 @@
       if (isGridMode) {
         targetContainer.appendChild(div);
         targetGrid.style.height = 'auto';
-        
         const msg = targetGrid.querySelector('.empty-grid-msg');
         if (msg) msg.style.display = 'none';
-
-        if (selectedCanvasItem !== targetGrid) {
-           selectCanvasItem(targetGrid);
-        }
-
+        if (selectedCanvasItem !== targetGrid) selectCanvasItem(targetGrid);
         showToast(`枠内にスタンプ「${text}」を追加しました。`);
       } else {
         setupCanvasItemInteractions(div);
@@ -2231,10 +1344,6 @@
       }
     }
 
-
-    // ==========================================
-    // 6. キャンバスアセットの移動・リサイズ
-    // ==========================================
     function setupCanvasItemInteractions(el) {
       const workArea = document.getElementById('canvas-work-area');
       
@@ -2257,7 +1366,6 @@
         e.stopPropagation();
       });
 
-      // 四隅のリサイズハンドル
       const handleConfigs = [
         { class: 'top-0 left-0 cursor-nwse-resize border-b border-r rounded-br', handle: 'top-left' },
         { class: 'top-0 right-0 cursor-nesw-resize border-b border-l rounded-bl', handle: 'top-right' },
@@ -2272,7 +1380,6 @@
         el.appendChild(h);
       });
 
-      // 操作ボタン類
       const btnUp = document.createElement('button');
       btnUp.className = "inline-menu-btn absolute top-[-10px] left-[-10px] w-6 h-6 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full items-center justify-center shadow-lg border border-white z-30 transition-transform active:scale-90 font-bold text-[10px]";
       btnUp.title = "前面に移動";
@@ -2291,21 +1398,9 @@
       btnDel.innerHTML = "×";
       el.appendChild(btnDel);
 
-      btnUp.onclick = function(e) {
-        e.stopPropagation();
-        changeZIndexDirect(el, 'up');
-      };
-      btnDown.onclick = function(e) {
-        e.stopPropagation();
-        changeZIndexDirect(el, 'down');
-      };
-      btnDel.onclick = function(e) {
-        e.stopPropagation();
-        el.remove();
-        selectedCanvasItem = null;
-        showToast("要素を削除しました。");
-        checkEmptyCanvas();
-      };
+      btnUp.onclick = function(e) { e.stopPropagation(); changeZIndexDirect(el, 'up'); };
+      btnDown.onclick = function(e) { e.stopPropagation(); changeZIndexDirect(el, 'down'); };
+      btnDel.onclick = function(e) { e.stopPropagation(); el.remove(); selectedCanvasItem = null; showToast("要素を削除しました。"); checkEmptyCanvas(); };
 
       el.addEventListener('mousedown', function(e) {
         if (e.target.classList.contains('resize-handle')) {
@@ -2328,12 +1423,10 @@
           w: el.offsetWidth,
           h: el.offsetHeight
         };
-        
         e.preventDefault();
         e.stopPropagation();
       });
 
-      // マウスホイールによる直感的な拡大縮小
       el.addEventListener('wheel', function(e) {
         if (!el.classList.contains('canvas-item-active')) return;
         e.preventDefault();
@@ -2354,7 +1447,6 @@
         const newTop = currentTop - (newH - currentH) / 2;
         
         el.style.width = `${newW}px`;
-        // 修正: アイコン整列枠やスタンプ整列枠の場合は高さを自動調整(auto)に保ち、中身のはみ出しを防ぐ
         if (el.dataset.itemType === 'icon-grid' || el.dataset.itemType === 'appeal-grid' || el.dataset.itemType === 'image-grid') {
           el.style.height = 'auto';
         } else {
@@ -2363,7 +1455,6 @@
         el.style.left = `${newLeft}px`;
         el.style.top = `${newTop}px`;
 
-        // ホイール操作時にサイズを記憶
         if (el.dataset.itemType === 'icon') {
           lastIconSize = { w: newW, h: newH };
         } else if (el.dataset.itemType === 'appeal') {
@@ -2393,7 +1484,6 @@
             selectedCanvasItem.style.left = `${Math.max(minX, Math.min(maxX, newLeft))}px`;
             selectedCanvasItem.style.top = `${Math.max(minY, Math.min(maxY, newTop))}px`;
           } else if (isResizingCanvasItem && selectedCanvasItem) {
-            // 画像・スタンプ含め縦横比を固定せず自由にリサイズ可能にする
             let newW = activeCanvasItemPos.w;
             let newH = activeCanvasItemPos.h;
             let newX = activeCanvasItemPos.x;
@@ -2422,7 +1512,6 @@
             }
 
             selectedCanvasItem.style.width = `${newW}px`;
-            // 修正: アイコン整列枠の場合はリサイズ時も高さを自動調整(auto)に保つ
             if (selectedCanvasItem.dataset.itemType === 'icon-grid' || selectedCanvasItem.dataset.itemType === 'appeal-grid' || selectedCanvasItem.dataset.itemType === 'image-grid') {
               selectedCanvasItem.style.height = 'auto';
             } else {
@@ -2431,7 +1520,6 @@
             selectedCanvasItem.style.left = `${newX}px`;
             selectedCanvasItem.style.top = `${newY}px`;
 
-            // 追加: リサイズ中に計算されたサイズを即座に記憶する（これで確実に引き継がれます）
             if (selectedCanvasItem.dataset.itemType === 'icon') {
               lastIconSize = { w: newW, h: newH };
             } else if (selectedCanvasItem.dataset.itemType === 'appeal') {
@@ -2440,7 +1528,6 @@
           }
         });
 
-        // フラグのリセット
         document.addEventListener('mouseup', function() {
           isMovingCanvasItem = false;
           isResizingCanvasItem = false;
@@ -2477,6 +1564,27 @@
       }
     }
 
+    function initDropZone() {
+      const dropZone = document.getElementById('drop-zone');
+      if (!dropZone) return;
+
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
+      });
+
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => { dropZone.classList.add('border-indigo-500', 'bg-slate-800/80'); }, false);
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => { dropZone.classList.remove('border-indigo-500', 'bg-slate-800/80'); }, false);
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        if (e.dataTransfer.files.length) processMultipleFiles(e.dataTransfer.files);
+      }, false);
+    }
+
     function initCropBoxInteractions() {
       const cropBox = document.getElementById('crop-box');
       if (!cropBox) return;
@@ -2509,57 +1617,39 @@
           cropBoxPos.x = Math.max(bounds.left, Math.min(bounds.right - cropBoxPos.w, cropBoxPos.x));
           cropBoxPos.y = Math.max(bounds.top, Math.min(bounds.bottom - cropBoxPos.h, cropBoxPos.y));
         } else if (cropActiveHandle) {
-          let newX = cropBoxPos.x;
-          let newY = cropBoxPos.y;
-          let newW = cropBoxPos.w;
-          let newH = cropBoxPos.h;
+          let newX = cropBoxPos.x, newY = cropBoxPos.y, newW = cropBoxPos.w, newH = cropBoxPos.h;
 
           if (cropActiveHandle === 'top-left') {
             const potentialX = cropBoxPos.x + deltaX;
             if (potentialX >= bounds.left && potentialX <= cropBoxPos.x + cropBoxPos.w - minSize) {
-              newX = potentialX;
-              newW = cropBoxPos.w - deltaX;
+              newX = potentialX; newW = cropBoxPos.w - deltaX;
             }
             const potentialY = cropBoxPos.y + deltaY;
             if (potentialY >= bounds.top && potentialY <= cropBoxPos.y + cropBoxPos.h - minSize) {
-              newY = potentialY;
-              newH = cropBoxPos.h - deltaY;
+              newY = potentialY; newH = cropBoxPos.h - deltaY;
             }
           } else if (cropActiveHandle === 'top-right') {
             const potentialY = cropBoxPos.y + deltaY;
             if (potentialY >= bounds.top && potentialY <= cropBoxPos.y + cropBoxPos.h - minSize) {
-              newY = potentialY;
-              newH = cropBoxPos.h - deltaY;
+              newY = potentialY; newH = cropBoxPos.h - deltaY;
             }
             const potentialW = cropBoxPos.w + deltaX;
-            if (cropBoxPos.x + potentialW <= bounds.right && potentialW >= minSize) {
-              newW = potentialW;
-            }
+            if (cropBoxPos.x + potentialW <= bounds.right && potentialW >= minSize) newW = potentialW;
           } else if (cropActiveHandle === 'bottom-left') {
             const potentialX = cropBoxPos.x + deltaX;
             if (potentialX >= bounds.left && potentialX <= cropBoxPos.x + cropBoxPos.w - minSize) {
-              newX = potentialX;
-              newW = cropBoxPos.w - deltaX;
+              newX = potentialX; newW = cropBoxPos.w - deltaX;
             }
             const potentialH = cropBoxPos.h + deltaY;
-            if (cropBoxPos.y + potentialH <= bounds.bottom && potentialH >= minSize) {
-              newH = potentialH;
-            }
+            if (cropBoxPos.y + potentialH <= bounds.bottom && potentialH >= minSize) newH = potentialH;
           } else if (cropActiveHandle === 'bottom-right') {
             const potentialW = cropBoxPos.w + deltaX;
-            if (cropBoxPos.x + potentialW <= bounds.right && potentialW >= minSize) {
-              newW = potentialW;
-            }
+            if (cropBoxPos.x + potentialW <= bounds.right && potentialW >= minSize) newW = potentialW;
             const potentialH = cropBoxPos.h + deltaY;
-            if (cropBoxPos.y + potentialH <= bounds.bottom && potentialH >= minSize) {
-              newH = potentialH;
-            }
+            if (cropBoxPos.y + potentialH <= bounds.bottom && potentialH >= minSize) newH = potentialH;
           }
 
-          cropBoxPos.x = newX;
-          cropBoxPos.y = newY;
-          cropBoxPos.w = newW;
-          cropBoxPos.h = newH;
+          cropBoxPos.x = newX; cropBoxPos.y = newY; cropBoxPos.w = newW; cropBoxPos.h = newH;
         }
 
         updateCropBoxUI();
@@ -2571,15 +1661,6 @@
       });
     }
 
-    // PDFドロップやファイル選択経由での複数ファイル処理へルーティング
-    function handleImageUpload(event) {
-      const files = event.target.files;
-      if (files && files.length > 0) {
-        processMultipleFiles(files);
-      }
-    }
-
-    // ギャラリーへの複数ファイル読み込み処理
     function processMultipleFiles(files) {
       const galleryWrapper = document.getElementById('gallery-wrapper');
       if (galleryWrapper) galleryWrapper.classList.remove('hidden');
@@ -2587,22 +1668,17 @@
       Array.from(files).forEach(file => {
         if (file.type === "application/pdf" || file.name.toLowerCase().endsWith('.pdf')) {
           const reader = new FileReader();
-          reader.onload = function(e) {
-            renderPdfToGallery(e.target.result);
-          };
+          reader.onload = function(e) { renderPdfToGallery(e.target.result); };
           reader.readAsArrayBuffer(file);
         } else {
           const reader = new FileReader();
-          reader.onload = function(e) {
-            createGalleryThumbnail(e.target.result);
-          };
+          reader.onload = function(e) { createGalleryThumbnail(e.target.result); };
           reader.readAsDataURL(file);
         }
       });
       lucide.createIcons();
     }
 
-    // ギャラリー内にサムネイルを生成
     function createGalleryThumbnail(src) {
       const gallery = document.getElementById('image-gallery');
       if (!gallery) return;
@@ -2625,13 +1701,9 @@
 
       gallery.appendChild(container);
       
-      // 最初に追加された画像、または現在選択がない場合は自動的に選択状態にする
-      if (!selectedGalleryImage) {
-        container.click();
-      }
+      if (!selectedGalleryImage) container.click();
     }
 
-    // PDFをパースしてギャラリーに投げる
     function renderPdfToGallery(arrayBuffer) {
       if (typeof pdfjsLib === 'undefined') {
         showToast("PDFエンジンロード中。再試行してください。");
@@ -2654,7 +1726,6 @@
       });
     }
 
-    // キャンバスから切り出し画像を抽出して配置（整列枠対応）
     function addCroppedToCanvas() {
       const img = document.getElementById('source-image');
       if (!img || !img.src || img.naturalWidth === 0) {
@@ -2663,11 +1734,8 @@
       }
 
       const bounds = getImageBounds();
-      const naturalWidth = img.naturalWidth;
-      const naturalHeight = img.naturalHeight;
-
-      const scaleX = naturalWidth / bounds.width;
-      const scaleY = naturalHeight / bounds.height;
+      const scaleX = img.naturalWidth / bounds.width;
+      const scaleY = img.naturalHeight / bounds.height;
 
       let cropX = Math.round((cropBoxPos.x - bounds.left) * scaleX);
       let cropY = Math.round((cropBoxPos.y - bounds.top) * scaleY);
@@ -2676,8 +1744,8 @@
 
       if (cropX < 0) cropX = 0;
       if (cropY < 0) cropY = 0;
-      if (cropX + cropW > naturalWidth) cropW = naturalWidth - cropX;
-      if (cropY + cropH > naturalHeight) cropH = naturalHeight - cropY;
+      if (cropX + cropW > img.naturalWidth) cropW = img.naturalWidth - cropX;
+      if (cropY + cropH > img.naturalHeight) cropH = img.naturalHeight - cropY;
 
       cropW = Math.max(1, cropW);
       cropH = Math.max(1, cropH);
@@ -2691,15 +1759,12 @@
         ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
         const croppedBase64 = canvas.toDataURL('image/png');
         
-        // --- 修正: 切り出した画像も、整列枠があればそこへ吸着させる ---
         let targetGrid = null;
         if (selectedCanvasItem && selectedCanvasItem.dataset.itemType === 'image-grid') {
           targetGrid = selectedCanvasItem;
         } else {
           const grids = document.querySelectorAll('.image-grid-container');
-          if (grids.length > 0) {
-            targetGrid = grids[grids.length - 1];
-          }
+          if (grids.length > 0) targetGrid = grids[grids.length - 1];
         }
 
         if (targetGrid) {
@@ -2721,10 +1786,7 @@
         } else {
           let spawnW = 400;
           let spawnH = 400 * (cropH / cropW);
-          if (spawnH > 400) {
-              spawnH = 400;
-              spawnW = 400 * (cropW / cropH);
-          }
+          if (spawnH > 400) { spawnH = 400; spawnW = 400 * (cropW / cropH); }
           addPresetAssetToCanvas(croppedBase64, 150, 150, spawnW, spawnH);
           showToast("選択範囲を切りぬいて配置しました。");
         }
@@ -2734,7 +1796,6 @@
       }
     }
 
-    // そのまま配置ボタン（ギャラリー選択中の画像を配置）
     function addFullSelectedImageToCanvas() {
       if (!selectedGalleryImage) {
         showToast("ギャラリーから画像を選択してください。");
@@ -2746,9 +1807,7 @@
         targetGrid = selectedCanvasItem;
       } else {
         const grids = document.querySelectorAll('.image-grid-container');
-        if (grids.length > 0) {
-          targetGrid = grids[grids.length - 1];
-        }
+        if (grids.length > 0) targetGrid = grids[grids.length - 1];
       }
 
       if (targetGrid) {
@@ -2773,11 +1832,6 @@
       }
     }
 
-
-    // ==========================================
-    // 7. 出力・エクスポート
-    // ==========================================
-
     function exportToPDF() {
       deselectAllItems();
       const cEl = document.getElementById('mysoku-canvas');
@@ -2785,47 +1839,38 @@
       
       showToast("極高画質PDFをレンダリング中...");
 
-      // 一時的にスケールを解除して実寸でレンダリング
       const origT = cEl.style.transform;
       const origH = wrapper.style.height;
       cEl.style.transform = 'none';
       wrapper.style.height = 'auto';
 
-      // 整列枠の破線と背景を一時的に透明化する
       const grids = document.querySelectorAll('.icon-grid-container, .appeal-grid-container, .image-grid-container');
-      grids.forEach(g => {
-        g.classList.add('!border-transparent', '!bg-transparent');
-      });
+      grids.forEach(g => g.classList.add('!border-transparent', '!bg-transparent'));
 
-      // レンダリングが確実に完了するよう少し待つ
       setTimeout(() => {
         html2canvas(cEl, { 
-          scale: 3.5, // 超高解像度
+          scale: 3.5, 
           useCORS: true, 
           allowTaint: true, 
           backgroundColor: '#ffffff',
           logging: false 
         }).then(canvas => {
-          // 元に戻す
           cEl.style.transform = origT;
           wrapper.style.height = origH;
           grids.forEach(g => g.classList.remove('!border-transparent', '!bg-transparent'));
           
           try {
             const imgData = canvas.toDataURL('image/jpeg', 1.0);
-            const pdf = new window.jspdf.jsPDF({
-              orientation: 'landscape',
-              unit: 'mm',
-              format: 'a4'
-            });
-            // A4横サイズにピッタリ合わせる (297x210)
+            const pdf = new window.jspdf.jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
             pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210, undefined, 'FAST');
             pdf.save(`販売図面_${document.getElementById('input-title').value.replace(/\s+/g, '_')}.pdf`);
             showToast("A4横向きの極高画質PDFファイルを出力しました！");
           } catch (e) {
+            console.error("PDF Export Error:", e);
             showToast("外部画像のセキュリティ制限によりPDF出力を実行できません。");
           }
         }).catch(e => {
+          console.error("html2canvas Error:", e);
           cEl.style.transform = origT;
           wrapper.style.height = origH;
           grids.forEach(g => g.classList.remove('!border-transparent', '!bg-transparent'));
@@ -2834,7 +1879,6 @@
       }, 100);
     }
 
-    // 初期化
     window.onload = function() {
       lucide.createIcons();
       resizeCanvas();
@@ -2846,7 +1890,6 @@
 
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Delete' || e.key === 'Backspace') {
-          // 入力フォーム操作中は無効化
           const activeEl = document.activeElement;
           if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable)) {
             return;
