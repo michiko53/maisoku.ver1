@@ -253,9 +253,6 @@
           <span class="text-[10px] text-slate-400 font-bold whitespace-nowrap"><i data-lucide="grid" class="w-3 h-3 inline pb-0.5"></i> 画像整列枠を追加:</span>
           <button onclick="addImageGrid(1)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 font-semibold">1列</button>
           <button onclick="addImageGrid(2)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 font-semibold">2列</button>
-          <button onclick="addImageGrid(3)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 font-semibold">3列</button>
-          <button onclick="addImageGrid(4)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 font-semibold">4列</button>
-          <button onclick="addImageGrid(5)" class="px-2 py-1 bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 rounded text-[10px] border border-indigo-500/30 font-semibold">5列</button>
         </div>
 
         <div id="source-image-wrapper" class="hidden space-y-4">
@@ -1597,7 +1594,6 @@
     }
 
     // 画像整列枠配置
- // 画像整列枠配置
     function addImageGrid(cols) {
       const guide = document.getElementById('canvas-guide');
       if (guide) guide.style.opacity = '0';
@@ -1609,13 +1605,7 @@
       const pos = getNextSpawnPos(100, 220);
       div.style.left = `${pos.x}px`;
       div.style.top = `${pos.y}px`;
-      
-      // キャンバス最大幅(1000px)からはみ出さないよう列数に応じて1セルあたりの初期横幅を調整
-      let colWidth = 250;
-      if (cols === 4) colWidth = 220;
-      if (cols === 5) colWidth = 180;
-      
-      div.style.width = `${cols * colWidth + (cols - 1) * 8 + 16}px`; 
+      div.style.width = `${cols * 250 + (cols - 1) * 8 + 16}px`; 
       div.style.height = 'auto'; 
       div.style.minHeight = '100px';
 
@@ -1623,7 +1613,7 @@
         <div class="grid-inner w-full p-2 grid gap-2 content-start" style="grid-template-columns: repeat(${cols}, minmax(0, 1fr));">
         </div>
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none empty-grid-msg opacity-40">
-           <span class="text-[10px] font-bold text-indigo-400 text-center leading-tight">画像整列枠（${cols}列）<br>画像を選択して配置</span>
+           <span class="text-[10px] font-bold text-indigo-400 text-center leading-tight">画像整列枠<br>画像を選択して配置</span>
         </div>
       `;
 
