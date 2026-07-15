@@ -22,8 +22,6 @@
 
   <style>
     .mysoku-canvas-container { width: 1000px; height: 707px; position: relative; overflow: hidden; background-color: #ffffff; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); }
-    .crop-box { border: 2px dashed #ef4444; background-color: rgba(239, 68, 68, 0.15); position: absolute; cursor: move; }
-    .crop-handle { width: 12px; height: 12px; background-color: #ef4444; border: 2px solid white; border-radius: 50%; position: absolute; }
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #f1f1f1; }
     ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
@@ -52,7 +50,6 @@
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans flex flex-col overflow-x-hidden">
 
-  <!-- ヘッダー -->
   <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex items-center justify-between sticky top-0 z-50 shadow-md">
     <div class="flex items-center space-x-3">
       <div class="p-2.5 bg-gradient-to-br from-indigo-500 to-emerald-500 rounded-xl shadow-lg shadow-indigo-500/20">
@@ -130,7 +127,6 @@
   </header>
 
   <div class="flex-1 flex overflow-hidden">
-    <!-- サイドバー -->
     <aside class="w-[420px] bg-slate-800/90 border-r border-slate-700 flex flex-col h-[calc(100vh-73px)] shrink-0 overflow-y-auto font-sans">
       
       <div class="flex border-b border-slate-700 sticky top-0 bg-slate-800 z-10">
@@ -234,7 +230,7 @@
       <div id="panel-crop" class="p-5 space-y-6 hidden">
         <div>
           <h3 class="text-sm font-extrabold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5"><i data-lucide="arrow-left-right" class="w-4 h-4 text-emerald-400"></i>他社マイソク 帯替え・画像配置</h3>
-          <p class="text-xs text-slate-400 mb-4 leading-relaxed">複数の画像やPDFをまとめてアップロードし、ギャラリーから選択してキャンバスや専用の整列枠に綺麗に配置できます。</p>
+          <p class="text-xs text-slate-400 mb-4 leading-relaxed">複数の画像やPDFをまとめてアップロードし、ギャラリーから選択してキャンバスや専用の整列枠に配置できます。</p>
 
           <div id="drop-zone" class="border-2 border-dashed border-slate-600 rounded-xl p-6 text-center hover:border-indigo-500 transition cursor-pointer bg-slate-900/50 group relative mb-4">
             <input type="file" id="file-input" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*,application/pdf" multiple onchange="handleMultipleFilesUpload(event)">
@@ -259,19 +255,11 @@
         </div>
 
         <div id="source-image-wrapper" class="hidden space-y-4">
-          <div class="flex items-center justify-between"><span class="text-xs font-bold text-slate-300">選択中の画像の編集・トリム</span></div>
-          <div class="relative bg-slate-950 border border-slate-700 rounded-lg overflow-hidden flex items-center justify-center min-h-[220px] max-h-[350px]">
-            <img id="source-image" class="max-w-full max-h-[300px] object-contain select-none animate-pulse" alt="ソース画像">
-            <div id="crop-box" class="crop-box hidden">
-              <div class="crop-handle top-[-6px] left-[-6px] cursor-nwse-resize" data-handle="top-left"></div>
-              <div class="crop-handle top-[-6px] right-[-6px] cursor-nesw-resize" data-handle="top-right"></div>
-              <div class="crop-handle bottom-[-6px] left-[-6px] cursor-nesw-resize" data-handle="bottom-left"></div>
-              <div class="crop-handle bottom-[-6px] right-[-6px] cursor-nwse-resize" data-handle="bottom-right"></div>
-            </div>
-          </div>
-          <div class="grid grid-cols-2 gap-2">
-            <button onclick="addCroppedToCanvas()" class="py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 col-span-2 shadow"><i data-lucide="crop" class="w-4 h-4"></i> 選択範囲を切り出して配置</button>
-            <button onclick="addFullSelectedImageToCanvas()" class="py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 col-span-2 shadow"><i data-lucide="maximize" class="w-4 h-4"></i> 画像をそのまま配置</button>
+          <div class="flex items-center justify-between"><span class="text-xs font-bold text-slate-300">選択した画像の配置</span></div>
+          <div class="grid grid-cols-1 gap-2">
+            <button onclick="addFullSelectedImageToCanvas()" class="py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-sm flex items-center justify-center gap-1.5 shadow">
+              <i data-lucide="images" class="w-5 h-5"></i> 選択した画像を一括で配置する
+            </button>
           </div>
         </div>
       </div>
@@ -510,17 +498,9 @@
     // ==========================================
     let activeTab = 'info';
     let currentTheme = 'premium';
-    let uploadedImageBase64 = null;
     let selectedCanvasItem = null;
     let canvasItemIdCounter = 0;
 
-    // トリミング用のドラッグ制御
-    let isCroppingDrag = false;
-    let cropStartPos = { x: 0, y: 0 };
-    let cropBoxPos = { x: 20, y: 20, w: 120, h: 120 };
-    let cropActiveHandle = null;
-
-    // キャンバス上のアイテム移動・リサイズ制御
     let isMovingCanvasItem = false;
     let isResizingCanvasItem = false;
     let activeCanvasItemPos = { x: 0, y: 0, w: 0, h: 0 };
@@ -529,7 +509,7 @@
     let isCanvasGlobalEventRegistered = false;
 
     // 複数画像・ギャラリー制御用
-    let selectedGalleryImage = null;
+    let selectedGalleryImages = [];
 
     let cascadeOffsetCounter = 0;
     let lastIconSize = { w: 75, h: 75 };
@@ -538,7 +518,6 @@
     // ==========================================
     // 2. コア・共通ユーティリティ関数
     // ==========================================
-    
     function formatToYen(value) {
       if (!value) return "0";
       return value.toString().replace(/\d+/g, function(match) {
@@ -677,6 +656,15 @@
         toast.classList.remove('translate-y-0', 'opacity-100');
         toast.classList.add('translate-y-20', 'opacity-0');
       }, 3000);
+    }
+
+    // キャンバスのスケール値を取得する関数（マウス操作のズレ補正用）
+    function getCanvasScale() {
+      const canvas = document.getElementById('mysoku-canvas');
+      if (!canvas) return 1;
+      const transform = canvas.style.transform;
+      const match = transform.match(/scale\(([^)]+)\)/);
+      return match ? parseFloat(match[1]) || 1 : 1;
     }
 
     function resizeCanvas() {
@@ -1185,9 +1173,7 @@
         if (locationBadge) locationBadge.className = "bg-slate-500 text-white px-2 py-1 rounded font-black shrink-0 text-[10px]";
         
         watermark.innerHTML = `<i data-lucide="flag" class="w-[300px] h-[300px] text-slate-100"></i>`;
-      }
-
-      else if (color === 'solid-blue') {
+      } else if (color === 'solid-blue') {
         headerBg.classList.add('bg-blue-900');
         if (headerBorder) headerBorder.classList.add('bg-blue-400');
         footerBg.classList.add('bg-blue-900', 'border-t-[5px]', 'border-blue-400');
@@ -1417,7 +1403,6 @@
         watermark.innerHTML = `<i data-lucide="heart" class="w-[300px] h-[300px] text-rose-900"></i>`;
       }
       
-      // 白・ライトグレー時の文字色反転制御
       if (color === 'grad-silver' || color === 'grad-iceblue' || color === 'grad-mint' || color === 'grad-champagne' || color === 'grad-tricolor') {
         headerBg.classList.add('theme-light');
         footerBg.classList.add('theme-light');
@@ -1431,64 +1416,11 @@
       lucide.createIcons();
     }
 
-    // 画像描画境界取得
-    function getImageBounds() {
-      const img = document.getElementById('source-image');
-      const container = img.parentElement;
-      if (!img || img.clientWidth === 0) {
-        return { left: 0, top: 0, right: container.clientWidth, bottom: container.clientHeight, width: container.clientWidth, height: container.clientHeight };
-      }
-      const imgW = img.clientWidth;
-      const imgH = img.clientHeight;
-      const left = Math.max(0, (container.clientWidth - imgW) / 2);
-      const top = Math.max(0, (container.clientHeight - imgH) / 2);
-      return {
-        left: left,
-        top: top,
-        right: left + imgW,
-        bottom: top + imgH,
-        width: imgW,
-        height: imgH
-      };
-    }
-
-    // クロップ初期化
-    function resetCropBox() {
-      const bounds = getImageBounds();
-      const w = Math.max(50, bounds.width * 0.6);
-      const h = Math.max(50, bounds.height * 0.6);
-      cropBoxPos = {
-        x: bounds.left + (bounds.width - w) / 2,
-        y: bounds.top + (bounds.height - h) / 2,
-        w: w,
-        h: h
-      };
-      updateCropBoxUI();
-    }
-
-    // クロップUI更新
-    function updateCropBoxUI() {
-      const cropBox = document.getElementById('crop-box');
-      if (!cropBox) return;
-      cropBox.style.left = `${cropBoxPos.x}px`;
-      cropBox.style.top = `${cropBoxPos.y}px`;
-      cropBox.style.width = `${cropBoxPos.w}px`;
-      cropBox.style.height = `${cropBoxPos.h}px`;
-    }
-
     function getNextSpawnPos(baseX, baseY) {
       cascadeOffsetCounter = (cascadeOffsetCounter + 15) % 120;
-      return {
-        x: baseX + cascadeOffsetCounter,
-        y: baseY + cascadeOffsetCounter
-      };
+      return { x: baseX + cascadeOffsetCounter, y: baseY + cascadeOffsetCounter };
     }
 
-    // ==========================================
-    // 3. アセット作成・配置コントロール
-    // ==========================================
-
-    // アイコン整列枠配置
     function addIconGrid(cols) {
       const guide = document.getElementById('canvas-guide');
       if (guide) guide.style.opacity = '0';
@@ -1505,8 +1437,7 @@
       div.style.minHeight = '90px';
 
       div.innerHTML = `
-        <div class="grid-inner w-full p-2 grid gap-2 content-start" style="grid-template-columns: repeat(${cols}, minmax(0, 1fr));">
-        </div>
+        <div class="grid-inner w-full p-2 grid gap-2 content-start" style="grid-template-columns: repeat(${cols}, minmax(0, 1fr));"></div>
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none empty-grid-msg opacity-50">
            <span class="text-[10px] font-bold text-indigo-400 text-center leading-tight">ここにアイコンが<br>並びます</span>
         </div>
@@ -1521,7 +1452,6 @@
       }, 50);
     }
 
-    // スタンプ整列枠配置
     function addAppealGrid(cols) {
       const guide = document.getElementById('canvas-guide');
       if (guide) guide.style.opacity = '0';
@@ -1538,8 +1468,7 @@
       div.style.minHeight = '60px'; 
 
       div.innerHTML = `
-        <div class="grid-inner w-full p-2 grid gap-2 content-start" style="grid-template-columns: repeat(${cols}, minmax(0, 1fr));">
-        </div>
+        <div class="grid-inner w-full p-2 grid gap-2 content-start" style="grid-template-columns: repeat(${cols}, minmax(0, 1fr));"></div>
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none empty-grid-msg opacity-50">
            <span class="text-[10px] font-bold text-indigo-400 text-center leading-tight">ここにスタンプが<br>並びます</span>
         </div>
@@ -1554,7 +1483,6 @@
       }, 50);
     }
 
-    // 画像整列枠配置
     function addImageGrid(cols) {
       const guide = document.getElementById('canvas-guide');
       if (guide) guide.style.opacity = '0';
@@ -1571,8 +1499,7 @@
       div.style.minHeight = '100px';
 
       div.innerHTML = `
-        <div class="grid-inner w-full p-2 grid gap-2 content-start" style="grid-template-columns: repeat(${cols}, minmax(0, 1fr));">
-        </div>
+        <div class="grid-inner w-full p-2 grid gap-2 content-start" style="grid-template-columns: repeat(${cols}, minmax(0, 1fr));"></div>
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none empty-grid-msg opacity-40">
            <span class="text-[10px] font-bold text-indigo-400 text-center leading-tight">画像整列枠<br>画像を選択して配置</span>
         </div>
@@ -1586,7 +1513,6 @@
       }, 50);
     }
 
-    // 画像アセット自由配置
     function addPresetAssetToCanvas(src, customX = 80, customY = 60, customW = 280, customH = 210) {
       const guide = document.getElementById('canvas-guide');
       if (guide) guide.style.opacity = '0';
@@ -1602,14 +1528,14 @@
       div.style.top = `${pos.y}px`;
 
       const innerContainer = document.createElement('div');
-      innerContainer.className = "w-full h-full overflow-hidden flex items-center justify-center";
+      innerContainer.className = "w-full h-full overflow-hidden flex items-center justify-center bg-transparent";
 
       const img = document.createElement('img');
       if (src.startsWith('http') && !src.includes(window.location.host)) {
         img.crossOrigin = "anonymous";
       }
       img.src = src;
-      img.className = "w-full h-full object-cover select-none pointer-events-none";
+      img.className = "w-full h-full object-contain select-none pointer-events-none";
       
       img.onerror = function() {
         img.src = "data:image/svg+xml;charset=utf-8,%3Csvg xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg' width%3D'100' height%3D'100' viewBox%3D'0 0 100 100'%3E%3Crect width%3D'100%25' height%3D'100%25' fill%3D'%23f1f5f9'%2F%3E%3Ctext x%3D'50%25' y%3D'50%25' font-family%3D'sans-serif' font-size%3D'10' font-weight%3D'bold' text-anchor%3D'middle' fill%3D'%2394a3b8' dy%3D'.3em'%3EIMAGE ERROR%3C%2Ftext%3E%3C%2Fsvg%3E";
@@ -1620,7 +1546,6 @@
       setupCanvasItemInteractions(div);
     }
 
-    // 詳細概要カード生成
     function spawnSummaryCard(customX = 630, customY = 170, customW = 340, customH = 430) {
       const existingInner = document.getElementById('summary-card-inner');
       if (existingInner && existingInner.parentElement) {
@@ -1653,7 +1578,6 @@
       spawnSummaryCard(630, 170, 340, 430);
     }
 
-    // 概要同期ロジック
     function syncSummaryCard() {
       const inner = document.getElementById('summary-card-inner');
       if (!inner) return;
@@ -1735,7 +1659,6 @@
       `;
     }
 
-    // デザイナーズアイコン配置
     function addDesignerIconBox(type) {
       const guide = document.getElementById('canvas-guide');
       if (guide) guide.style.opacity = '0';
@@ -1790,209 +1713,209 @@
       if (type === 'B・T別') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2 13h14v2a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-2z" fill="#bae6fd" />
-            <path d="M4 13V6a2 2 0 0 1 2-2h2" />
-            <circle cx="10" cy="3" r="1.5" fill="#f8fafc" />
-            <line x1="17" y1="2" x2="17" y2="22" stroke-dasharray="3 3" />
-            <path d="M19 11v4h4v-2a2 2 0 0 0-2-2h-2z" fill="#e2e8f0" />
-            <path d="M19 15c-1 0-2 1-2 2v2h4v-2c0-1-1-2-2-2z" fill="#f8fafc" />
+            <path d="M2 13h14v2a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4v-2z" fill="#bae6fd"/>
+            <path d="M4 13V6a2 2 0 0 1 2-2h2"/>
+            <circle cx="10" cy="3" r="1.5" fill="#f8fafc"/>
+            <line x1="17" y1="2" x2="17" y2="22" stroke-dasharray="3 3"/>
+            <path d="M19 11v4h4v-2a2 2 0 0 0-2-2h-2z" fill="#e2e8f0"/>
+            <path d="M19 15c-1 0-2 1-2 2v2h4v-2c0-1-1-2-2-2z" fill="#f8fafc"/>
           </svg>
         `;
       } else if (type === 'オートロック') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="5" y="11" width="14" height="10" rx="3" fill="#fcd34d" />
-            <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-            <circle cx="12" cy="16" r="1.5" fill="#1e293b" />
+            <rect x="5" y="11" width="14" height="10" rx="3" fill="#fcd34d"/>
+            <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+            <circle cx="12" cy="16" r="1.5" fill="#1e293b"/>
           </svg>
         `;
       } else if (type === '独立洗面') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="7" y="3" width="10" height="8" rx="2" fill="#e0f2fe" />
-            <path d="M4 14h16v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3z" fill="#f8fafc" />
-            <path d="M12 11v3" />
-            <path d="M10 12h4" />
+            <rect x="7" y="3" width="10" height="8" rx="2" fill="#e0f2fe"/>
+            <path d="M4 14h16v3a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3z" fill="#f8fafc"/>
+            <path d="M12 11v3"/>
+            <path d="M10 12h4"/>
           </svg>
         `;
       } else if (type === '温水便座') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="6" y="3" width="12" height="6" rx="2" fill="#f8fafc" />
-            <path d="M8 9v6a4 4 0 0 0 8 0V9H8z" fill="#e2e8f0" />
-            <path d="M12 15c-1 0-2-1-2-2s2-4 2-4 2 3 2 4-1 2-2 2z" fill="#60a5fa" stroke="none" />
-            <circle cx="16" cy="6" r="1" fill="#94a3b8" />
+            <rect x="6" y="3" width="12" height="6" rx="2" fill="#f8fafc"/>
+            <path d="M8 9v6a4 4 0 0 0 8 0V9H8z" fill="#e2e8f0"/>
+            <path d="M12 15c-1 0-2-1-2-2s2-4 2-4 2 3 2 4-1 2-2 2z" fill="#60a5fa" stroke="none"/>
+            <circle cx="16" cy="6" r="1" fill="#94a3b8"/>
           </svg>
         `;
       } else if (type === '室内洗濯') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="5" y="3" width="14" height="18" rx="3" fill="#f8fafc" />
-            <line x1="5" y1="8" x2="19" y2="8" />
-            <circle cx="12" cy="14" r="4" fill="#bae6fd" />
-            <circle cx="8" cy="5.5" r="1" fill="#1e293b" />
-            <circle cx="11" cy="5.5" r="1" fill="#1e293b" />
+            <rect x="5" y="3" width="14" height="18" rx="3" fill="#f8fafc"/>
+            <line x1="5" y1="8" x2="19" y2="8"/>
+            <circle cx="12" cy="14" r="4" fill="#bae6fd"/>
+            <circle cx="8" cy="5.5" r="1" fill="#1e293b"/>
+            <circle cx="11" cy="5.5" r="1" fill="#1e293b"/>
           </svg>
         `;
       } else if (type === 'システムK') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 13h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6z" fill="#fbcfe8" />
-            <line x1="3" y1="13" x2="21" y2="13" />
-            <circle cx="8" cy="11" r="2" fill="#f97316" stroke="none" />
-            <circle cx="16" cy="11" r="2" fill="#f97316" stroke="none" />
-            <path d="M12 9V5c0-1 1-2 2-2s2 1 2 2v2" />
+            <path d="M3 13h18v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-6z" fill="#fbcfe8"/>
+            <line x1="3" y1="13" x2="21" y2="13"/>
+            <circle cx="8" cy="11" r="2" fill="#f97316" stroke="none"/>
+            <circle cx="16" cy="11" r="2" fill="#f97316" stroke="none"/>
+            <path d="M12 9V5c0-1 1-2 2-2s2 1 2 2v2"/>
           </svg>
         `;
       } else if (type === '追い焚き') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 14h16v2a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-2z" fill="#93c5fd" />
-            <path d="M12 9c-1-1-2-2-2-4s2-2 2-2 2 0 2 2-1 3-2 4z" fill="#f87171" stroke="none" />
-            <path d="M7 8c0-2 1-3 2-4" />
-            <path d="M17 8c0-2-1-3-2-4" />
+            <path d="M4 14h16v2a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-2z" fill="#93c5fd"/>
+            <path d="M12 9c-1-1-2-2-2-4s2-2 2-2 2 0 2 2-1 3-2 4z" fill="#f87171" stroke="none"/>
+            <path d="M7 8c0-2 1-3 2-4"/>
+            <path d="M17 8c0-2-1-3-2-4"/>
           </svg>
         `;
       } else if (type === '浴室乾燥機') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="4" y="3" width="16" height="6" rx="1" fill="#e2e8f0" />
-            <line x1="6" y1="6" x2="18" y2="6" stroke-dasharray="2 2" />
-            <path d="M12 11l-3 3v6h6v-6l-3-3z" fill="#fef08a" />
-            <path d="M12 11a1 1 0 0 0-1-1 1 1 0 0 1 1-1 1 1 0 0 1 1 1 1 1 0 0 0-1 1z" />
-            <path d="M7 14s2 2 5 2 5-2 5-2" stroke="#94a3b8" />
+            <rect x="4" y="3" width="16" height="6" rx="1" fill="#e2e8f0"/>
+            <line x1="6" y1="6" x2="18" y2="6" stroke-dasharray="2 2"/>
+            <path d="M12 11l-3 3v6h6v-6l-3-3z" fill="#fef08a"/>
+            <path d="M12 11a1 1 0 0 0-1-1 1 1 0 0 1 1-1 1 1 0 0 1 1 1 1 1 0 0 0-1 1z"/>
+            <path d="M7 14s2 2 5 2 5-2 5-2" stroke="#94a3b8"/>
           </svg>
         `;
       } else if (type === 'ネット無料') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 8.5a10 10 0 0 1 14 0" />
-            <path d="M8.5 12.5a5 5 0 0 1 7 0" />
-            <circle cx="12" cy="16.5" r="1.5" fill="#3b82f6" stroke="none" />
-            <rect x="6" y="19" width="12" height="3" rx="1" fill="#1e293b" />
+            <path d="M5 8.5a10 10 0 0 1 14 0"/>
+            <path d="M8.5 12.5a5 5 0 0 1 7 0"/>
+            <circle cx="12" cy="16.5" r="1.5" fill="#3b82f6" stroke="none"/>
+            <rect x="6" y="19" width="12" height="3" rx="1" fill="#1e293b"/>
           </svg>
         `;
       } else if (type === 'ペット可') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 12c-2.5 0-5 2-5 5.5S9 22 12 22s5-1 5-4.5-2.5-5.5-5-5.5z" fill="#f43f5e" />
-            <circle cx="7" cy="9" r="2.5" fill="#f43f5e" />
-            <circle cx="10.5" cy="5.5" r="2.5" fill="#f43f5e" />
-            <circle cx="14.5" cy="5.5" r="2.5" fill="#f43f5e" />
-            <circle cx="18" cy="9" r="2.5" fill="#f43f5e" />
+            <path d="M12 12c-2.5 0-5 2-5 5.5S9 22 12 22s5-1 5-4.5-2.5-5.5-5-5.5z" fill="#f43f5e"/>
+            <circle cx="7" cy="9" r="2.5" fill="#f43f5e"/>
+            <circle cx="10.5" cy="5.5" r="2.5" fill="#f43f5e"/>
+            <circle cx="14.5" cy="5.5" r="2.5" fill="#f43f5e"/>
+            <circle cx="18" cy="9" r="2.5" fill="#f43f5e"/>
           </svg>
         `;
       } else if (type === '宅配ボックス') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="3" width="10" height="18" rx="1" fill="#e2e8f0" />
-            <line x1="3" y1="9" x2="13" y2="9" />
-            <line x1="3" y1="15" x2="13" y2="15" />
-            <path d="M15 13l6 3v5l-6-3v-5z" fill="#d97706" stroke="#b45309" />
-            <path d="M15 13l3-1.5 3 1.5-3 1.5-3-1.5z" fill="#f59e0b" stroke="#b45309" />
+            <rect x="3" y="3" width="10" height="18" rx="1" fill="#e2e8f0"/>
+            <line x1="3" y1="9" x2="13" y2="9"/>
+            <line x1="3" y1="15" x2="13" y2="15"/>
+            <path d="M15 13l6 3v5l-6-3v-5z" fill="#d97706" stroke="#b45309"/>
+            <path d="M15 13l3-1.5 3 1.5-3 1.5-3-1.5z" fill="#f59e0b" stroke="#b45309"/>
           </svg>
         `;
       } else if (type === 'WIC') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="16" rx="2" fill="#ede9fe" />
-            <path d="M3 8h18" />
-            <path d="M8 8l-2 4h4l-2-4z" fill="#a855f7" />
-            <path d="M16 8l-2 4h4l-2-4z" fill="#a855f7" />
-            <path d="M8 8c0-1 .5-2 1-2s1 1 1 2" />
-            <path d="M16 8c0-1 .5-2 1-2s1 1 1 2" />
+            <rect x="3" y="4" width="18" height="16" rx="2" fill="#ede9fe"/>
+            <path d="M3 8h18"/>
+            <path d="M8 8l-2 4h4l-2-4z" fill="#a855f7"/>
+            <path d="M16 8l-2 4h4l-2-4z" fill="#a855f7"/>
+            <path d="M8 8c0-1 .5-2 1-2s1 1 1 2"/>
+            <path d="M16 8c0-1 .5-2 1-2s1 1 1 2"/>
           </svg>
         `;
       } else if (type === 'エレベーター') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="4" y="2" width="16" height="20" rx="1" fill="#cbd5e1" />
-            <line x1="12" y1="2" x2="12" y2="22" />
-            <path d="M9 10l-2-2-2 2" stroke="#475569" />
-            <line x1="7" y1="8" x2="7" y2="16" stroke="#475569" />
-            <path d="M15 14l2 2 2-2" stroke="#475569" />
-            <line x1="17" y1="8" x2="17" y2="16" stroke="#475569" />
+            <rect x="4" y="2" width="16" height="20" rx="1" fill="#cbd5e1"/>
+            <line x1="12" y1="2" x2="12" y2="22"/>
+            <path d="M9 10l-2-2-2 2" stroke="#475569"/>
+            <line x1="7" y1="8" x2="7" y2="16" stroke="#475569"/>
+            <path d="M15 14l2 2 2-2" stroke="#475569"/>
+            <line x1="17" y1="8" x2="17" y2="16" stroke="#475569"/>
           </svg>
         `;
       } else if (type === '防犯カメラ') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="5" y="8" width="14" height="8" rx="2" fill="#cbd5e1" />
-            <path d="M19 10l3-2v8l-3-2" fill="#cbd5e1" />
-            <circle cx="9" cy="12" r="2" fill="#1e293b" />
-            <circle cx="9" cy="12" r="0.5" fill="#ef4444" stroke="none" />
+            <rect x="5" y="8" width="14" height="8" rx="2" fill="#cbd5e1"/>
+            <path d="M19 10l3-2v8l-3-2" fill="#cbd5e1"/>
+            <circle cx="9" cy="12" r="2" fill="#1e293b"/>
+            <circle cx="9" cy="12" r="0.5" fill="#ef4444" stroke="none"/>
           </svg>
         `;
       } else if (type === '駐輪場') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="6" cy="16" r="4" fill="#a7f3d0" />
-            <circle cx="18" cy="16" r="4" fill="#a7f3d0" />
-            <path d="M6 16l3-6h6l3 6" />
-            <path d="M12 16v-6" />
-            <path d="M8 10h8" />
+            <circle cx="6" cy="16" r="4" fill="#a7f3d0"/>
+            <circle cx="18" cy="16" r="4" fill="#a7f3d0"/>
+            <path d="M6 16l3-6h6l3 6"/>
+            <path d="M12 16v-6"/>
+            <path d="M8 10h8"/>
           </svg>
         `;
       } else if (type === '駐車場') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 15h14a2 2 0 0 0 2-2v-2l-3-4H6l-3 4v2a2 2 0 0 0 2 2z" fill="#fdba74" />
-            <circle cx="7" cy="16" r="3" fill="#1e293b" />
-            <circle cx="17" cy="16" r="3" fill="#1e293b" />
-            <path d="M6 11h12" />
+            <path d="M5 15h14a2 2 0 0 0 2-2v-2l-3-4H6l-3 4v2a2 2 0 0 0 2 2z" fill="#fdba74"/>
+            <circle cx="7" cy="16" r="3" fill="#1e293b"/>
+            <circle cx="17" cy="16" r="3" fill="#1e293b"/>
+            <path d="M6 11h12"/>
           </svg>
         `;
       } else if (type === 'エアコン') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="8" rx="2" fill="#f8fafc" />
-            <line x1="6" y1="8" x2="18" y2="8" />
-            <line x1="8" y1="16" x2="10" y2="20" stroke="#60a5fa" />
-            <line x1="12" y1="16" x2="12" y2="20" stroke="#60a5fa" />
-            <line x1="16" y1="16" x2="14" y2="20" stroke="#60a5fa" />
+            <rect x="3" y="4" width="18" height="8" rx="2" fill="#f8fafc"/>
+            <line x1="6" y1="8" x2="18" y2="8"/>
+            <line x1="8" y1="16" x2="10" y2="20" stroke="#60a5fa"/>
+            <line x1="12" y1="16" x2="12" y2="20" stroke="#60a5fa"/>
+            <line x1="16" y1="16" x2="14" y2="20" stroke="#60a5fa"/>
           </svg>
         `;
       } else if (type === 'TVモニターホン') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="4" y="3" width="16" height="18" rx="2" fill="#e9d5ff" />
-            <rect x="6" y="6" width="12" height="8" rx="1" fill="#f8fafc" />
-            <circle cx="12" cy="10" r="2" fill="#a855f7" stroke="none" />
-            <circle cx="9" cy="17" r="1.5" fill="#a855f7" />
-            <circle cx="15" cy="17" r="1.5" fill="#a855f7" />
+            <rect x="4" y="3" width="16" height="18" rx="2" fill="#e9d5ff"/>
+            <rect x="6" y="6" width="12" height="8" rx="1" fill="#f8fafc"/>
+            <circle cx="12" cy="10" r="2" fill="#a855f7" stroke="none"/>
+            <circle cx="9" cy="17" r="1.5" fill="#a855f7"/>
+            <circle cx="15" cy="17" r="1.5" fill="#a855f7"/>
           </svg>
         `;
       } else if (type === 'カウンターK') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 18v-8h16" fill="none" />
-            <path d="M4 18h4v-4h12V10H4z" fill="#fbcfe8" />
-            <path d="M12 18v-4" />
-            <path d="M10 14h4" />
-            <path d="M18 18v-4" />
-            <path d="M16 14h4" />
+            <path d="M4 18v-8h16" fill="none"/>
+            <path d="M4 18h4v-4h12V10H4z" fill="#fbcfe8"/>
+            <path d="M12 18v-4"/>
+            <path d="M10 14h4"/>
+            <path d="M18 18v-4"/>
+            <path d="M16 14h4"/>
           </svg>
         `;
       } else if (type === '新築') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 3l8 6v12H4V9l8-6z" fill="#fed7aa" />
-            <path d="M10 21V14h4v7" fill="#f8fafc" />
-            <path d="M5 5l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" />
-            <path d="M19 5l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" />
-            <path d="M19 12l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none" />
+            <path d="M12 3l8 6v12H4V9l8-6z" fill="#fed7aa"/>
+            <path d="M10 21V14h4v7" fill="#f8fafc"/>
+            <path d="M5 5l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none"/>
+            <path d="M19 5l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none"/>
+            <path d="M19 12l1-1 1 1-1 1-1-1z" fill="#f59e0b" stroke="none"/>
           </svg>
         `;
       } else if (type === 'RC') {
         svgContent = `
           <svg class="w-11 h-11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="5" y="4" width="14" height="18" rx="1" fill="#e2e8f0" />
-            <rect x="8" y="7" width="3" height="3" fill="#64748b" stroke="none" />
-            <rect x="13" y="7" width="3" height="3" fill="#64748b" stroke="none" />
-            <rect x="8" y="12" width="3" height="3" fill="#64748b" stroke="none" />
-            <rect x="13" y="12" width="3" height="3" fill="#64748b" stroke="none" />
-            <rect x="8" y="17" width="3" height="3" fill="#64748b" stroke="none" />
-            <rect x="13" y="17" width="3" height="3" fill="#64748b" stroke="none" />
+            <rect x="5" y="4" width="14" height="18" rx="1" fill="#e2e8f0"/>
+            <rect x="8" y="7" width="3" height="3" fill="#64748b" stroke="none"/>
+            <rect x="13" y="7" width="3" height="3" fill="#64748b" stroke="none"/>
+            <rect x="8" y="12" width="3" height="3" fill="#64748b" stroke="none"/>
+            <rect x="13" y="12" width="3" height="3" fill="#64748b" stroke="none"/>
+            <rect x="8" y="17" width="3" height="3" fill="#64748b" stroke="none"/>
+            <rect x="13" y="17" width="3" height="3" fill="#64748b" stroke="none"/>
           </svg>
         `;
       }
@@ -2060,40 +1983,6 @@
       }
     }
 
-    // PDFドロップ連携
-    function initDropZone() {
-      const dropZone = document.getElementById('drop-zone');
-      if (!dropZone) return;
-
-      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }, false);
-      });
-
-      ['dragenter', 'dragover'].forEach(eventName => {
-        dropZone.addEventListener(eventName, () => {
-          dropZone.classList.add('border-indigo-500', 'bg-slate-800/80');
-        }, false);
-      });
-
-      ['dragleave', 'drop'].forEach(eventName => {
-        dropZone.addEventListener(eventName, () => {
-          dropZone.classList.remove('border-indigo-500', 'bg-slate-800/80');
-        }, false);
-      });
-
-      dropZone.addEventListener('drop', (e) => {
-        if (e.dataTransfer.files.length) {
-          processMultipleFiles(e.dataTransfer.files);
-        }
-      }, false);
-    }
-
-    // ==========================================
-    // 4. アピール文言（フリーワード）配置ロジック
-    // ==========================================
     function addCustomAppealText() {
       const text = document.getElementById('custom-appeal-text').value.trim();
       const bgClass = document.getElementById('custom-appeal-color').value;
@@ -2109,11 +1998,9 @@
       let targetGrid = null;
       let isGridMode = false;
 
-      // 1. 選択中の要素が「スタンプ整列枠」だった場合
       if (selectedCanvasItem && selectedCanvasItem.dataset.itemType === 'appeal-grid') {
         targetGrid = selectedCanvasItem;
       } 
-      // 2. 何も選択されていない場合でも、キャンバス上に「スタンプ整列枠」があれば自動で拾って吸着させる
       else if (!selectedCanvasItem) {
         const grids = document.querySelectorAll('.appeal-grid-container');
         if (grids.length > 0) {
@@ -2157,7 +2044,6 @@
           ${deleteBtnHtml}
         `;
       } else {
-        // SVGを使ってテキストを完全にコンテナにフィットさせ、文字切れを防ぐ
         div.innerHTML = `
           <svg class="w-full h-full pointer-events-none" preserveAspectRatio="none" style="overflow:visible;">
             <text dominant-baseline="central" text-anchor="middle" font-weight="900" font-family="inherit" fill="currentColor">${text}</text>
@@ -2165,7 +2051,6 @@
         `;
       }
 
-      // 自由配置モードの時の自動リサイズ（SVGのviewBox動的設定）
       if (!isGridMode) {
         const tempSpan = document.createElement('span');
         tempSpan.style.position = 'absolute';
@@ -2184,7 +2069,6 @@
         const svg = div.querySelector('svg');
         const textEl = svg.querySelector('text');
         
-        // 少し余白(パディング)を持たせて文字切れを完全に防ぐ
         const padX = tw * 0.04;
         const padY = th * 0.08;
         const vbW = tw + padX * 2;
@@ -2193,7 +2077,6 @@
         svg.setAttribute('viewBox', `0 0 ${vbW} ${vbH}`);
         textEl.setAttribute('font-size', '100');
         textEl.setAttribute('x', vbW / 2);
-        // dominant-baseline の微調整のため少し上にオフセット
         textEl.setAttribute('y', vbH / 2 + (th * 0.02));
       }
 
@@ -2215,10 +2098,6 @@
       }
     }
 
-
-    // ==========================================
-    // 6. キャンバスアセットの移動・リサイズ
-    // ==========================================
     function setupCanvasItemInteractions(el) {
       const workArea = document.getElementById('canvas-work-area');
       
@@ -2241,7 +2120,6 @@
         e.stopPropagation();
       });
 
-      // 四隅のリサイズハンドル
       const handleConfigs = [
         { class: 'top-0 left-0 cursor-nwse-resize border-b border-r rounded-br', handle: 'top-left' },
         { class: 'top-0 right-0 cursor-nesw-resize border-b border-l rounded-bl', handle: 'top-right' },
@@ -2256,7 +2134,6 @@
         el.appendChild(h);
       });
 
-      // 操作ボタン類
       const btnUp = document.createElement('button');
       btnUp.className = "inline-menu-btn absolute top-[-10px] left-[-10px] w-6 h-6 bg-indigo-600 hover:bg-indigo-500 text-white rounded-full items-center justify-center shadow-lg border border-white z-30 transition-transform active:scale-90 font-bold text-[10px]";
       btnUp.title = "前面に移動";
@@ -2317,7 +2194,7 @@
         e.stopPropagation();
       });
 
-      // マウスホイールによる直感的な拡大縮小
+      // マウスホイールによる直感的な拡大縮小とはみ出し防止
       el.addEventListener('wheel', function(e) {
         if (!el.classList.contains('canvas-item-active')) return;
         e.preventDefault();
@@ -2334,11 +2211,29 @@
         const currentLeft = parseFloat(el.style.left) || 0;
         const currentTop = parseFloat(el.style.top) || 0;
         
-        const newLeft = currentLeft - (newW - currentW) / 2;
-        const newTop = currentTop - (newH - currentH) / 2;
+        let newLeft = currentLeft - (newW - currentW) / 2;
+        let newTop = currentTop - (newH - currentH) / 2;
         
+        const workAreaWidth = 1000;
+        const workAreaHeight = 442; // (707 - 170 - 95)
+
+        // 枠内からはみ出ないように補正
+        if (newW > workAreaWidth) newW = workAreaWidth;
+        if (newH > workAreaHeight) newH = workAreaHeight;
+        
+        if (newLeft < 0) {
+            newLeft = 0;
+        } else if (newLeft + newW > workAreaWidth) {
+            newLeft = workAreaWidth - newW;
+        }
+        
+        if (newTop < 0) {
+            newTop = 0;
+        } else if (newTop + newH > workAreaHeight) {
+            newTop = workAreaHeight - newH;
+        }
+
         el.style.width = `${newW}px`;
-        // 修正: アイコン整列枠やスタンプ整列枠の場合は高さを自動調整(auto)に保ち、中身のはみ出しを防ぐ
         if (el.dataset.itemType === 'icon-grid' || el.dataset.itemType === 'appeal-grid' || el.dataset.itemType === 'image-grid') {
           el.style.height = 'auto';
         } else {
@@ -2347,7 +2242,6 @@
         el.style.left = `${newLeft}px`;
         el.style.top = `${newTop}px`;
 
-        // ホイール操作時にサイズを記憶
         if (el.dataset.itemType === 'icon') {
           lastIconSize = { w: newW, h: newH };
         } else if (el.dataset.itemType === 'appeal') {
@@ -2361,23 +2255,29 @@
         document.addEventListener('mousemove', function(e) {
           if (!isMovingCanvasItem && !isResizingCanvasItem) return;
 
-          const deltaX = e.clientX - pointerStartPos.x;
-          const deltaY = e.clientY - pointerStartPos.y;
+          // スケールに応じたマウス移動量の補正
+          const scale = getCanvasScale();
+          const deltaX = (e.clientX - pointerStartPos.x) / scale;
+          const deltaY = (e.clientY - pointerStartPos.y) / scale;
 
           if (isMovingCanvasItem && selectedCanvasItem) {
+            const workAreaWidth = 1000;
+            const workAreaHeight = 442;
+            
             const newLeft = activeCanvasItemPos.x + deltaX;
             const newTop = activeCanvasItemPos.y + deltaY;
             
-            const testWorkArea = document.getElementById('canvas-work-area');
-            const minX = -selectedCanvasItem.offsetWidth + 40;
-            const maxX = testWorkArea ? testWorkArea.clientWidth - 40 : 960;
-            const minY = -selectedCanvasItem.offsetHeight + 40;
-            const maxY = testWorkArea ? testWorkArea.clientHeight - 40 : 400;
+            const minX = 0;
+            const maxX = Math.max(0, workAreaWidth - selectedCanvasItem.offsetWidth);
+            const minY = 0;
+            const maxY = Math.max(0, workAreaHeight - selectedCanvasItem.offsetHeight);
 
             selectedCanvasItem.style.left = `${Math.max(minX, Math.min(maxX, newLeft))}px`;
             selectedCanvasItem.style.top = `${Math.max(minY, Math.min(maxY, newTop))}px`;
           } else if (isResizingCanvasItem && selectedCanvasItem) {
-            // 画像・スタンプ含め縦横比を固定せず自由にリサイズ可能にする
+            const workAreaWidth = 1000;
+            const workAreaHeight = 442;
+            
             let newW = activeCanvasItemPos.w;
             let newH = activeCanvasItemPos.h;
             let newX = activeCanvasItemPos.x;
@@ -2405,8 +2305,26 @@
               newY = activeCanvasItemPos.y;
             }
 
+            // リサイズ時も枠からはみ出ないように補正
+            if (newX < 0) {
+              newW += newX;
+              newX = 0;
+            }
+            if (newY < 0) {
+              newH += newY;
+              newY = 0;
+            }
+            if (newX + newW > workAreaWidth) {
+              newW = workAreaWidth - newX;
+            }
+            if (newY + newH > workAreaHeight) {
+              newH = workAreaHeight - newY;
+            }
+
+            newW = Math.max(40, newW);
+            newH = Math.max(40, newH);
+
             selectedCanvasItem.style.width = `${newW}px`;
-            // 修正: アイコン整列枠の場合はリサイズ時も高さを自動調整(auto)に保つ
             if (selectedCanvasItem.dataset.itemType === 'icon-grid' || selectedCanvasItem.dataset.itemType === 'appeal-grid' || selectedCanvasItem.dataset.itemType === 'image-grid') {
               selectedCanvasItem.style.height = 'auto';
             } else {
@@ -2415,7 +2333,6 @@
             selectedCanvasItem.style.left = `${newX}px`;
             selectedCanvasItem.style.top = `${newY}px`;
 
-            // 追加: リサイズ中に計算されたサイズを即座に記憶する
             if (selectedCanvasItem.dataset.itemType === 'icon') {
               lastIconSize = { w: newW, h: newH };
             } else if (selectedCanvasItem.dataset.itemType === 'appeal') {
@@ -2424,7 +2341,6 @@
           }
         });
 
-        // フラグのリセット
         document.addEventListener('mouseup', function() {
           isMovingCanvasItem = false;
           isResizingCanvasItem = false;
@@ -2438,132 +2354,12 @@
       }
     }
 
-    function setSourceImage(src) {
-      const img = document.getElementById('source-image');
-      if (src.startsWith('data:')) {
-        img.removeAttribute('crossorigin');
-      } else {
-        img.setAttribute('crossorigin', 'anonymous');
-      }
-
-      img.onload = function() {
-        img.classList.remove('animate-pulse');
-        resetCropBox();
-      };
-      img.src = src;
-      document.getElementById('source-image-wrapper').classList.remove('hidden');
-      document.getElementById('crop-box').classList.remove('hidden');
-    }
-
     function handleMultipleFilesUpload(event) {
       if (event.target.files && event.target.files.length > 0) {
         processMultipleFiles(event.target.files);
       }
     }
 
-    function initCropBoxInteractions() {
-      const cropBox = document.getElementById('crop-box');
-      if (!cropBox) return;
-
-      cropBox.addEventListener('mousedown', function(e) {
-        if (e.target.classList.contains('crop-handle')) {
-          cropActiveHandle = e.target.dataset.handle;
-        } else {
-          isCroppingDrag = true;
-          cropActiveHandle = null;
-        }
-        cropStartPos = { x: e.clientX, y: e.clientY };
-        e.preventDefault();
-        e.stopPropagation();
-      });
-
-      document.addEventListener('mousemove', function(e) {
-        if (!isCroppingDrag && !cropActiveHandle) return;
-
-        const deltaX = e.clientX - cropStartPos.x;
-        const deltaY = e.clientY - cropStartPos.y;
-        cropStartPos = { x: e.clientX, y: e.clientY };
-
-        const bounds = getImageBounds();
-        const minSize = 30;
-
-        if (isCroppingDrag) {
-          cropBoxPos.x += deltaX;
-          cropBoxPos.y += deltaY;
-          cropBoxPos.x = Math.max(bounds.left, Math.min(bounds.right - cropBoxPos.w, cropBoxPos.x));
-          cropBoxPos.y = Math.max(bounds.top, Math.min(bounds.bottom - cropBoxPos.h, cropBoxPos.y));
-        } else if (cropActiveHandle) {
-          let newX = cropBoxPos.x;
-          let newY = cropBoxPos.y;
-          let newW = cropBoxPos.w;
-          let newH = cropBoxPos.h;
-
-          if (cropActiveHandle === 'top-left') {
-            const potentialX = cropBoxPos.x + deltaX;
-            if (potentialX >= bounds.left && potentialX <= cropBoxPos.x + cropBoxPos.w - minSize) {
-              newX = potentialX;
-              newW = cropBoxPos.w - deltaX;
-            }
-            const potentialY = cropBoxPos.y + deltaY;
-            if (potentialY >= bounds.top && potentialY <= cropBoxPos.y + cropBoxPos.h - minSize) {
-              newY = potentialY;
-              newH = cropBoxPos.h - deltaY;
-            }
-          } else if (cropActiveHandle === 'top-right') {
-            const potentialY = cropBoxPos.y + deltaY;
-            if (potentialY >= bounds.top && potentialY <= cropBoxPos.y + cropBoxPos.h - minSize) {
-              newY = potentialY;
-              newH = cropBoxPos.h - deltaY;
-            }
-            const potentialW = cropBoxPos.w + deltaX;
-            if (cropBoxPos.x + potentialW <= bounds.right && potentialW >= minSize) {
-              newW = potentialW;
-            }
-          } else if (cropActiveHandle === 'bottom-left') {
-            const potentialX = cropBoxPos.x + deltaX;
-            if (potentialX >= bounds.left && potentialX <= cropBoxPos.x + cropBoxPos.w - minSize) {
-              newX = potentialX;
-              newW = cropBoxPos.w - deltaX;
-            }
-            const potentialH = cropBoxPos.h + deltaY;
-            if (cropBoxPos.y + potentialH <= bounds.bottom && potentialH >= minSize) {
-              newH = potentialH;
-            }
-          } else if (cropActiveHandle === 'bottom-right') {
-            const potentialW = cropBoxPos.w + deltaX;
-            if (cropBoxPos.x + potentialW <= bounds.right && potentialW >= minSize) {
-              newW = potentialW;
-            }
-            const potentialH = cropBoxPos.h + deltaY;
-            if (cropBoxPos.y + potentialH <= bounds.bottom && potentialH >= minSize) {
-              newH = potentialH;
-            }
-          }
-
-          cropBoxPos.x = newX;
-          cropBoxPos.y = newY;
-          cropBoxPos.w = newW;
-          cropBoxPos.h = newH;
-        }
-
-        updateCropBoxUI();
-      });
-
-      document.addEventListener('mouseup', function() {
-        isCroppingDrag = false;
-        cropActiveHandle = null;
-      });
-    }
-
-    // PDFドロップやファイル選択経由での複数ファイル処理へルーティング
-    function handleImageUpload(event) {
-      const files = event.target.files;
-      if (files && files.length > 0) {
-        processMultipleFiles(files);
-      }
-    }
-
-    // ギャラリーへの複数ファイル読み込み処理
     function processMultipleFiles(files) {
       const galleryWrapper = document.getElementById('gallery-wrapper');
       if (galleryWrapper) galleryWrapper.classList.remove('hidden');
@@ -2586,7 +2382,6 @@
       lucide.createIcons();
     }
 
-    // ギャラリー内にサムネイルを生成
     function createGalleryThumbnail(src) {
       const gallery = document.getElementById('image-gallery');
       if (!gallery) return;
@@ -2600,22 +2395,29 @@
       `;
       
       container.addEventListener('click', function() {
-        document.querySelectorAll('.thumbnail-item').forEach(item => item.classList.remove('border-indigo-500', 'ring-2', 'ring-indigo-500/40'));
-        container.classList.add('border-indigo-500', 'ring-2', 'ring-indigo-500/40');
+        const index = selectedGalleryImages.indexOf(src);
+        if (index > -1) {
+          selectedGalleryImages.splice(index, 1);
+          container.classList.remove('border-indigo-500', 'ring-2', 'ring-indigo-500/40');
+        } else {
+          selectedGalleryImages.push(src);
+          container.classList.add('border-indigo-500', 'ring-2', 'ring-indigo-500/40');
+        }
         
-        selectedGalleryImage = src;
-        setSourceImage(src);
+        const wrapper = document.getElementById('source-image-wrapper');
+        if (wrapper) {
+          if (selectedGalleryImages.length > 0) {
+            wrapper.classList.remove('hidden');
+          } else {
+            wrapper.classList.add('hidden');
+          }
+        }
       });
 
       gallery.appendChild(container);
-      
-      // 最初に追加された画像、または現在選択がない場合は自動的に選択状態にする
-      if (!selectedGalleryImage) {
-        container.click();
-      }
+      container.click(); 
     }
 
-    // PDFをパースしてギャラリーに投げる
     function renderPdfToGallery(arrayBuffer) {
       if (typeof pdfjsLib === 'undefined') {
         showToast("PDFエンジンロード中。再試行してください。");
@@ -2638,89 +2440,8 @@
       });
     }
 
-    // キャンバスから切り出し画像を抽出して配置（整列枠対応）
-    function addCroppedToCanvas() {
-      const img = document.getElementById('source-image');
-      if (!img || !img.src || img.naturalWidth === 0) {
-        showToast("画像がまだロードされていません。");
-        return;
-      }
-
-      const bounds = getImageBounds();
-      const naturalWidth = img.naturalWidth;
-      const naturalHeight = img.naturalHeight;
-
-      const scaleX = naturalWidth / bounds.width;
-      const scaleY = naturalHeight / bounds.height;
-
-      let cropX = Math.round((cropBoxPos.x - bounds.left) * scaleX);
-      let cropY = Math.round((cropBoxPos.y - bounds.top) * scaleY);
-      let cropW = Math.round(cropBoxPos.w * scaleX);
-      let cropH = Math.round(cropBoxPos.h * scaleY);
-
-      if (cropX < 0) cropX = 0;
-      if (cropY < 0) cropY = 0;
-      if (cropX + cropW > naturalWidth) cropW = naturalWidth - cropX;
-      if (cropY + cropH > naturalHeight) cropH = naturalHeight - cropY;
-
-      cropW = Math.max(1, cropW);
-      cropH = Math.max(1, cropH);
-
-      try {
-        const canvas = document.createElement('canvas');
-        canvas.width = cropW;
-        canvas.height = cropH;
-        const ctx = canvas.getContext('2d');
-        
-        ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
-        const croppedBase64 = canvas.toDataURL('image/png');
-        
-        // --- 修正: 切り出した画像も、整列枠があればそこへ吸着させる ---
-        let targetGrid = null;
-        if (selectedCanvasItem && selectedCanvasItem.dataset.itemType === 'image-grid') {
-          targetGrid = selectedCanvasItem;
-        } else {
-          const grids = document.querySelectorAll('.image-grid-container');
-          if (grids.length > 0) {
-            targetGrid = grids[grids.length - 1];
-          }
-        }
-
-        if (targetGrid) {
-          const innerContainer = targetGrid.querySelector('.grid-inner');
-          const div = document.createElement('div');
-          div.className = "relative w-full aspect-[4/3] bg-white overflow-hidden group border border-slate-300 shadow-sm";
-          div.innerHTML = `
-            <img src="${croppedBase64}" class="w-full h-full object-cover pointer-events-none">
-            <button onclick="const p = this.parentElement; const g = p.closest('.image-grid-container'); p.remove(); if(g && g.querySelector('.grid-inner').children.length === 0){ g.querySelector('.empty-grid-msg').style.display = 'flex'; } event.stopPropagation();" class="absolute top-1 right-1 w-4 h-4 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-[9px] opacity-0 group-hover:opacity-100 transition z-10 pointer-events-auto">×</button>
-          `;
-          innerContainer.appendChild(div);
-          targetGrid.style.height = 'auto';
-          
-          const msg = targetGrid.querySelector('.empty-grid-msg');
-          if (msg) msg.style.display = 'none';
-
-          if (selectedCanvasItem !== targetGrid) selectCanvasItem(targetGrid);
-          showToast("切り出し画像を整列枠内に配置しました。");
-        } else {
-          let spawnW = 400;
-          let spawnH = 400 * (cropH / cropW);
-          if (spawnH > 400) {
-              spawnH = 400;
-              spawnW = 400 * (cropW / cropH);
-          }
-          addPresetAssetToCanvas(croppedBase64, 150, 150, spawnW, spawnH);
-          showToast("選択範囲を切りぬいて配置しました。");
-        }
-      } catch (err) {
-        console.error("Cropping Error: ", err);
-        showToast("切り取りエラーが発生しました。");
-      }
-    }
-
-    // そのまま配置ボタン（ギャラリー選択中の画像を配置）
     function addFullSelectedImageToCanvas() {
-      if (!selectedGalleryImage) {
+      if (selectedGalleryImages.length === 0) {
         showToast("ギャラリーから画像を選択してください。");
         return;
       }
@@ -2735,31 +2456,84 @@
         }
       }
 
-      if (targetGrid) {
-        const innerContainer = targetGrid.querySelector('.grid-inner');
-        const div = document.createElement('div');
-        div.className = "relative w-full aspect-[4/3] bg-white overflow-hidden group border border-slate-300 shadow-sm";
-        div.innerHTML = `
-          <img src="${selectedGalleryImage}" class="w-full h-full object-cover pointer-events-none">
-          <button onclick="const p = this.parentElement; const g = p.closest('.image-grid-container'); p.remove(); if(g && g.querySelector('.grid-inner').children.length === 0){ g.querySelector('.empty-grid-msg').style.display = 'flex'; } event.stopPropagation();" class="absolute top-1 right-1 w-4 h-4 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-[9px] opacity-0 group-hover:opacity-100 transition z-10 pointer-events-auto">×</button>
-        `;
-        innerContainer.appendChild(div);
-        targetGrid.style.height = 'auto';
-        
-        const msg = targetGrid.querySelector('.empty-grid-msg');
-        if (msg) msg.style.display = 'none';
+      selectedGalleryImages.forEach(src => {
+        if (targetGrid) {
+          const innerContainer = targetGrid.querySelector('.grid-inner');
+          const div = document.createElement('div');
+          div.className = "relative w-full aspect-[4/3] bg-transparent overflow-hidden group border border-slate-300 shadow-sm flex items-center justify-center";
+          div.innerHTML = `
+            <img src="${src}" class="w-full h-full object-contain pointer-events-none">
+            <button onclick="const p = this.parentElement; const g = p.closest('.image-grid-container'); p.remove(); if(g && g.querySelector('.grid-inner').children.length === 0){ g.querySelector('.empty-grid-msg').style.display = 'flex'; } event.stopPropagation();" class="absolute top-1 right-1 w-4 h-4 bg-red-600 hover:bg-red-500 text-white rounded-full flex items-center justify-center font-bold text-[9px] opacity-0 group-hover:opacity-100 transition z-10 pointer-events-auto">×</button>
+          `;
+          innerContainer.appendChild(div);
+          targetGrid.style.height = 'auto';
+          
+          const msg = targetGrid.querySelector('.empty-grid-msg');
+          if (msg) msg.style.display = 'none';
+        } else {
+          const tempImg = new Image();
+          tempImg.onload = function() {
+            let natW = tempImg.naturalWidth || 300;
+            let natH = tempImg.naturalHeight || 225;
+            let spawnW = natW;
+            let spawnH = natH;
+            
+            if (spawnW > 400) {
+              spawnH = (spawnH * 400) / spawnW;
+              spawnW = 400;
+            }
+            if (spawnH > 400) {
+              spawnW = (spawnW * 400) / spawnH;
+              spawnH = 400;
+            }
+            addPresetAssetToCanvas(src, 100, 180, spawnW, spawnH);
+          };
+          tempImg.src = src;
+        }
+      });
 
+      if (targetGrid) {
         if (selectedCanvasItem !== targetGrid) selectCanvasItem(targetGrid);
-        showToast("整列枠内に画像を配置しました。");
+        showToast(`整列枠内に${selectedGalleryImages.length}枚の画像を配置しました。`);
       } else {
-        addPresetAssetToCanvas(selectedGalleryImage, 100, 180, 300, 225);
-        showToast("画像をそのまま配置しました。");
+        showToast(`${selectedGalleryImages.length}枚の画像をキャンバスに配置しました。`);
       }
+
+      selectedGalleryImages = [];
+      document.querySelectorAll('.thumbnail-item').forEach(item => item.classList.remove('border-indigo-500', 'ring-2', 'ring-indigo-500/40'));
+      const wrapper = document.getElementById('source-image-wrapper');
+      if(wrapper) wrapper.classList.add('hidden');
     }
 
-    // ==========================================
-    // 7. 出力・エクスポート
-    // ==========================================
+    function initDropZone() {
+      const dropZone = document.getElementById('drop-zone');
+      if (!dropZone) return;
+
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }, false);
+      });
+
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+          dropZone.classList.add('border-indigo-500', 'bg-slate-800/80');
+        }, false);
+      });
+
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+          dropZone.classList.remove('border-indigo-500', 'bg-slate-800/80');
+        }, false);
+      });
+
+      dropZone.addEventListener('drop', (e) => {
+        if (e.dataTransfer.files.length) {
+          processMultipleFiles(e.dataTransfer.files);
+        }
+      }, false);
+    }
 
     function exportToPDF() {
       deselectAllItems();
@@ -2768,28 +2542,24 @@
       
       showToast("極高画質PDFをレンダリング中...");
 
-      // 一時的にスケールを解除して実寸でレンダリング
       const origT = cEl.style.transform;
       const origH = wrapper.style.height;
       cEl.style.transform = 'none';
       wrapper.style.height = 'auto';
 
-      // 整列枠の破線と背景を一時的に透明化する
       const grids = document.querySelectorAll('.icon-grid-container, .appeal-grid-container, .image-grid-container');
       grids.forEach(g => {
         g.classList.add('!border-transparent', '!bg-transparent');
       });
 
-      // レンダリングが確実に完了するよう少し待つ
       setTimeout(() => {
         html2canvas(cEl, { 
-          scale: 3.5, // 超高解像度
+          scale: 3.5,
           useCORS: true, 
           allowTaint: true, 
           backgroundColor: '#ffffff',
           logging: false 
         }).then(canvas => {
-          // 元に戻す
           cEl.style.transform = origT;
           wrapper.style.height = origH;
           grids.forEach(g => g.classList.remove('!border-transparent', '!bg-transparent'));
@@ -2801,7 +2571,6 @@
               unit: 'mm',
               format: 'a4'
             });
-            // A4横サイズにピッタリ合わせる (297x210)
             pdf.addImage(imgData, 'JPEG', 0, 0, 297, 210, undefined, 'FAST');
             pdf.save(`販売図面_${document.getElementById('input-title').value.replace(/\s+/g, '_')}.pdf`);
             showToast("A4横向きの極高画質PDFファイルを出力しました！");
@@ -2817,7 +2586,6 @@
       }, 100);
     }
 
-    // 初期化
     window.onload = function() {
       lucide.createIcons();
       resizeCanvas();
@@ -2829,7 +2597,6 @@
 
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Delete' || e.key === 'Backspace') {
-          // 入力フォーム操作中は無効化
           const activeEl = document.activeElement;
           if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.isContentEditable)) {
             return;
@@ -2844,7 +2611,6 @@
       });
 
       initDropZone();
-      initCropBoxInteractions();
 
       setTimeout(() => {
         spawnSummaryCardDirect();
